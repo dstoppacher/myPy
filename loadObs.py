@@ -245,13 +245,14 @@ def Bernadi16_LF_CMASS(load_from_file=False):
 
 def Boselli14_Mcold2Mstar(load_from_file=False):
     
-    data = myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/OBS/Boselli+14_Mgas2Mstar.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float, skiprow=6)
+    #data = myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/OBS/Boselli+14_Mgas2Mstar.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float, skiprow=6)
+    data = myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/OBS/Boselli+14_Mgas2Mstar_Fig5a_new.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float, skiprow=2)
     obs_data_array = np.zeros((data[:,0].size,7), dtype=np.float)     
     
-    obs_data_array[:,0] = np.log10(data[:,0])
-    obs_data_array[:,1] = np.log10(data[:,1])
-    obs_data_array[:,4] = (data[:,4]/data[:,1])*0.434
-    obs_data_array[:,5] = (data[:,5]/data[:,1])*0.434
+    obs_data_array[:,0] = data[:,0]
+    obs_data_array[:,1] = data[:,1] 
+    obs_data_array[:,4] = data[:,4]
+    obs_data_array[:,5] = data[:,5]
 
     return obs_data_array, 'Boselli+14', False
 
@@ -259,16 +260,16 @@ def CARNage_cold_gas_fraction_Peeples11(load_from_file=True):
         
     data_array = myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/OBS/Peeples11_mcold2mstar_Fig2.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float32, skiprow=6)
 
-    obs_data_array = np.zeros((data_array[:,0].size,5), dtype=np.float32)
+    obs_data_array = np.zeros((data_array[:,0].size,7), dtype=np.float32)
 
     obs_data_array[:,0] = data_array[:,0]
     obs_data_array[:,1] = data_array[:,1] 
-    obs_data_array[:,3] = data_array[:,4]
-    obs_data_array[:,4] = data_array[:,5]
+    obs_data_array[:,4] = data_array[:,4]
+    obs_data_array[:,5] = data_array[:,5]
           
     #print obs_data_array        
          
-    return obs_data_array, 'Peeples&Shankar 11', False
+    return obs_data_array, 'Peeples & Shankar 11', False
 
 def CARNage_sfr_Gruppioni15(load_from_file=False):
                 
@@ -510,6 +511,23 @@ def Gruppioni15_z_200(load_from_file=False):
     
     return obs_data_array, 'Gruppioni+15', False
 
+def Gruppioni15_cSFRD(load_from_file=False):
+                
+    data = myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/OBS/Grupponi+15_Table1_cSFRD_UV+IR.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float32, skiprow=2)
+    print data
+    obs_data_array = np.zeros((data[:,0].size, 7), dtype=np.float)
+
+    obs_data_array[:,0] = (data[:,0]+data[:,1])/2.0 +1     
+    obs_data_array[:,1] = np.log10(data[:,2])
+
+    #shaded region corresponding to error bars
+    obs_data_array[:,4] = data[:,3]/data[:,2]*0.434
+    obs_data_array[:,5] = data[:,3]/data[:,2]*0.434
+    
+    print obs_data_array
+    
+    return obs_data_array, 'Gruppioni et al. (2015)', False
+
 def load_catalog(path,
                  name_x,
                  name_y,
@@ -683,9 +701,14 @@ def adjust_data_for_plot(data,
 
     def ssfr_mstar(data):
 
-        data['ssfr']=np.log10(data['ssfr'])        
+        try:
+            data['ssfr']=np.log10(data['ssfr'])
+            mask=np.where(np.isfinite(data['ssfr']))            
+        except:
+            data['sfr']=np.log10(data['sfr']/data['mstar'])
+            mask=np.where(np.isfinite(data['sfr']))
+            
         data['mstar']=np.log10(data['mstar'])
-        mask=np.where(np.isfinite(data['ssfr']))
             
         return data[mask[:][0]]
 
@@ -954,7 +977,7 @@ def adjust_data_for_plot(data,
             
         func = choose.get(plot_type)
         
-        if np.all(data['weight_tot']==-99.0):
+        if np.all(data['weight_tot']==-99.0) or np.all(data['weight_tot']==0.0):
             print 'set weights to 1!'
             data['weight_tot']=np.ones((data.size,), dtype=np.int8)
    
@@ -979,14 +1002,13 @@ def adjust_data_for_plot(data,
     return data 
     
 
-plot_type = 'jbarcomp_mbar'
+plot_type = 'ssfr_mstar'
 
 #mycomp='/home/doris/anaconda/pro/data/'
 
 
 def myCatalog(load_from_file=False): 
-    return load_SAM_catalog(mycomp+'anaconda/pro/data/Galacticus_1Gpc_run2/Galacticus_1Gpc_run2_z_0.0_tarsel_angularM.hdf5', 'Gal')
-
+    return load_SAM_catalog(mycomp+'anaconda/pro/data/Galacticus_1Gpc_run2/Galacticus_1Gpc_run2_z_0.0_tarsel.hdf5', 'Gal2')
 
 def CMASS_Galacticus_color_catalog(load_from_file=False): 
     try:
@@ -1080,8 +1102,8 @@ def load_SAM_catalog(filename,
                      legend):
     
     data=load_catalog(filename,
-                     'angM_disk',
-                     'angM_spheroid',
+                     'mstar',
+                     'sfr',
                      name_add2='mstar_spheroid',
                      name_add3='mcold_spheroid',
                      name_add4='mstar')
@@ -1140,7 +1162,7 @@ def CMASS_spall_por_PS_055_DR12v4(load_from_file=False): return CMASS_DR12_catal
 def CMASS_spall_por_PS_0554_DR12v4(load_from_file=False): return CMASS_DR12_catalog('0.56_spall_por_PS', '0.55', info='DR12v4_compl_sample', legend='0.554<z<0.56')       
 
 def SMF_CMASS_spall_wis_056_DR12v4(load_from_file=False): return CMASS_DR12('0.61_spall_wis', '0.51', info='DR12v4_compl_sample', legend='WIS CMASS DR12')
-def SMF_CMASS_spall_gra_056_DR12v4(load_from_file=False): return CMASS_DR12('0.61_spall_gra_nodust', '0.51', info='DR12v4_compl_sample', legend='GRA CMASS DR12')
+def SMF_CMASS_spall_gra_056_DR12v4(load_from_file=False): return CMASS_DR12('0.61_spall_gra', '0.51', info='DR12v4_compl_sample', legend='GRA CMASS DR12')
 def SMF_CMASS_spall_por_mer_all_DR12v4(load_from_file=False): return CMASS_DR12('0.7_spall_por_merged', '0.43', info='DR12v4_compl_sample_wg', legend='0.43<z<0.70')
 def SMF_CMASS_spall_por_mer_056_DR12v4(load_from_file=False): return CMASS_DR12('0.61_spall_por_merged', '0.51', info='DR12v4_compl_sample', legend='CMASS DR12')
 def SMF_CMASS_spall_por_mer_050_DR12v4(load_from_file=False): return CMASS_DR12('0.6_spall_por_merged', '0.5', info='DR12v4_compl_sample_wg_25bins_1e10', legend='CMASS DR12')
@@ -1162,8 +1184,8 @@ def SMF_CMASS_spall_por_PS_055_DR12v4(load_from_file=False): return CMASS_DR12('
 def SMF_CMASS_spall_por_PS_0554_DR12v4(load_from_file=False): return CMASS_DR12('0.56_spall_por_PS', '0.554', info='DR12v4_compl_sample', legend='CMASS DR12 0.554<z<0.56')
 
 def SMF_CMASS_spall_por_SF_050_DR12v4(load_from_file=False): return CMASS_DR12('0.6_spall_por_PS', '0.5', info='DR12v4_compl_sample_wg', legend='Portsmouth SF')
-def SMF_CMASS_spall_gra_050_DR12v4(load_from_file=False): return CMASS_DR12('0.6_spall_por_PS', '0.5', info='DR12v4_compl_sample_wg', legend='Granada')
-def SMF_CMASS_spall_wis_050_DR12v4(load_from_file=False): return CMASS_DR12('0.6_spall_por_PS', '0.5', info='DR12v4_compl_sample_wg', legend='Wisconsin')
+def SMF_CMASS_spall_gra_050_DR12v4(load_from_file=False): return CMASS_DR12('0.6_spall_gra', '0.5', info='DR12v4_compl_sample_wg', legend='Granada')
+def SMF_CMASS_spall_wis_050_DR12v4(load_from_file=False): return CMASS_DR12('0.6_spall_wis', '0.5', info='DR12v4_compl_sample_wg', legend='Wisconsin')
 
 
 
@@ -1765,7 +1787,7 @@ def Elbaz11_function(load_from_file=False):
     reference={}
     reference  = {'name': 'Elbaz+11', 
                   'filename': 'elbaz_11_masssfr.dat', 
-                  'legend': 'Elbaz+11 compilation', 
+                  'legend': 'Elbaz+11', 
                   'paper': 'Elbaz et al. A&A 533, A119 (2011)', 
                   'little_h': 0.6777,
                   'IMF_corr': -0.24}
@@ -1791,6 +1813,8 @@ def Elbaz11_dots(load_from_file=False):
 
     data[:,0]=10**(np.log10(data[:,0]/reference['little_h'])+reference['IMF_corr'])   
     data[:,1]=data[:,1]/data[:,0]
+    print data
+    
     return data, reference['legend'], True
 
 def Elbaz112(load_from_file=False):
@@ -1802,8 +1826,8 @@ def Elbaz112(load_from_file=False):
 
     else:
     
-        #obs_data_array = myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/OBS/CalibrationData/PROPER_DATA/SpecificStarFormationRatevsStellarMassBlue/Elbaz+11/elbaz_11_masssfr.dat', data_format='ASCII', nr_col=2, nr_rows=28610, data_shape='shaped', delim=' ', mydtype=np.float, skiprow=1)
-        obs_data_array = myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/OBS/elbaz+11_ex1.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float, skiprow=6)
+        obs_data_array = myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/OBS/CalibrationData/PROPER_DATA/SpecificStarFormationRatevsStellarMassBlue/Elbaz+11/elbaz_11_masssfr.dat', data_format='ASCII', nr_col=2, nr_rows=28610, data_shape='shaped', delim=' ', mydtype=np.float, skiprow=1)
+        #obs_data_array = myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/OBS/elbaz+11_ex1.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float, skiprow=6)
     
         myFuncs = mF.MyFunctions()
     
@@ -2532,16 +2556,23 @@ def ssfr2mstar_ref(reference,
     myFuncs = mF.MyFunctions()
     
     data=data[np.where(data[:,1] > 1.0e-11)[:][0]]
-                           
+ 
+    data = data[np.where(data[:,0]>=np.percentile(data[:,0],0.01))[:][0]]
+    data = data[np.where(data[:,0]<np.percentile(data[:,0],99.9))[:][0]]                          
+
+    print data
                                         
     mybinned_array, binsize = myFuncs.binUp(data,
                                             20,
-                                            histo_min=min(data[:,0]),
-                                            histo_max=max(data[:,0]),
+                                            histo_min='min',
+                                            histo_max='max',
                                             log10bin=True,
                                             binup_2D=True,
                                             use_MAD=True,
-                                            norm_by_binsize=False)
+                                            norm_by_binsize=False,
+                                            equal_bins=False)
+    
+    #print mybinned_array
 
     obs_data_array = np.zeros((mybinned_array[:,0].size,7), dtype=np.float32)  
     #Errorbars in log(y) vs log(x) plot
@@ -2568,6 +2599,7 @@ def ssfr2mstar_ref(reference,
 #                           data_format="%0.8e",
 #                           mydelimiter='\t')
 
+    #print obs_data_array[:, [0,1]]
 
     return obs_data_array, reference['legend'], False
 
@@ -2654,7 +2686,9 @@ def SAGE_load_add(load_from_file=False): return load_the_shit2('SAGE_1Gpc', 'SMF
 
 def SAGE_load_add2(load_from_file=False): return load_the_shit2('SAGE_1Gpc', 'SMF', '0.09', info='_v3_IC', legend='SAGE IC')
 
-def Gal_ssfr2mstar(load_from_file=False): return load_the_shit2('Galacticus_1Gpc', 'ssfr2mstar', '0.0', info='_stf_cut_1e-11')
+def Gal_ssfr2mstar(load_from_file=False): return load_the_shit2('Galacticus_1Gpc', 'ssfr2mstar', '0.0', info='_stf_cut_1e-11', legend='Gal')
+
+def Gal2_ssfr2mstar(load_from_file=False): return load_the_shit2('Galacticus_1Gpc_run2', 'ssfr2mstar', '0.0', info='_tarsel', legend='Gal2')
     
 def SAG_ssfr2mstar(load_from_file=False): return load_the_shit2('SAG_1Gpc',  'ssfr2mstar', '0.0', info='_stf_cut_1e-11_v3')
 
@@ -2695,20 +2729,33 @@ def oh2mstar(load_from_file=False): return load_the_shit2(catname, 'oh2mstar', '
 
 def load_the_shit(load_from_file=False):
 
-    filename=mycomp+'/anaconda/pro/myRun/histos/HOD/HOD_Galacticus_1Gpc_z_0.56_tarsel_new_mags_CMASS_mhalo_200c'
+    #filename=mycomp+'/anaconda/pro/myRun/histos/HOD/HOD_Galacticus_1Gpc_z_0.56_tarsel_new_mags_CMASS_down_sample3_HOD_test_HOD_mhalo_cents_200c'
+    #filename=mycomp+'/anaconda/pro/myRun/histos/HOD/HOD_Galacticus_1Gpc_run2_z_0.56_tarsel_CMASS_down_sample3_mhalo_cents_200c'
+    redshift='3.04'
+    
+    for item in ['CUT1_mstar', 'CUT2_mstar', 'CUT3_mstar', 'CUT1_sfr', 'CUT2_sfr', 'CUT3_sfr', 'CUT1_ssfr', 'CUT2_ssfr', 'CUT3_ssfr']:
+        #filename=mycomp+'/anaconda/pro/myRun/histos/HOD/HOD_Galacticus_400Mpc_z_'+redshift+'_tarsel_rand-sample_n_0.008_mhalo_cents_200c'
+        #filename=mycomp+'/anaconda/pro/myRun/histos/HOD/HOD_Galacticus_1Gpc_z_'+redshift+'_tarsel_rand-sample_n_0.016_mhalo_cents_200c'
+        filename=mycomp+'/anaconda/pro/myRun/histos/HOD/HOD-SF/HOD_Galacticus_1Gpc_z_'+redshift+'_tarsel_HOD-SF_'+item+'_mhalo_cents_200c'    
+        #filename=mycomp+'/anaconda/pro/myRun/histos/HOD/HOD-SF/HOD_Galacticus_400Mpc_z_'+redshift+'_tarsel_HOD-SF_'+item+'_mhalo_cents_200c'
+        #filename=mycomp+'/anaconda/pro/myRun/histos/HOD/HOD-SF/HOD_IllustrisTNG300_z_'+redshift+'_tarsel_HOD-SF_'+item+'_mhalo_200c'
         
-    data_all = myData.readAnyFormat(config=False, mypath=filename+'_all.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float32, skiprow=2)
+        data_all = myData.readAnyFormat(config=False, mypath=filename+'_all.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float32, skiprow=2)
+        
+        data_centrals = myData.readAnyFormat(config=False, mypath=filename+'_centrals.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float32, skiprow=2)    
+        
+        data_all[:,1]=data_all[:,1]-data_centrals[:,1]
+        
+        header='\n(1) mhalo_200c [Msun] (2) <ngal> [-] (3) -dx \t(4) dx\t(5) N unique\t(6) N sats (7) Nhalos M200c from cosmosim.org' # from IllustrisTNG300 FULLHalos cats (Celeste)'
+        #header='\n(1) mhalo_200c [Msun] (2) <ngal> [-] (3) -dx \t(4) dx\t(5) N unique\t(6) N sats (7) from IllustrisTNG300 FULLHalos cats (Celeste)'
     
-    data_centrals = myData.readAnyFormat(config=False, mypath=filename+'_centrals.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float32, skiprow=2)    
-    
-    data_all[:,1]=data_all[:,1]-data_centrals[:,1]
-    
-    header='\n(1) mhalo [Msun] (2) <ngal> [-] (3) N MD halos (from Sergio)\t(4) dx\t(5) N centrals\t(6) N hosthalos\t(7) N halo/bin'
-    myOutput.writeIntoFile(filename+'_sats.txt',
-                           data_all,
-                           myheader='HODFunction Galacticus_1Gpc z=0.56 cumulative: no'+header,
-                           data_format="%0.8e",
-                           mydelimiter='\t')
+        myOutput.writeIntoFile(filename+'_sats.txt',
+                               data_all,
+                               myheader='HODFunction MDPL2 Galacticus 1h-1Gpc z='+redshift+' cumulative: no'+header,
+                               #myheader='HODFunction SMDPL Galacticus 400h-1Gpc z='+redshift+' cumulative: no'+header,
+                               #myheader='HODFunction Illustris TNG300-1 205h-1Gpc z='+redshift+' cumulative: no'+header,
+                               data_format="%0.8e",
+                               mydelimiter='\t')
     exit()    
 
 def load_the_shit2(catname,
@@ -2721,18 +2768,13 @@ def load_the_shit2(catname,
     filename=mycomp+'/anaconda/pro/myRun/histos/'+plot_key+'/'+key+plot_key+'_'+catname+'_z_'+redshift+info+'.txt'        
     print 'load binned-function:', filename
     data_array = myData.readAnyFormat(config=False, mypath=filename, data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float32, skiprow=2)
-
-#    if plot_key.find('zgas')!=-1:
-#        #only take every second datopoint
-#        i=0
-#        while i<data_array[:,0].size:
-#            data_array[i,0]=0.0       
-#            i+=2
-#        
-#        data_array = myData.selectData2Compute(data_array, 
-#                                                  selected_col=0, 
-#                                                  operator='>', 
-#                                                  condition=0.0) 
+    #print data_array
+    #if plot_key.find('zgas')!=-1:
+    #only take every second datopoint
+    i=0
+    while i<data_array[:,0].size:
+        data_array[i,0]=-1      
+        i+=2
 
     if plot_key.find('zgas')==-1: 
         obs_data_array = np.zeros((data_array[:,0].size,7), dtype=np.float)
@@ -2749,7 +2791,7 @@ def load_the_shit2(catname,
         if plot_key.find('zgas')==-1 and plot_key.find('oh')==-1:
             obs_data_array[:,1] = np.log10(data_array[:,1])
             obs_data_array[:,4] = (data_array[:,4]/data_array[:,1])*0.43    
-            obs_data_array[:,5] = (data_array[:,5]/data_array[:,1])*0.43
+            obs_data_array[:,5] = obs_data_array[:,4]#(data_array[:,5]/data_array[:,1])*0.43
         else:
             obs_data_array[:,1] = data_array[:,1] #+0.25     
             obs_data_array[:,4] = data_array[:,4]   
@@ -2786,7 +2828,27 @@ def load_the_shit3(load_from_file=False):
     data=data_mass[np.where(test==False)[:][0]]
     print data
     exit()
-    
+
+def format_MTs_Rockstar(load_from_file=False):
+
+    path=mycomp+'/anaconda/pro/data/ROCKSTAR/MDPL2_merger_tree_info_300-r0002.csv'
+    path=mycomp+'/anaconda/pro/data/ROCKSTAR/rtest2.csv'
+    IDs = myData.readAnyFormat(config=False, mypath=path, data_format='ASCII', data_shape='shaped', delim=',', mydtype=np.str_, skiprow=1)
+    cluster_name='rtest2'#path[path.find('-r')+2: -4]
+
+    for i, item in enumerate(IDs[:,2]):
+        #print item, i
+        IDs[i,2]=format(mL.expfactor_to_redshift(float(IDs[i,2])), '0.2f')
+
+    myOutput.writeIntoFile(mycomp+'/anaconda/pro/data/ROCKSTAR/MDPL2_merger_tree_info_300-r'+cluster_name+'.txt',
+                           IDs[:,[1,2,3]],
+                           myheader='MDPL2.Rockstar main progenitor of central halo from 300-cluster region: '+cluster_name+' from cosmosim.org\n(1) snapnum (2) z (3) haloid/rockstarId',
+                           data_format="%s",
+                           mydelimiter='\t')
+
+
+
+    exit()        
 
 ##############################################################################################################################################################  
 
@@ -3013,6 +3075,17 @@ def HOD_sats_dummy(load_from_file=False):
     obs_data_array = np.zeros((data_array[:,0].size,7), dtype=np.float32)
     return obs_data_array, 'sats', False   
 
+def CUT1_dummy(load_from_file=False):
+  
+    return np.zeros((2,7), dtype=np.float32), 'CUT1', False   
+
+def CUT2_dummy(load_from_file=False):
+
+    return np.zeros((2,7), dtype=np.float32), 'CUT2', False
+
+def CUT3_dummy(load_from_file=False):
+
+    return np.zeros((2,7), dtype=np.float32), 'CUT3', False   
 
 def White11_HOD_fit(load_from_file=False):
 
@@ -3044,27 +3117,60 @@ def White11_wp(load_from_file=False):
     return obs_data_array, 'White+11', False
 
 
-def Zehavi11_wp(load_from_file=False):
+def Zehavi11_18_17_wp(load_from_file=False):
+    
+    data_array = myData.readAnyFormat(config=False, mypath=mycomp+'/anaconda/pro/OBS/Zehavi+11_Table7_18_M_r_17.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float32, skiprow=2)
+    
+    return load_Zehavi11_wp(data_array, '$-18<M_r<-17$')
 
-    #data_array = myData.readAnyFormat(config=False, mypath=mycomp+'/anaconda/pro/OBS/Zehavi+11_Table8_M_r_22.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float32, skiprow=2)
+def Zehavi11_19_18_wp(load_from_file=False):
 
-    #data_array = myData.readAnyFormat(config=False, mypath=mycomp+'/anaconda/pro/OBS/Zehavi+11_Table7_18_M_r_17.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float32, skiprow=2)
-    #data_array = myData.readAnyFormat(config=False, mypath=mycomp+'/anaconda/pro/OBS/Zehavi+11_Table7_19_M_r_18.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float32, skiprow=2)
-    #data_array = myData.readAnyFormat(config=False, mypath=mycomp+'/anaconda/pro/OBS/Zehavi+11_Table7_20_M_r_19.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float32, skiprow=2)
-    #data_array = myData.readAnyFormat(config=False, mypath=mycomp+'/anaconda/pro/OBS/Zehavi+11_Table7_21_M_r_20.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float32, skiprow=2)
+    data_array = myData.readAnyFormat(config=False, mypath=mycomp+'/anaconda/pro/OBS/Zehavi+11_Table7_19_M_r_18.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float32, skiprow=2)
+
+    return load_Zehavi11_wp(data_array, '$-19<M_r<-18$')
+
+def Zehavi11_20_19_wp(load_from_file=False):
+
+    data_array = myData.readAnyFormat(config=False, mypath=mycomp+'/anaconda/pro/OBS/Zehavi+11_Table7_20_M_r_19.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float32, skiprow=2)
+
+    return load_Zehavi11_wp(data_array, '$-20<M_r<-19$')
+
+def Zehavi11_21_20_wp(load_from_file=False):
+
+    data_array = myData.readAnyFormat(config=False, mypath=mycomp+'/anaconda/pro/OBS/Zehavi+11_Table7_21_M_r_20.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float32, skiprow=2)
+
+    return load_Zehavi11_wp(data_array, '$-21<M_r<-20$')
+
+def Zehavi11_22_21_wp(load_from_file=False): 
+
     data_array = myData.readAnyFormat(config=False, mypath=mycomp+'/anaconda/pro/OBS/Zehavi+11_Table7_22_M_r_21.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float32, skiprow=2)
-    #data_array = myData.readAnyFormat(config=False, mypath=mycomp+'/anaconda/pro/OBS/Zehavi+11_Table8_M_r_21.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float32, skiprow=2)
+    
+    return load_Zehavi11_wp(data_array, '$-22<M_r<-21$')
+
+def Zehavi11_21_wp(load_from_file=False): 
+
+    data_array = myData.readAnyFormat(config=False, mypath=mycomp+'/anaconda/pro/OBS/Zehavi+11_Table8_M_r_21.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float32, skiprow=2)   
+
+    return load_Zehavi11_wp(data_array, '$M_r>-22$')
+
+def Zehavi11_22_wp(load_from_file=False): 
+
+    data_array = myData.readAnyFormat(config=False, mypath=mycomp+'/anaconda/pro/OBS/Zehavi+11_Table8_M_r_22.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float32, skiprow=2)
+    
+    return load_Zehavi11_wp(data_array, '$M_r>-22$')
+
+def load_Zehavi11_wp(data_array, legend):    
 
     obs_data_array = np.zeros((data_array[:,0].size,7), dtype=np.float32)
   
-    obs_data_array[:,0] = np.log10(data_array[:,0]/0.6777)
-    obs_data_array[:,1] = np.log10(data_array[:,1]/0.6777)
+    obs_data_array[:,0] = data_array[:,0]/0.6777
+    obs_data_array[:,1] = np.log10(data_array[:,1]/0.6777*obs_data_array[:,0])
 
     obs_data_array[:,4] = (data_array[:,2]/data_array[:,1])*0.434
     obs_data_array[:,5] = obs_data_array[:,4]
    
     #print obs_data_array
-    return obs_data_array, 'SDSS DR7 z~0.1', False
+    return obs_data_array, legend, False
 
 def ZFOURGE_150_z_250_SF(load_from_file=True):
 
@@ -3080,6 +3186,34 @@ def ZFOURGE_150_z_250_SF(load_from_file=True):
     print obs_data_array
     
     return obs_data_array, 'ZFOURGE/CANDLES', False  
+
+def loadDiverse(load_from_file=False):
+    
+    redshift='0.09'            
+    filename = mycomp+'anaconda/pro/OBS/HMF_MDPL2_Rockstar_z_'+redshift+'_M200c_Msun_Nhalos.txt'
+    print filename
+    data = myData.readAnyFormat(config=False, mypath=filename, data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float64, skiprow=11)
+    obs_data_array = np.zeros((data[:,0].size,7), dtype=np.float)
+    obs_data_array[:,0] = 10**data[:,0]
+    
+    volume=(1000/0.6778)**3
+    obs_data_array[:,1] = data[:,1]/0.1/volume
+    
+    obs_data_array[:,4] = obs_data_array[:,1] + obs_data_array[:,1]/(data[:,1]**0.5)
+    obs_data_array[:,5] = obs_data_array[:,1] - obs_data_array[:,1]/(data[:,1]**0.5)
+
+    obs_data_array[:,6] = data[:,1]
+    
+    filename_out = mycomp+'anaconda/pro/myRun/histos/HMF/HMF_MDPL2_Rockstar_z_'+redshift+'_Nhalos.txt'
+    myOutput.writeIntoFile(filename_out, 
+                               obs_data_array,
+                               myheader='HMF MDPL2 Rockstar 1h-1Gpc z='+redshift+' cumulative: NO\n(1) mhalo_200c [Msun] (2) Phi [Mpc-3 dex-1]	(3) -dx	(4) dx	(5) -dy	(6) +dy	(7) N count',
+                               data_format="%0.8e",
+                               mydelimiter='\t')
+    
+    exit()
+    return obs_data_array, legend, False
+
 
 #Luminosity functions
 ##########################################################################################################################################################    

@@ -447,7 +447,8 @@ def convert_units_Galacticus(catname,
                 caseSwitcher(conv_name)
             
         except:
-            print name, 'is not able to convert ...\n'  
+            pass
+            #print name, 'is not able to convert ...\n'  
     
         i+=1
     
@@ -491,7 +492,7 @@ def correct_units(catname,
         try:
             #print 'i:', i, 'name:', id_col_array['name'+str(i)], 'corr_type:', id_col_array['corr_type'+str(i)], 'unit_corr:', id_col_array['unit_corr'+str(i)] 
             if id_col_array['corr_type'+str(i)]!='no_corr' and id_col_array['corr_type'+str(i)]!='int_num' and id_col_array['corr_type'+str(i)]!='id_num':        
-                #print 'i:', i, 'corr_type:', id_col_array['corr_type'+str(i)], 'name:', id_col_array['name'+str(i)], 'unit_corr:', id_col_array['unit_corr'+str(i)], 'col_id:', id_col_array['col_id'+str(i)]
+                print 'i:', i, 'corr_type:', id_col_array['corr_type'+str(i)], 'name:', id_col_array['name'+str(i)], 'unit_corr:', id_col_array['unit_corr'+str(i)], 'col_id:', id_col_array['col_id'+str(i)]
 
                 if id_col_array['name'+str(i)].find('pos')!=-1:
 
@@ -507,10 +508,11 @@ def correct_units(catname,
                     #print 'power10'
                     data[id_col_array['name'+str(i)]]=10**data[id_col_array['name'+str(i)]]
                 elif id_col_array['corr_type'+str(i)]=='lum':
-                    print 'here! lum:', id_col_array['unit_corr'+str(i)] 
+                    #print 'here! lum:', id_col_array['unit_corr'+str(i)] 
                     data[id_col_array['name'+str(i)]]*=id_col_array['unit_corr'+str(i)] 
                 elif id_col_array['corr_type'+str(i)]=='MAB':
-                    print 'MAB-corr ... nothing to do!'         
+                    pass
+                    #print 'MAB-corr ... nothing to do!'         
                 else:
                     #print 'default: /'
                     data[id_col_array['name'+str(i)]]/=id_col_array['unit_corr'+str(i)]
@@ -1139,8 +1141,8 @@ def filter_data_before_analysis(data,
     #print data.shape
     #find max/min-values for calculate histo/binned array       
     cond_min, cond_max = find_min_and_max_values(data[myselected_col], mycond_min, mycond_max)
- 
-    #print 'check: min/max --> data:', min(data[myselected_col]), '/', max(data[myselected_col])
+     
+    #print 'check: min/max --> data:', min(data[myselected_col]), '/', max(data[myselected_col]), data.shape
     
     #print 'cond_min:', cond_min, 'cond_max', cond_max, 'sel_col:', myselected_col, 'myplot_key:', myplot_key, 'col_orphan_status:', mycol_orphan
     data = myData.selectData2Compute(data, 
@@ -1153,7 +1155,7 @@ def filter_data_before_analysis(data,
                                       operator='<=', 
                                       condition=cond_max)     
 
-    #print 'check: min/max --> data:', min(data[myselected_col]), '/', max(data[myselected_col])
+    #print 'check: min/max --> data:', min(data[myselected_col]), '/', max(data[myselected_col]), data.shape
     return data
     
 
@@ -1221,7 +1223,7 @@ def filter_data_before_write2file(data,
             max_data = int(max(data[name]))
             min_data = int(min(data[name]))
         else:
-            if name.startswith('L_') or name.find('age')!=-1 or name.find('ang')!=-1 or name.startswith('satelliteMergeTim') or name.startswith('mbasi') or name.startswith('sfr') or name.startswith('ssfr') or name.startswith('r') or name.startswith('mstar') or name.startswith('mhalo') or name.startswith('mcold') or name.startswith('mhot') or name.find('bh')!=-1 or name.startswith('zgas') or name.startswith('zstar') or name.startswith('zhot') or name.startswith('Mz'):
+            if name.startswith('L_') or name.find('age')!=-1 or name.find('ang')!=-1 or name.startswith('satelliteMergeTim') or name.startswith('mbasi') or name.startswith('sfr') or name.startswith('ssfr') or name.startswith('r') or name.startswith('mstar') or name.startswith('mhalo') or name.startswith('mcold') or name.startswith('mhot') or name.startswith('mbh') or name.find('bh_acc')!=-1 or name.startswith('zgas') or name.startswith('zstar') or name.startswith('zhot') or name.startswith('Mz'):
                 
                 max_data = "{0:.2e}".format(max(data[name]))
                 min_data = "{0:.2e}".format(min(data[name]))
@@ -1481,7 +1483,7 @@ def calculate_NFW_con_with_fit(mhalo,
         from Klypin+16 Eq. (24) for PLANCK cosmology, Mhalo[200c], Table 2/A1, all halos selected by mass, z=0.0
         Parameter: c0=7.40, gamma=0.120, M0=5.5e5/1e12h-1
         """
-        M12=1e12
+        M12=1e12/0.6778
         M0=5.5e5
         
         return  7.40*(mhalo/M12)**-0.120 * (1+(mhalo/M0/M12)**0.4)
@@ -1491,10 +1493,9 @@ def calculate_NFW_con_with_fit(mhalo,
         from Klypin+16 Eq. (24) for PLANCK cosmology, Mhalo[200c], Table 2/A1, all halos selected by mass, z=0.5
         Parameter: c0=6.5, gamma=0.105, M0=1e4/1e12h-1
         """
-        M12=1e12/0.6777
+        M12=1e12/0.6778
         M0=1e4
         
-        #return  6.5*(mhalo/1e12)**-0.105 * (1+(mhalo/1e12/M0)**0.4)
         return  6.5*(mhalo/M12)**-0.105 * (1+(mhalo/M0/M12)**0.4)
     
     def approx_NFW_con_z050_WMAP7():
@@ -1503,7 +1504,7 @@ def calculate_NFW_con_with_fit(mhalo,
         Parameter: c0=5.25, gamma=0.105, M0=6e4/1e12h-1
         """
     
-        M12=1e12/0.6777    
+        M12=1e12/0.6778    
         M0=6e4
         
         return  5.25*(mhalo/M12)**-0.105 * (1+(mhalo/M0/M12)**0.4)
@@ -1516,7 +1517,7 @@ def calculate_NFW_con_with_fit(mhalo,
         c0=9.75
         gamma=0.110
         M0=5e5
-        M12=1e12/0.6777    
+        M12=1e12/0.6778    
         
         return  c0*(mhalo/M12)**-gamma * (1+(mhalo/M0/M12)**0.4)
     
@@ -1528,7 +1529,7 @@ def calculate_NFW_con_with_fit(mhalo,
         c0=7.25
         gamma=0.107
         M0=2.2e4
-        M12=1e12/0.6777    
+        M12=1e12/0.6778    
         
         return  c0*(mhalo/M12)**-gamma * (1+(mhalo/M0/M12)**0.4)
     
@@ -1540,7 +1541,7 @@ def calculate_NFW_con_with_fit(mhalo,
         c0=6.5
         gamma=0.105
         M0=1e4
-        M12=1e12/0.6777    
+        M12=1e12/0.6778    
         
         return  c0*(mhalo/M12)**-gamma * (1+(mhalo/M0/M12)**0.4)
     
@@ -1552,8 +1553,8 @@ def calculate_NFW_con_with_fit(mhalo,
 
         c0=4.75
         gamma=0.100
-        M0=1000
-        M12=1e12/0.6777    
+        M0=1e3
+        M12=1e12/0.6778    
         
         return  c0*(mhalo/M12)**-gamma * (1+(mhalo/M0/M12)**0.4)
     
@@ -1565,7 +1566,7 @@ def calculate_NFW_con_with_fit(mhalo,
         c0=3.8
         gamma=0.095
         M0=210
-        M12=1e12/0.6777    
+        M12=1e12/0.6778    
         
         return  c0*(mhalo/M12)**-gamma * (1+(mhalo/M0/M12)**0.4)
     
@@ -1577,7 +1578,7 @@ def calculate_NFW_con_with_fit(mhalo,
         c0=3.0
         gamma=0.085
         M0=43
-        M12=1e12/0.6777    
+        M12=1e12/0.6778    
         
         return  c0*(mhalo/M12)**-gamma * (1+(mhalo/M0/M12)**0.4)
     
@@ -1589,7 +1590,7 @@ def calculate_NFW_con_with_fit(mhalo,
         c0=2.65
         gamma=0.080
         M0=18
-        M12=1e12/0.6777    
+        M12=1e12/0.6778    
         
         return  c0*(mhalo/M12)**-gamma * (1+(mhalo/M0/M12)**0.4)
     
@@ -1613,7 +1614,7 @@ def calculate_NFW_con_with_fit(mhalo,
         c0=2.10
         gamma=0.080
         M0=1.9
-        M12=1e12/0.6777    
+        M12=1e12/0.6778    
         
         return  c0*(mhalo/M12)**-gamma * (1+(mhalo/M0/M12)**0.4)
     
@@ -1625,7 +1626,7 @@ def calculate_NFW_con_with_fit(mhalo,
         c0=1.86
         gamma=0.080
         M0=0.42
-        M12=1e12/0.6777    
+        M12=1e12/0.6778    
         
         return  c0*(mhalo/M12)**-gamma * (1+(mhalo/M0/M12)**0.4)
     
@@ -1671,7 +1672,9 @@ def calculate_NFW_con_with_fit(mhalo,
     elif redshift>3.10 and redshift<=4.60:
         z_key='410'
     elif redshift>4.6:
-        z_key='540'          
+        z_key='540'
+
+    print 'key:', z_key          
         
     return caseSwitcher(cosmology+overdens+z_key)
 
@@ -1679,14 +1682,11 @@ def convert_halo_mass(mhalo,
                       NFW_con,
                       orphan,
                       Dv_old=139,
-                      Dv_new=200):
-
+                      Dv_new=200,
+                      redshift=0.0):
+    print '--> convert Mvir to M200c!',
     #Formular to get the halo concentration from Klypin+16 (1411.4001v2), Eq.: 24
-    #Parameter: TableA3, all halo selected by mass, z=0.5
-    #c0=6.5, gamma=0.105, M0=1e4/1e12h-1
-
-    
-    NFW_con    = approx_NFW_con_z000_Planck(mhalo)
+    #Convertion of halo mass from 139 to 200 x critical overdensity follows Lokas&Mamon01 MNRAS 321, 155
     
     NFW_con[np.where(np.isfinite(NFW_con)==False)[:][0]] = 99.99
 
@@ -1696,7 +1696,7 @@ def convert_halo_mass(mhalo,
     
     s_new=np.zeros((mhalo.size,), np.float32)
 
-    #import matplotlib.pyplot as plt
+    import matplotlib.pyplot as plt
     #formulae
     for i,c in enumerate(NFW_con):
         #print 'i:', i, 'con', c,
@@ -1718,16 +1718,16 @@ def convert_halo_mass(mhalo,
         #plt.plot(s, rho_in_s, '.')
         #plt.plot(s_new[i], rho_inter[mask2[0]], 'x')
 
-#    plt.plot(s_new[i], Dv_new, '^')
-#    plt.ylim((0,1000))
-#    plt.axhline(y=Dv_new, xmin=-100, xmax=100, color='k', ls='--', lw=2.0)
-#    plt.axhline(y=Dv_old, xmin=-100, xmax=100, color='k', ls='--', lw=2.0)
-#    plt.savefig(mycomp+'anaconda/pro/data/Galacticus_1Gpc/HMF_c_test.png', format='png', rasterized=True, dpi=100, bbox_inches='tight', pad_inches=0.1)
+    plt.plot(s_new[i], Dv_new, '^')
+    plt.ylim((0,1000))
+    plt.axhline(y=Dv_new, xmin=-100, xmax=100, color='k', ls='--', lw=2.0)
+    plt.axhline(y=Dv_old, xmin=-100, xmax=100, color='k', ls='--', lw=2.0)
+    plt.savefig(mycomp+'anaconda/pro/data/Galacticus_1Gpc/HMF_c_test.png', format='png', rasterized=True, dpi=100, bbox_inches='tight', pad_inches=0.1)
              
     ratio  = g*(np.log(1.0+NFW_con*s_new)-NFW_con*s_new/(1.0+NFW_con*s_new))
     print 'median ratio:', np.median(ratio[np.where(np.isfinite(ratio)==True)[:][0]]), '+/-', np.percentile(ratio[np.where(np.isfinite(ratio)==True)[:][0]], 75)-np.median(ratio[np.where(np.isfinite(ratio)==True)[:][0]]), '/', np.median(ratio[np.where(np.isfinite(ratio)==True)[:][0]])-np.percentile(ratio[np.where(np.isfinite(ratio)==True)[:][0]],25) 
-    
-    return ratio*mhalo, NFW_con
+    print 'CHECK!/n'
+    return ratio*mhalo
    
    
 def calc_survey_volume(skycoverage,
@@ -2295,23 +2295,29 @@ def downsample_SMF(data):
     
     myData = aD.ArangeData()
  
-    data_mask=data[np.where(data['mstar']>2e10)[0][:]]
+    data_mask=data[np.where(data['mstar']>1e10)[0][:]]
     print data.shape    
     #data_mask=data_mask[np.where(data_mask['mstar']<1.1e12)[0][:]]
-    print data_mask.shape        
+        
 #
 #        #Guo+13 cut
 #        #(r-i)>0.679 -0.082(Mi+20)
     #cut=0.679-0.082*(data_mask['MAB_dA_total_i']-5*np.log10(0.6777)+20.0)      
     #data_mask=data_mask[np.where(data_mask['mAB_dA_total_r']-data_mask['mAB_dA_total_i']>cut)[0][:]]
     #data_mask=data_mask[np.where(data_mask['sfr']/data_mask['mstar']<1e-11)[0][:]]
-    
+    #print data_mask.shape    
     #standard g-i>2.35
-    #data_mask=data_mask[np.where(data_mask['mAB_dA_total_g']-data_mask['mAB_dA_total_i']>2.35)[0][:]]        
+#    try:
+#        data_mask=data_mask[np.where(data_mask['mAB_dA_total_g']-data_mask['mAB_dA_total_i']>2.35)[0][:]]        
+#    except:
+#        data_mask=data_mask[np.where(data_mask['mAB_total_g']-data_mask['mAB_total_i']>2.35)[0][:]]
 
+    cut=0.679-0.082*(data_mask['MAB_dA_total_i']-5*np.log10(0.6777)+20.0)
+    data_mask=data_mask[np.where(data_mask['mAB_dA_total_r']-data_mask['mAB_dA_total_i']>cut)[0][:]]         
+    print 'selection: --> r-i > ', data_mask.shape
     
-    #histo_data=myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/myRun/histos/SMF/SMF_CMASS_SPALL_z_0.5_0.6_spall_por_merged_DR12v4_compl_sample_wg_fixed_40bins.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float, skiprow=2)        
-    histo_data=myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/myRun/histos/SMF/SMF_CMASS_SPALL_z_0.5_0.6_spall_por_merged_DR12v4_compl_sample_wg_fixed_35bins_1e10_-0.2.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float, skiprow=2)        
+    histo_data=myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/myRun/histos/SMF/SMF_CMASS_SPALL_z_0.5_0.6_spall_por_merged_DR12v4_compl_sample_wg_fixed_25bins_1e10.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float, skiprow=2)        
+    #histo_data=myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/myRun/histos/SMF/SMF_CMASS_SPALL_z_0.5_0.6_spall_por_merged_DR12v4_compl_sample_wg_fixed_35bins_1e10_-0.2.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float, skiprow=2)        
 
     #histo_model=myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/myRun/histos/SMF/SMF_Galacticus_1Gpc_z_0.56_tarsel_new_mags_g-i_gt_2.35_fixed_40bins.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float, skiprow=2)        
     #histo_model=myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/myRun/histos/SMF/SMF_Galacticus_1Gpc_z_0.56_tarsel_new_mags_red_fixed_40bins.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float, skiprow=2)        
@@ -2320,7 +2326,15 @@ def downsample_SMF(data):
     #histo_model=myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/myRun/histos/SMF/SMF_SAGE_1Gpc_z_0.56_tarsel_v3_mags_run_1238_red_fixed_40bins.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float, skiprow=2)        
 
     #histo_model=myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/myRun/histos/SMF/SMF_LGALAXIES_500Mpc_z_0.56_fixed_35bins_1e10.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float, skiprow=2)        
-    histo_model=myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/myRun/histos/SMF/SMF_LGALAXIES_500Mpc_z_0.56_tarsel_35bins_2e10_no.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float, skiprow=2)        
+    #histo_model=myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/myRun/histos/SMF/SMF_LGALAXIES_500Mpc_z_0.56_tarsel_35bins_2e10_no.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float, skiprow=2)        
+
+    #histo_model=myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/myRun/histos/SMF/SMF_Galacticus_1Gpc_run2_z_0.56_tarsel_fixed_25bins_1e10_test2.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float, skiprow=2)        
+    histo_model=myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/myRun/histos/SMF/SMF_Galacticus_1Gpc_run2_z_0.56_tarsel_Guo13_cut_fixed_25bins_1e10.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float, skiprow=2)        
+
+    #histo_model=myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/myRun/histos/SMF/SMF_Galacticus_400Mpc_z_0.55_tarsel_g-i_gt_2.35_fixed_25bins_1e10.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float, skiprow=2)        
+    #histo_model=myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/myRun/histos/SMF/SMF_Galacticus_400Mpc_z_0.55_tarsel_fixed_25bins_1e10_test2.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float, skiprow=2)        
+    #histo_model=myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/myRun/histos/SMF/SMF_Galacticus_400Mpc_z_0.55_tarsel_Guo13_cut_fixed_25bins_1e10.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float, skiprow=2)        
+
 
     frac_data=histo_data[:,1]/histo_model[:,1]
 
@@ -2364,7 +2378,7 @@ def give_galaxy_type_info(data):
         data_sats=data[np.where(data==1)[0][:]]
         data_os=data[np.where(data==2)[0][:]]
 
-        print 'all [N]:\t', data.size
+        print 'all [N]:\t', data.size, 'n: ', format(data.size/(400/0.6778)**3, '.4f')
         print 'counts [N]\tcents:', data_cents.size, '\ttot sats:', data_sats.size+data_os.size, '\tno-sats:', data_sats.size, '\torphans:', data_os.size
         print 'fractions \tcents:', format(data_cents.size/float(data.size), '.3f'), \
                             '\ttot sats:',  format((data_sats.size+data_os.size)/float(data.size), '.3f'), \
@@ -2476,7 +2490,7 @@ def manual_selection(data):
  
     return data
 
-def reduce_rand(data):
+def reduce_rand_sats(data):
     print 'Redruce randomly galaxies from the catalog!'
     data_sats=data[np.where(data['orphan']>=1)[0][:]]
     
@@ -2488,10 +2502,23 @@ def reduce_rand(data):
     
     data_sats=np.sort(data_sats, order=['mhalo'])
     
-    #data2reduce=choose_random_sample(data_sats,ngal2reduce)
+    data2reduce=choose_random_sample(data_sats,ngal2reduce)
     
     data2reduce=data_sats[0:ngal2reduce]
 
+    test, indices_basic, indices_check = np.intersect1d(data['hostid'], data2reduce['hostid'], return_indices=True)       
+
+    data=np.delete(data, np.s_[indices_basic], axis=0)                
+
+                   
+    return data
+
+def reduce_rand(data):
+    print 'Redruce randomly galaxies from the catalog!'
+    
+    
+    data2reduce=choose_random_sample(data,int(data.size*0.9))
+    
     test, indices_basic, indices_check = np.intersect1d(data['hostid'], data2reduce['hostid'], return_indices=True)       
 
     data=np.delete(data, np.s_[indices_basic], axis=0)                
@@ -2522,7 +2549,7 @@ def df_to_sarray(df):
     :return: a numpy structured array representation of df
     """
 
-    df=df.drop(['row_id','index'], axis=1)
+    #df=df.drop(['row_id','index'], axis=1)
     
     v = df.values
     cols = df.columns
@@ -2550,3 +2577,323 @@ def show_mag_info(data):
         
     exit()
     
+def test_haloids(data):
+
+    import pandas as pd
+    data1 = pd.read_csv(mycomp+'anaconda/pro/data/Galacticus_1Gpc/Galacticus_1Gpc_z_0.56_tarsel_new_mags_CMASS_down_sample3_haloid.txt', skiprows=2, names=['haloid', 'hostid', 'orphan', 'env_512', 'env_1024'], sep='  ')
+    data_test_against = df_to_sarray(data1)
+    
+    #print data_test_against[0:1]
+    print np.info(data_test_against)
+    
+#    data2 = pd.read_csv(mycomp+'anaconda/pro/myRun/histos/sfr2z/Galacticus_SDSS/haloids/sfr2z_Galacticus_1Gpc_z_0.56_tarsel_CUT3_Contreras+13_mcold_SFH_method2_cents_lowZcold-highMstar_haloids.txt', skiprows=2, names=['haloid', 'hostid', 'orphan', 'mhalo', 'mstar'], sep='\t')
+#    data_test = df_to_sarray(data2)
+
+#    print 'Gal-dens:\n'
+#    for prop in ['mhalo', 'mstar', 'sfr', 'ssfr', 'zcold', 'mbh']:
+#        print prop, '\t\t', "{0:.2f}".format(np.log10(np.nanmedian(data_test_against[prop]))), '\t', "{0:.2f}".format(np.log10(np.nanmedian(data_test_against[prop]))-np.log10(np.nanpercentile(data_test_against[prop], 32))), '/', "{0:.2f}".format(np.log10(np.nanpercentile(data_test_against[prop], 68))-np.log10(np.nanmedian(data_test_against[prop])))
+
+#    print 'Gal2-dens:\n'
+#    for prop in ['mhalo', 'mstar', 'sfr', 'ssfr', 'zcold', 'mbh']:
+#        if prop=='zcold': 10**data[prop]
+#        print prop, '\t\t', "{0:.2f}".format(np.log10(np.nanmedian(data[prop]))), '\t', "{0:.2f}".format(np.log10(np.nanmedian(data[prop]))-np.log10(np.nanpercentile(data[prop], 32))), '/', "{0:.2f}".format(np.log10(np.nanpercentile(data[prop], 68))-np.log10(np.nanmedian(data[prop])))
+
+
+
+#    import numpy.lib.recfunctions as rcfuncs        
+#    data = rcfuncs.append_fields([data], ['haloid_Gal_dens','hostid_Ga_-dens','orphan_Gal_dens', 'env_1024', 'env_512'],[data['haloid'],data['haloid'],data['orphan'],data['haloid'],data['haloid']], usemask=False)
+
+    #test = np.in1d(data_test_against['hostid'], data['hostid'])
+#    #print test
+#    
+    #data_test_against=data_test_against[np.where(test==True)[:][0]]
+
+    for ID in data['hostid']:
+        print 'ID:', ID
+        try:
+            data[['haloid_Gal_dens','hostid_Gal_dens', 'orphan_Gal_dens', 'env_512', 'env_1024']][np.where(data['hostid']==ID)[:][0]]=data_test_against[['haloid','hostid','orphan','env_512','env_1024']][np.where(data_test_against['hostid']==ID)[:][0]]
+        except:
+            print 'no ID found!'
+    #data[::-1].sort(order=['hostid'], axis=0)
+    #data_test_against[::-1].sort(order=['hostid'], axis=0)    
+    
+    #data[['haloid_Gal_dens','hostid_Gal_dens', 'orphan_Gal_dens', 'env_512', 'env_1024']]=data_test_against[['haloid','hostid','orphan','env_512','env_1024']]
+    
+    print data[['hostid','hostid_Gal_dens', 'orphan', 'orphan_Gal_dens', 'env_512', 'env_1024']][0:3]
+    #exit()
+
+    return data
+    #return data_SDSS    
+
+def calc_residuals(data, count, redshift, sample, prop):
+    #print 'count:', count, 'redshift:', redshift, 'sample:', sample, 'prop:', prop 
+    
+    import pandas as pd
+    data1 = pd.read_csv(mycomp+'anaconda/pro/data/Galacticus_1Gpc/SFH/SFH_Index_'+str(redshift)+'_'+sample+'_props_M1.txt', skiprows=2, names=['haloid', 'parentIndex', 'hostid', 'nodeIndex', 'satelliteNodeIndex', 'orphan', 'mhalo', 'mstar',  'SHMR', 'mcold',  'Mzgas',  'zcold', 'g-i', 'sfr', 'ssfr'], sep='\t')
+    data_M1 = df_to_sarray(data1)
+        
+    #print data_test_against[0:1]
+    #print np.info(data_M1)
+    
+    data2 = pd.read_csv(mycomp+'anaconda/pro/data/Galacticus_1Gpc/SFH/SFH_Index_'+str(redshift)+'_'+sample+'_props_M2.txt', skiprows=2, names=['haloid', 'parentIndex', 'hostid', 'nodeIndex', 'satelliteNodeIndex', 'orphan', 'mhalo', 'mstar',  'SHMR', 'mcold',  'Mzgas',  'zcold', 'g-i', 'sfr', 'ssfr'], sep='\t')
+    data_M2 = df_to_sarray(data2)   
+    #print np.info(data_M2)
+
+    #data_M1['mhalo']=data_M1['mstar']/data_M1['mhalo']
+    #data_M2['mhalo']=data_M2['mstar']/data_M2['mhalo']
+    
+    test_frac_in_M1 = np.in1d(data_M1['hostid'], data_M2['hostid'])
+    test = test_frac_in_M1[np.where(test_frac_in_M1==True)[:][0]]
+    
+    print 'data_M1 / test', data_M1.size , '/', test.size
+
+    data_M1_found=data_M1[np.where(test_frac_in_M1==True)[:][0]]
+
+    myprop_unit_map={'mstar':  'log10(mstar [Msun])',\
+                   'mhalo':    'log10(mhalo [Msun])',\
+                   'mcold':    'log10(mcold [Msun])',\
+                   'zcold':    'zcold [-]',\
+                   'Mzgas':    'log10(Mzcold [Msun])',\
+                   'sfr':      'log10(SFR [Msunyr-1])',\
+                   'ssfr':     'log10(sSFR [yr-1])',\
+                   'g-i':      'g-i [-]',\
+                   'SHMR':     'log10(mstar/mhalo) [-])'}  
+    
+    i=1
+    if prop=='SHMR':
+        prop='mhalo'
+        myprop_unit_map.update({'mhalo': 'log10(mstar/mhalo) [-])'})
+        
+    myheader='('+str(i)+') z ('+str(i+1)+') N_M1found/N_M1 ('+str(i+2)+') N_M1found/N_M2 ('+str(i+3)+') N_M1/N_M1'+\
+             '('+str(i+4)+') '+myprop_unit_map[prop]+' M1found ('+str(i+5)+') +dy ('+str(i+6)+') -dy ('+str(i+7)+') N_M1found [-] '+\
+             '('+str(i+8)+') '+myprop_unit_map[prop]+' M1 ('+str(i+9)+') +dy ('+str(i+10)+') -dy ('+str(i+11)+') N_M1 [-] '+\
+             '('+str(i+12)+') '+myprop_unit_map[prop]+' M2 ('+str(i+13)+') +dy ('+str(i+14)+') -dy ('+str(i+15)+') N_M2 [-] '+\
+             '('+str(i+16)+') '+myprop_unit_map[prop]+' median(M1_found)/median(M1)-1 [-] '+\
+             '('+str(i+17)+') '+myprop_unit_map[prop]+' median(M1_found)/median(M2)-1 [-] '+\
+             '('+str(i+18)+') '+myprop_unit_map[prop]+' median(M1)/median(M2)-1 [-] '+\
+             '('+str(i+19)+') '+myprop_unit_map[prop]+' (median(M1found)-median(M1))/median(M2) [-]'
+
+
+    data[count, 0] = redshift
+    data[count, 1] = data_M1_found.size/float(data_M1.size)
+    data[count, 2] = data_M1_found.size/float(data_M2.size)
+    data[count, 3] = data_M1.size/float(data_M2.size)
+    data[count, 4] = np.nanmedian(data_M1_found[prop])
+    data[count, 5] = np.nanmedian(data_M1_found[prop])-np.nanpercentile(data_M1_found[prop], 32)
+    data[count, 6] = np.nanpercentile(data_M1_found[prop], 68)-np.nanmedian(data_M1_found[prop])
+    data[count, 7] = data_M1_found.size
+    data[count, 8] = np.nanmedian(data_M1[prop])
+    data[count, 9] = np.nanmedian(data_M1[prop])-np.nanpercentile(data_M1[prop], 32)
+    data[count, 10] = np.nanpercentile(data_M1[prop], 68)-np.nanmedian(data_M1[prop])
+    data[count, 11] = data_M1.size
+    data[count, 12] = np.nanmedian(data_M2[prop])
+    data[count, 13] = np.nanmedian(data_M2[prop])-np.nanpercentile(data_M2[prop], 32)
+    data[count, 14] = np.nanpercentile(data_M2[prop], 68)-np.nanmedian(data_M2[prop])
+    data[count, 15] = data_M2.size
+    data[count, 16] = np.nanmedian(data_M1_found[prop])/np.nanmedian(data_M1[prop])-1.0    
+    data[count, 17] = np.nanmedian(data_M1_found[prop])/np.nanmedian(data_M2[prop])-1.0
+    data[count, 18] = np.nanmedian(data_M1[prop])/np.nanmedian(data_M2[prop])-1.0
+    data[count, 19] = (np.nanmedian(data_M1_found[prop])-np.nanmedian(data_M1[prop]))/np.nanmedian(data_M2[prop]) 
+
+#    if prop=='zcold' or prop=='g-i':
+#        min_prop_M1=str("{0:.2f}".format(min(data_M1[prop])))
+#        max_prop_M1=str("{0:.2f}".format(max(data_M1[prop])))
+#        min_prop_M2=str("{0:.2f}".format(min(data_M2[prop])))
+#        max_prop_M2=str("{0:.2f}".format(max(data_M2[prop])))
+#        min_prop_M1_found=str("{0:.2f}".format(min(data_M1_found[prop])))
+#        max_prop_M1_found=str("{0:.2f}".format(max(data_M1_found[prop])))
+#    else:
+#        min_prop_M1=str("{0:.2f}".format(min(np.log10(data_M1[prop]))))
+#        max_prop_M1=str("{0:.2f}".format(max(np.log10(data_M1[prop]))))
+#        min_prop_M2=str("{0:.2f}".format(min(np.log10(data_M2[prop]))))
+#        max_prop_M2=str("{0:.2f}".format(max(np.log10(data_M2[prop]))))
+#        min_prop_M1_found=str("{0:.2f}".format(min(np.log10(data_M1_found[prop]))))
+#        max_prop_M1_found=str("{0:.2f}".format(max(np.log10(data_M1_found[prop]))))        
+
+    #header_prefix=', '+myprop_unit_map[prop]+' M1found min/max: '+min_prop_M1_found+'/'+max_prop_M1_found+', M1 min/max: '+min_prop_M1+'/'+max_prop_M1+', M2 min/max: '+min_prop_M2+'/'+max_prop_M2+'\n'
+        
+    return data,  myheader
+
+def test_methods(redshift, sample, props, bad_mstar_count):
+
+    print 'z:', redshift,
+        
+    import pandas as pd
+    data1 = pd.read_csv(mycomp+'anaconda/pro/data/Galacticus_1Gpc/SFH/SFH_Index_'+str(redshift)+'_'+sample+'_props_M1.txt', skiprows=2, names=['haloid', 'parentIndex', 'hostid', 'nodeIndex', 'satelliteNodeIndex', 'orphan', 'mhalo', 'mstar',  'SHMR', 'mcold',  'Mzgas',  'zcold', 'g-i', 'sfr', 'ssfr'], sep='\t')
+    data_M1 = df_to_sarray(data1)
+        
+    #print data_test_against[0:1]
+    #print np.info(data_M1)
+    
+    data2 = pd.read_csv(mycomp+'anaconda/pro/data/Galacticus_1Gpc/SFH/SFH_Index_'+str(redshift)+'_'+sample+'_props_M2.txt', skiprows=2, names=['haloid', 'parentIndex', 'hostid', 'nodeIndex', 'satelliteNodeIndex', 'orphan', 'mhalo', 'mstar',  'SHMR', 'mcold',  'Mzgas',  'zcold', 'g-i', 'sfr', 'ssfr'], sep='\t')
+    data_M2 = df_to_sarray(data2)   
+    #print np.info(data_M2)
+
+    data_M1['mhalo']=data_M1['mstar']/data_M1['mhalo']
+    data_M2['mhalo']=data_M2['mstar']/data_M2['mhalo']
+    
+    test_frac_in_M1 = np.in1d(data_M1['hostid'], data_M2['hostid'])
+    test = test_frac_in_M1[np.where(test_frac_in_M1==True)[:][0]]
+    
+    print 'data_M1 / test', data_M1.size , '/', test.size
+    
+#    stats_props_all='\multicolumn{1}{c|}{\multirow{2}{*}{\parbox{0.04\linewidth}{\centering'+str(redshift)+'}}}\t&M1&'
+#    for prop in ['mhalo', 'mstar', 'SHMR', 'sfr', 'ssfr', 'mcold', 'Mzgas', 'zcold', 'g-i']:
+#        if prop=='zcold' or prop=='g-i':
+#            stats_props_all+=str("{0:.2f}".format(np.nanmedian(data_M1[prop])))+'$_{-'+str("{0:.2f}".format(np.nanmedian(data_M1[prop])-np.nanpercentile(data_M1[prop], 32)))+'}^{+'+str("{0:.2f}".format(np.nanpercentile(data_M1[prop], 68)-np.nanmedian(data_M1[prop])))+'}$\t& ' 
+#        else:
+#            stats_props_all+=str("{0:.2f}".format(np.log10(np.nanmedian(data_M1[prop]))))+'$_{-'+str("{0:.2f}".format(np.log10(np.nanmedian(data_M1[prop]))-np.log10(np.nanpercentile(data_M1[prop], 32))))+'}^{+'+str("{0:.2f}".format(np.log10(np.nanpercentile(data_M1[prop], 68))-np.log10(np.nanmedian(data_M1[prop]))))+'}$\t& ' 
+#
+#    stats_props_all+='\multicolumn{1}{c}{\multirow{2}{*}{\parbox{0.04\linewidth}{\centering'+str("{0:.2f}".format(test.size/float(data_M1.size)))+'}}}///'
+#
+#    stats_props_all+='\n\cline{2-11}\n&M2\t&'
+#    for prop in ['mhalo', 'mstar', 'SHMR', 'sfr', 'ssfr', 'mcold', 'Mzgas', 'zcold', 'g-i']:
+#        if prop=='zcold' or prop=='g-i':
+#            stats_props_all+=str("{0:.2f}".format(np.nanmedian(data_M2[prop])))+'$_{-'+str("{0:.2f}".format(np.nanmedian(data_M2[prop])-np.nanpercentile(data_M2[prop], 32)))+'}^{+'+str("{0:.2f}".format(np.nanpercentile(data_M2[prop], 68)-np.nanmedian(data_M1[prop])))+'}$\t& ' 
+#        else:
+#            stats_props_all+=str("{0:.2f}".format(np.log10(np.nanmedian(data_M2[prop]))))+'$_{-'+str("{0:.2f}".format(np.log10(np.nanmedian(data_M2[prop]))-np.log10(np.nanpercentile(data_M2[prop], 32))))+'}^{+'+str("{0:.2f}".format(np.log10(np.nanpercentile(data_M2[prop], 68))-np.log10(np.nanmedian(data_M2[prop]))))+'}$\t& ' 
+#
+#    stats_props_all+='\n///\n\hline'
+#    #print "{0:.2f}".format(test.size/float(data_M1.size))
+#
+#    #print data_M1[0:10]
+#
+    stats_props_found_M1='\multicolumn{1}{c|}{\multirow{4}{*}{\parbox{0.03\linewidth}{\centering'+str(redshift)+'}}}\t&M1&' 
+#    for prop in ['mhalo', 'mstar', 'SHMR', 'sfr', 'ssfr', 'mcold', 'Mzgas', 'zcold', 'g-i']:
+#        if prop=='zcold' or prop=='g-i':
+#            stats_props_found_M1+=str("{0:.2f}".format(np.nanmedian(data_M1[prop])))+'$_{-'+str("{0:.2f}".format(np.nanmedian(data_M1[prop])-np.nanpercentile(data_M1[prop], 32)))+'}^{+'+str("{0:.2f}".format(np.nanpercentile(data_M1[prop], 68)-np.nanmedian(data_M1[prop])))+'}$\t& ' 
+#        else:
+#            stats_props_found_M1+=str("{0:.2f}".format(np.log10(np.nanmedian(data_M1[prop]))))+'$_{-'+str("{0:.2f}".format(np.log10(np.nanmedian(data_M1[prop]))-np.log10(np.nanpercentile(data_M1[prop], 32))))+'}^{+'+str("{0:.2f}".format(np.log10(np.nanpercentile(data_M1[prop], 68))-np.log10(np.nanmedian(data_M1[prop]))))+'}$\t& ' 
+#
+#
+#    stats_props_found_M1+='\multicolumn{1}{c}{\multirow{4}{*}{\parbox{0.03\linewidth}{\centering'+str("{0:.2f}".format(test.size/float(data_M1.size)))+'}}}///\n'
+
+    data_M1_found=data_M1[np.where(test_frac_in_M1==True)[:][0]]
+#    stats_props_found_M1+='\cline{2-11}\n&M2\t&'
+#    for prop in ['mhalo', 'mstar', 'SHMR', 'sfr', 'ssfr', 'mcold', 'Mzgas', 'zcold', 'g-i']:
+#        if prop=='zcold' or prop=='g-i':
+#            stats_props_found_M1+=str("{0:.2f}".format(np.nanmedian(data_M2[prop])))+'$_{-'+str("{0:.2f}".format(np.nanmedian(data_M2[prop])-np.nanpercentile(data_M2[prop], 32)))+'}^{+'+str("{0:.2f}".format(np.nanpercentile(data_M2[prop], 68)-np.nanmedian(data_M2[prop])))+'}$\t& ' 
+#        else:
+#            stats_props_found_M1+=str("{0:.2f}".format(np.log10(np.nanmedian(data_M2[prop]))))+'$_{-'+str("{0:.2f}".format(np.log10(np.nanmedian(data_M2[prop]))-np.log10(np.nanpercentile(data_M2[prop], 32))))+'}^{+'+str("{0:.2f}".format(np.log10(np.nanpercentile(data_M2[prop], 68))-np.log10(np.nanmedian(data_M2[prop]))))+'}$\t& ' 
+#
+#    stats_props_found_M1+='///\n'
+#
+#    stats_props_found_M1+='\cline{2-11}\n&M1$_{/rm{true}}$\t&'
+#    for prop in ['mhalo', 'mstar', 'SHMR', 'sfr', 'ssfr', 'mcold', 'Mzgas', 'zcold', 'g-i']:
+#        if prop=='zcold' or prop=='g-i':
+#            stats_props_found_M1+=str("{0:.2f}".format(np.nanmedian(data_M1_found[prop])))+'$_{-'+str("{0:.2f}".format(np.nanmedian(data_M1_found[prop])-np.nanpercentile(data_M1_found[prop], 32)))+'}^{+'+str("{0:.2f}".format(np.nanpercentile(data_M1_found[prop], 68)-np.nanmedian(data_M1_found[prop])))+'}$\t& ' 
+#        else:
+#            stats_props_found_M1+=str("{0:.2f}".format(np.log10(np.nanmedian(data_M1_found[prop]))))+'$_{-'+str("{0:.2f}".format(np.log10(np.nanmedian(data_M1_found[prop]))-np.log10(np.nanpercentile(data_M1_found[prop], 32))))+'}^{+'+str("{0:.2f}".format(np.log10(np.nanpercentile(data_M1_found[prop], 68))-np.log10(np.nanmedian(data_M1_found[prop]))))+'}$\t& ' 
+#
+#    stats_props_found_M1+='///\n'
+#    
+#    stats_props_found_M1+='\cline{2-11}\n&f$_{/rm{M1_{/rm{true}}}/rm{M2}}$\t&'
+#    for prop in ['mhalo', 'mstar', 'SHMR', 'sfr', 'ssfr', 'mcold', 'Mzgas', 'zcold', 'g-i']:
+#        data_M1_found_median=np.nanmedian(data_M1_found[prop])/np.nanmedian(data_M2[prop])
+#        if prop=='zcold' or prop=='g-i':
+#            stats_props_found_M1+=str("{0:.2f}".format(data_M1_found_median))+'\t& ' 
+#        else:
+#            stats_props_found_M1+=str("{0:.2f}".format(np.log10(data_M1_found_median)))+'\t& ' 
+#
+#    stats_props_found_M1+='///\n\hline'
+    
+    stats_props_tab=str(redshift)+'  '+str("{0:.2f}".format(data_M1_found.size/float(data_M1.size)))+'  '
+
+    i=3
+
+    myprop_unit_map={'mstar':  'log10(mstar [Msun])',\
+                   'mhalo':    'log10(mhalo [Msun])',\
+                   'mcold':    'log10(mcold [Msun])',\
+                   'zcold':    'zcold [-]',\
+                   'Mzgas':    'log10(Mzcold [Msun])',\
+                   'sfr':      'log10(SFR [Msunyr-1])',\
+                   'ssfr':     'log10(sSFR [yr-1])',\
+                   'g-i':      'g-i [-]',\
+                   'SHMR':     'log10(mstar/mhalo) [-])'}  
+    
+    myheader=''
+    for prop in [props]:
+
+        myheader+='('+str(i)+') '+myprop_unit_map[prop] +'M1 ('+str(i+1)+') +dy ('+str(i+2)+') -dy ('+str(i+3)+') '+myprop_unit_map[prop] +' M2 ('+str(i+4)+') +dy ('+str(i+5)+') -dy ('+str(i+6)+') '+myprop_unit_map[prop] +' M1_found ('+str(i+7)+') +dy ('+str(i+8)+') -dy ('+str(i+9)+') '+myprop_unit_map[prop]+'  median(M1_found)/median(M2) [-] ('+str(i+10)+') '+myprop_unit_map[prop]+' median(M1_found)/median(M1) [-] '
+        if prop=='SHMR':
+            prop='mhalo'
+            myprop_unit_map.update({'mhalo': 'log10(mstar/mhalo) [-])'})
+
+        #print data_M1_found[prop].size
+        
+        if min(data_M1_found['mstar'])<1e6:
+            print '------------------------------> bad mstar!!!!', min(data_M1_found['mstar'])
+            bad_mstar_count+=1
+            #print 'total count: ', bad_mstar_count
+
+        data_M1_found_median=np.nanmedian(data_M1_found[prop])       
+        data_M1_found_32=np.nanpercentile(data_M1_found[prop], 32)
+        data_M1_found_68=np.nanpercentile(data_M1_found[prop], 68)
+            
+        median_data_M1_found_data_M2=data_M1_found_median/np.nanmedian(data_M2[prop])
+        median_data_M1_found_data_M1=data_M1_found_median/np.nanmedian(data_M1[prop])
+        
+        if prop=='zcold' or prop=='g-i':
+            stats_props_tab+=str("{0:.2f}".format(np.nanmedian(data_M1[prop])))+'  '+str("{0:.2f}".format(np.nanmedian(data_M1[prop])-np.nanpercentile(data_M1[prop], 32)))+'  '+str("{0:.2f}".format(np.nanpercentile(data_M1[prop], 68)-np.nanmedian(data_M1[prop])))+'  '+\
+                             str("{0:.2f}".format(np.nanmedian(data_M2[prop])))+'  '+str("{0:.2f}".format(np.nanmedian(data_M2[prop])-np.nanpercentile(data_M2[prop], 32)))+'  '+str("{0:.2f}".format(np.nanpercentile(data_M2[prop], 68)-np.nanmedian(data_M2[prop])))+'  '+\
+                             str("{0:.2f}".format(data_M1_found_median))+'  '+str("{0:.2f}".format(data_M1_found_median-data_M1_found_32))+'  '+str("{0:.2f}".format(data_M1_found_68-data_M1_found_median))+'  '+\
+                             str("{0:.2f}".format(median_data_M1_found_data_M2))+'  '+str("{0:.2f}".format(median_data_M1_found_data_M1))+'  '
+            min_prop_M1=str("{0:.2f}".format(min(data_M1[prop])))
+            max_prop_M1=str("{0:.2f}".format(max(data_M1[prop])))
+            min_prop_M2=str("{0:.2f}".format(min(data_M2[prop])))
+            max_prop_M2=str("{0:.2f}".format(max(data_M2[prop])))
+            min_prop_M1_found=str("{0:.2f}".format(min(data_M1_found[prop])))
+            max_prop_M1_found=str("{0:.2f}".format(max(data_M1_found[prop])))            
+        else:
+            stats_props_tab+=str("{0:.2f}".format(np.log10(np.nanmedian(data_M1[prop]))))+'  '+str("{0:.2f}".format(np.log10(np.nanmedian(data_M1[prop]))-np.log10(np.nanpercentile(data_M1[prop], 32))))+'  '+str("{0:.2f}".format(np.log10(np.nanpercentile(data_M1[prop], 68))-np.log10(np.nanmedian(data_M1[prop]))))+'  '+\
+                             str("{0:.2f}".format(np.log10(np.nanmedian(data_M2[prop]))))+'  '+str("{0:.2f}".format(np.log10(np.nanmedian(data_M2[prop]))-np.log10(np.nanpercentile(data_M2[prop], 32))))+'  '+str("{0:.2f}".format(np.log10(np.nanpercentile(data_M2[prop], 68))-np.log10(np.nanmedian(data_M2[prop]))))+'  '+\
+                             str("{0:.2f}".format(np.log10(data_M1_found_median)))+'  '+str("{0:.2f}".format(np.log10(data_M1_found_median)-np.log10(data_M1_found_32)))+'  '+str("{0:.2f}".format(np.log10(data_M1_found_68)-np.log10(data_M1_found_median)))+'  '+\
+                             str("{0:.2f}".format(median_data_M1_found_data_M2))+'  '+str("{0:.2f}".format(median_data_M1_found_data_M1))+'  '
+            min_prop_M1=str("{0:.2f}".format(np.log10(min(data_M1[prop]))))
+            max_prop_M1=str("{0:.2f}".format(np.log10(max(data_M1[prop]))))
+            min_prop_M2=str("{0:.2f}".format(np.log10(min(data_M2[prop]))))
+            max_prop_M2=str("{0:.2f}".format(np.log10(max(data_M2[prop]))))
+            min_prop_M1_found=str("{0:.2f}".format(np.log10(min(data_M1_found[prop]))))
+            max_prop_M1_found=str("{0:.2f}".format(np.log10(max(data_M1_found[prop]))))
+        i+=11
+
+    header_prefix=', '+myprop_unit_map[prop]+' M1 min/max: '+min_prop_M1+'/'+max_prop_M1+', M2 min/max: '+min_prop_M2+'/'+max_prop_M2+', M1_found min/max: '+min_prop_M1_found+'/'+max_prop_M1_found+', bad mstar count: '+str(bad_mstar_count)+'\n'
+        
+    return stats_props_tab[:-2], stats_props_found_M1[:-1], "{0:.2f}".format(test.size/float(data_M1.size)), header_prefix, myheader, bad_mstar_count
+
+def property_stats(data):
+    
+    #data=data[np.where(data['orphan']==0)[:][0]]
+    size=data.size
+      
+    pop=2
+    if pop==1 or pop==2:
+        data=data[np.where(data['pop']==pop)[:][0]]
+
+      
+    print 'pop:', pop, 'ngal:', data.size, '\b', "{0:.2f}".format(100.0/size*data.size), '% of all galaxies', size
+#
+    for env, env_name in zip([-99, 0,1,2,3],['all', 'void','sheet','filament','knot']):
+    #for env, env_name in zip([-99],['all']):            
+        print '\n'
+        if env_name!='all':
+            sample=data[np.where(data['env_1024']==env)[:][0]]
+        else:
+            sample=data
+
+        print 'env', env, 'name:', env_name, 'ngal:', sample.size, '\t', "{0:.0f}".format(100.0/data.size*sample.size),'% of all galaxies'
+        print '////////////////////////////////////////////////'
+    
+        print 'prop\t\tmedian\t32th / 68th\n-------------------------------\n'
+        for prop in ['mhalo', 'mhalo_200c', 'NFW_con', 'mstar', 'zcold', 'sfr', 'ssfr', 'mcold', 'Mzgas', 'cgf', 'mbh','MAB_dA_total_g', 'MAB_dA_total_r', 'MAB_dA_total_i', 'mAB_dA_total_cut_r_i','mAB_dA_total_cut_g_r','mAB_dA_total_cut_g_i', 'mean_age_stars_disk', 'mean_age_stars_spheroid']:
+        #for prop in ['mcold', 'mstar', 'zcold', 'mbh']:
+            print prop,
+            if prop.find('AB')==-1 and prop!='zcold' and prop!='NFW_con' and prop.find('age')==-1:
+                print '\t\t', "{0:.2f}".format(np.log10(np.nanmedian(sample[prop]))), '\t', "{0:.2f}".format(np.log10(np.nanmedian(sample[prop]))-np.log10(np.nanpercentile(sample[prop], 32))), '/', "{0:.2f}".format(np.log10(np.nanpercentile(sample[prop], 68))-np.log10(np.nanmedian(sample[prop])))
+            else:
+                print '\t', "{0:.2f}".format(np.nanmedian(sample[prop])), '\t', "{0:.2f}".format(np.nanmedian(sample[prop])-np.nanpercentile(sample[prop], 32)), '/', "{0:.2f}".format(np.nanpercentile(sample[prop], 68)-np.nanmedian(sample[prop]))
+
+
+    print '--> DONE!\n'
+    exit()
+   

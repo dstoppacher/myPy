@@ -1005,17 +1005,19 @@ class	ArangeData:
                 self.data_array=np.zeros((nr_rows,), dtype=dt)
                 nr_entries=nr_col
             
+            #myfilename='/store/erebos/doris/Galacticus_1Gpc_z_0.09_CUT3_Contreras+13_mcold.hdf5'
             print 'myfilename:', myfilename
+            
             f = hdf5.File(myfilename+crossmatch, "r")
                 
 
             self.cat_attributes = {}                           
             i=0
             while i<len(f.attrs.keys()):
-                #print f.attrs.keys()[i], f.attrs.values()[i]
+                print f.attrs.keys()[i], f.attrs.values()[i]
                 self.cat_attributes[f.attrs.keys()[i]] = f.attrs.values()[i]
                 i+=1
-
+            print '+++++++++++++++++++++++++++\n'
             try:
                 self.redshift = self.cat_attributes['redshift']
                 self.scale_factor = self.cat_attributes['scaleFactor']
@@ -1065,7 +1067,7 @@ class	ArangeData:
 
             #print 'mysave_colname', mysave_colname
             self.data_array = self.data_array[:f[mysave_colname].size]
-            print 'self.data_array after read-in:', self.data_array.shape
+            print 'self.data_array after read-in:', self.data_array.shape, 'redshift:', self.redshift, 'scale factor:', self.scale_factor
             #print self.data_array[0:3]
 
         def readSAMHDF5(halocat_code):
@@ -1082,7 +1084,8 @@ class	ArangeData:
                     'SAG_': SAG,
                     'SAGE_': SAGE,
                     'LGALAXIES_': LGALAXIES,                  
-                    'sussing_': ROCKSTAR
+                    'sussing_': ROCKSTAR,
+                    'IllustrisTNG300': IllustrisTNG300
                     }
                     
                 func = choose.get(catname)
@@ -1116,6 +1119,10 @@ class	ArangeData:
             def ROCKSTAR():
                 file_struc_info= hdf5lib.ROCKSTAR_HDF5_halocat_filestruct(catname, snapid, path_to_directory=mypath)
                 return file_struc_info
+            
+            def IllustrisTNG300():
+                file_struc_info= hdf5lib.IllustrisTNG300_HDF5_Subhalo_filestruct(catname, snapid, path_to_directory=mypath)
+                return file_struc_info            
                 
             def other():
                 file_struc_info= hdf5lib.default_HDF5_filestruct(catname, snapid)
@@ -1151,8 +1158,11 @@ class	ArangeData:
                         self.data_array[myid_col_array['name'+str(a)]][size_before:new_size] = f[file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(a)])]][:,b]
                     b+=1
 
-            file_struc_info = caseSwitcher(catname[0:catname.find('_')+1])
-            #print file_struc_info
+            try:
+                file_struc_info = caseSwitcher(catname[0:catname.find('_')+1])
+            except:
+                file_struc_info = caseSwitcher(catname)
+
             size = 0
             size_before=0
             new_size=0
@@ -1189,7 +1199,17 @@ class	ArangeData:
                 #path='/store/multidark/NewMD_3840_Planck1/Galacticus/latest/job0/the_trees_0_1000000_0_results.hdf5'
                 #path='/data3/users/abenson/the_trees_0_1000000_0_results.hdf5'
                 f = hdf5.File(path, "r")
-                print 'i:', i, 'filename:', path
+                #print 'i:', i, 'filename:', path
+
+                #List snapshots for SMDPL-Galacticus 400Mpc
+#                l=1
+#                while l<=96:
+#                    try:
+#                        print 'snapshot: ', l, '\ta:', format(f['/Outputs/Output'+str(l)].attrs.get('outputExpansionFactor'), '.4f'), '\tz:', format(mL.expfactor_to_redshift(f['/Outputs/Output'+str(l)].attrs.get('outputExpansionFactor')), '.2f')
+#                    except:
+#                        print 'failed'
+#                    l+=1
+#                exit()
             
 #                p=0
 #                while p<(f['Arr/GalaxyID'][0].size):
@@ -1226,41 +1246,38 @@ class	ArangeData:
 #                                    
 #                exit()                                    
                 #Galacticus
-#                path='Outputs/Output75/nodeData/'
+#                path='Outputs/Output96/nodeData/'
 #                print f.keys()
 #                for key in f.keys():
 #                    print key, '\n-----------------\n'
 #                    for keykey in f[key].keys():
 #                        print keykey, ':\t', f[key].attrs.get(keykey)
-#                        path='Outputs/Output75/nodeData/'
+#                        #path='Outputs/Output96/nodeData/'
 #                    print '++++++++++++++++++++\n'
+#
 #                for name in f[path]:
-#                    count_att=0                   
-#                    print 'name:', name.ljust(30) 
-#                    for att in f[name].attrs:
-#                        print 'description:', f[name].attrs.get('Description')
-#                        count_att=1
-#                    if count_att==0:
-#                        count_att2=0
-#                        print '\n',
-#                        for key in f[name].keys():
-#                            print '        ', key.ljust(17), 
-#                            for att in f[name+'/'+key].attrs:
-#                                print'description:', f[name+'/'+key].attrs.get('Description')
-#                                count_att2=1
-#                            if count_att2==0:
-#                                print '\n',
-#                                for key2 in f[name+'/'+key].keys():
-#                                    print '           ', key2.ljust(14), 'description:', f[name+'/'+key+'/'+key2].attrs.get('Description')                            
+#                    print 'name:', name.ljust(20)                           
 #                            
+#              
+#                path='Parameters/'
+#
+#                    
+#                for name in f[path].attrs.items():            
+#                    print name[0].ljust(60), name[1]
+# 
+#                for name in f[path].keys():            
+#                    print name
+#                    for key in f[path+'/'+name].attrs.items():
+#                        print '\t', key[0].ljust(20), key[1]                                             
 #
 #                exit()
-                
+                   
+                    
                 if halocat_code=='False' and file_struc_info['catname'].find('SAGE')==-1:
                     if file_struc_info['catname'].find('SAGE')!=-1:
                         self.scale_factor = None
                         self.redshift = snapid
-                    elif file_struc_info['catname'].find('SAG_')==-1 and file_struc_info['catname'].find('LGALAXIES')==-1:
+                    elif file_struc_info['catname'].find('SAG_')==-1 and file_struc_info['catname'].find('LGALAXIES')==-1 and file_struc_info['catname'].find('Illustris')==-1:
                         self.scale_factor = f[file_struc_info[catname+'_path_to_snapid']].attrs.get(file_struc_info[catname+'_redshift_attribute'])
                         self.redshift = mL.expfactor_to_redshift(self.scale_factor)                     
                     else:
@@ -1321,11 +1338,12 @@ class	ArangeData:
                 
                 new_size=size+size_before
 
-                if np.sum(f[file_struc_info[file_struc_info['catname']+'_'+str(first_prop)]].shape)<size and file_struc_info['catname'].startswith('LGALAXIES')==-1:
+                if size_before==0 and np.sum(f[file_struc_info[file_struc_info['catname']+'_'+str(first_prop)]].shape)>size and file_struc_info['catname'].startswith('LGALAXIES')==False:
+                    print 'expand array!'
                     self.data_array = np.expand_dims(self.data_array, axis=1)
                     
                 
-                #print 'here:', np.info(self.data_array), np.sum(f[file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(0)])]].shape), size      
+                #print 'here:', str(myid_col_array['name'+str(0)]), np.sum(f[file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(0)])]].shape), size, np.sum(f[file_struc_info[file_struc_info['catname']+'_'+str(first_prop)]].shape)     
                 check_size=size
                 
                 #print 'size_before:', size_before, 'datasize:', size,  'size_new:', size_before+size, 'check_size:', new_size            
@@ -1348,8 +1366,8 @@ class	ArangeData:
                         #print 'ngalaxies at i:', i, f[file_struc_info[file_struc_info['catname']+'_ngalaxies']]
                         self.data_array['name'+str(a)][size_before:new_size] = size
 
-                    elif myid_col_array['name'+str(a)]=='x_pos' and catname.startswith('LGALAXIES'):
-                        print 'LGALAXIES position ...'
+                    elif myid_col_array['name'+str(a)]=='x_pos' and (catname.startswith('LGALAXIES') or catname.startswith('Illustris')):
+                        print 'LGALAXIES/Illustris positions ...'
                         self.data_array[myid_col_array['name'+str(a)]][size_before:new_size]=f[file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(a)])]][:,0] 
                         self.data_array['y_pos'][size_before:new_size]=f[file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(a)])]][:,1]                       
                         self.data_array['z_pos'][size_before:new_size]=f[file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(a)])]][:,2]
@@ -1409,6 +1427,8 @@ class	ArangeData:
                                         #print file_struc_info['catname']+'_'+myid_col_array['name'+str(a)][0:myid_col_array['name'+str(a)].find('total')]+'disk_'+filter_name
                                         #print f[file_struc_info[file_struc_info['catname']+'_'+myid_col_array['name'+str(a)][0:myid_col_array['name'+str(a)].find('total')]+'disk_'+filter_name]][0:10]
                                         #print file_struc_info['catname']+'_'+myid_col_array['name'+str(a)][0:myid_col_array['name'+str(a)].find('total')]+'spheroid_'+filter_name
+                                        #print f[file_struc_info[file_struc_info['catname']+'_'+myid_col_array['name'+str(a)][0:myid_col_array['name'+str(a)].find('total')]+'disk_'+filter_name]][0:10], '+', f[file_struc_info[file_struc_info['catname']+'_'+myid_col_array['name'+str(a)][0:myid_col_array['name'+str(a)].find('total')]+'spheroid_'+filter_name]][0:10]
+
                                         self.data_array[myid_col_array['name'+str(a)]][size_before:new_size] = f[file_struc_info[file_struc_info['catname']+'_'+myid_col_array['name'+str(a)][0:myid_col_array['name'+str(a)].find('total')]+'disk_'+filter_name]][:] + f[file_struc_info[file_struc_info['catname']+'_'+myid_col_array['name'+str(a)][0:myid_col_array['name'+str(a)].find('total')]+'spheroid_'+filter_name]][:]
                                         #print '-->CHECK!'
                                     except:
@@ -1427,7 +1447,7 @@ class	ArangeData:
                                 handle_multirow_dataset(nr_cols, a, size_before, new_size)
                             
                         else:
-                            #print 'name:', myid_col_array['name'+str(a)], 'size_before:', size_before, 'new_size:', new_size, 'datasize:', f[file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(a)])]].size
+                            #print 'name:', myid_col_array['name'+str(a)], 'size_before:', size_before, 'new_size:', new_size, 'datasize:', file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(a)])]
                             self.data_array[myid_col_array['name'+str(a)]][size_before:new_size] = f[file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(a)])]]
 
                     a+=1

@@ -6,6 +6,7 @@ import outputData as oD
 import arangeData as aD
 import myFuncs as mF
 import myLib as mL
+
 from cosmolopy import cd, fidcosmo
 #import loadObs as lO
 import subprocess as subs
@@ -144,28 +145,43 @@ class Pipeline:
                                                                                 
     def correctAndConvertUnits(self,
                                halocat_code=False):
+        
+        try:
+            print 'test format of [z] in mysnap_array ...',
+            print float(self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z'])+1.0
+            print 'is float! CORRECT!'
+        except:
+            print 'did not work! Convert [z] in mysnap_array to float!',
+            self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z'] =float(self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z'])
+            print float(self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z'])+1.0, '--> worked!'
 
-        print 'here: correctAndConvertUnits()'
-        if (self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_data_format']=='SAMHDF5' or self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_data_format']=='BINARY_SAGE') and myData.redshift!=False and myData.redshift!=None:
+        
+        
+        print 'here: correctAndConvertUnits() --> set redshift: '
+        if self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_data_format']=='SAMHDF5' or self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_data_format']=='BINARY_SAGE':
             self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z'] = myData.redshift
         
-        else:
-            #print 'else'
-        #self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_data_format']=='BINARY' or self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_data_format']=='CATASCII':
             try:
-                myData.redshift=float(self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z'])
-            except:
-                myData.redshift=float(self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_manual_input_redshift'])
-                self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z']=myData.redshift
-            try:
-                myData.scale_factor= float(self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['a'])           
-            except:
+                myData.redshift=self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z']
                 myData.scale_factor=mL.redshift_to_expfactor(myData.redshift)
-#        else:
-#            self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z']=float(self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_manual_input_redshift'])
-#            myData.redshift=float(self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_manual_input_redshift'])
-#            myData.scale_factor=mL.redshift_to_expfactor(myData.redshift)
-        #print myData.redshift, self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z'], myData.scale_factor       
+            except:
+                try:
+                    print '--> did not work, except!',
+                    myData.redshift=float(self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_manual_input_redshift'])
+                    self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z']=myData.redshift
+                    myData.scale_factor=mL.redshift_to_expfactor(myData.redshift)
+                    print myData.redshift+1.0, myData.scale_factor+1.0, 'redshift and scale factor set correctly!!!'
+                except:
+                    print '--> did not work, try to set scale factor!',
+                    myData.scale_factor= float(self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['a'])           
+                    try:
+                        print '---> did not work, second except!',
+                        myData.scale_factor=mL.redshift_to_expfactor(myData.redshift)
+                        print myData.redshift+1.0, myData.scale_factor+1.0, 'redshift and scale factor set correctly!!!'   
+                    except:
+                        print 'WARNING REDSHIFT WAS NOT CORRECTLY SET!!!'
+       
+        print 'myData.redshift:', myData.redshift, 'z in mysnap_array:', self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z'], 'myData.scale_factor:', myData.scale_factor       
         #try:            
         self.volume = mL.survey_VolumeSqDeg_to_Mpc(box_size=self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_box_size'], 
                                                redshift=myData.redshift,
@@ -406,18 +422,36 @@ class Pipeline:
 
         def filterDensity(myheader, mylog):
 
+            def get_ngal(ndens):
+                print 'number density:', ndens, 'box size:', self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_box_size'], '[h-1Mpc] little-h:', self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_hubble_par'],
+                if str(ndens).find('h3')!=-1:                    
+                    ndens_unit=ndens[ndens.find('h3')::]
+                    ndens=ndens[0:ndens.find('h3')]
+                print 'ndens:', ndens, 'unit:', ndens_unit
+                if ndens_unit.find('h3')!=-1:
+                    print 'here unit with littel-h absorbed!\nngal=ndens*box^3'
+                    ngal=int(float(ndens)*float(self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_box_size'])**3)
+                else:
+                    print 'here unit with littel-h factored out!\nngal=ndens*(box/h)^3'
+                    ngal=int(float(ndens)*(float(self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_box_size'])/float(self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_hubble_par']))**3)
+                print '----> ngal:', ngal
+                return ngal           
+
             d=0
             while d<10:              
                 try:
                     ngal = self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filter_density_ngal'+str(d)]
+                    print 'ngal:', ngal
+                    try:
+                        print 'ngal: ', int(ngal),
+                    except:
+                        print '--> not found ...!'
+                        ngal=get_ngal(ngal)
                     cut_name = self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filter_density_cut_name'+str(d)]
                 except:
-                    if d==0:
-                        ngal = self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filter_density_ngal'] 
-                        cut_name=self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filter_density_cut_name']
-                    else:
-                        print 'END OF DENISTY FILTERING!'
-                        exit()                
+                    print 'END OF DENISTY FILTERING!'
+                    exit()  
+
                 
                 c=0
                 while c<100:
@@ -441,7 +475,7 @@ class Pipeline:
     
                     data_sorted = data[np.argsort(data[name])]
                     
-                    mylog_filter+='\nselected for number density property '+name+': '+str(int(ngal)/float(self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_box_size'])**3)+' Mpc-3h3\n'
+                    mylog_filter+='\nselected for number density property '+name+': '+str(int(ngal)/float(self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_box_size'])**3)+' h3Mpc-3\n'
                     print 'data after sort:', data.shape, 'mynumber_density_ngal', int(ngal),
                                     
                     size=len(data_sorted[name])
@@ -910,29 +944,29 @@ class Pipeline:
            
         while i<self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_id_col_array']['nr_entries']:
                      
-            if self.myconfig_array['catname'+str(self.a)]=='Galacticus_1Gpc' and self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_id_col_array']['name'+str(i)]=='hostid' and self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_data_format']=='SAMHDF5':
-                print 'GALACTICUS correct HOSTID of satellites and orphans!'                
+            if self.myconfig_array['catname'+str(self.a)].startswith('Galacticus') and self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_id_col_array']['name'+str(i)]=='hostid' and self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_data_format']=='SAMHDF5':
+                #print 'GALACTICUS correct HOSTID of satellites and orphans!'                
                 mask = np.where(data['orphan']!=0)               
                 data['hostid'][mask[:][0]]=data['satelliteNodeIndex'][mask[:][0]]
 
-            if self.myconfig_array['catname'+str(self.a)]=='Galacticus_1Gpc' and self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_id_col_array']['name'+str(i)]=='haloid' and self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_data_format']=='SAMHDF5':
-                print 'GALACTICUS: correct HALOID of satellites and orphans!'                    
+            if self.myconfig_array['catname'+str(self.a)].startswith('Galacticus') and self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_id_col_array']['name'+str(i)]=='haloid' and self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_data_format']=='SAMHDF5':
+                #print 'GALACTICUS: correct HALOID of satellites and orphans!'                    
                 mask = np.where(data['orphan']!=0)
                 data['haloid'][mask[:][0]]=data['parentIndex'][mask[:][0]]
 
             if self.myconfig_array['catname'+str(self.a)].startswith('Galacticus') and self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_id_col_array']['name'+str(i)]=='mhalo' and self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_data_format']=='SAMHDF5' and count_mhalo==0:
-                print 'GALACTICUS: set mhalo of the satellites to sattelliteBoundMass aka mhalo_sat!!!!'                
+                #print 'GALACTICUS: set mhalo of the satellites to sattelliteBoundMass aka mhalo_sat!!!!'                
                 mask = np.where(data['orphan']!=0)
                 data['mhalo'][mask[:][0]]=data['mhalo_sat'][mask[:][0]]
                 mask = np.where(data['orphan']!=0)              
 
             if self.myconfig_array['catname'+str(self.a)].startswith('Galacticus') and self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_id_col_array']['name'+str(i)]=='Mzgas' and self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_data_format']=='SAMHDF5' and count_Mzgas==0:
-                print 'GALACTICUS: MZgas = MZgas_spheroid + MZgas_disk!!!!'
+                #print 'GALACTICUS: MZgas = MZgas_spheroid + MZgas_disk!!!!'
                 count_Mzgas+=1
                 data['Mzgas']=data['Mzgas_spheroid']+data['Mzgas_disk']
 
             if self.myconfig_array['catname'+str(self.a)].startswith('Galacticus') and self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_id_col_array']['name'+str(i)]=='Mzstar' and self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_data_format']=='SAMHDF5' and count_Mzstar==0:
-                print 'GALACTICUS: MZstar = MZstar_spheroid + MZstar_disk!!!!'
+                #print 'GALACTICUS: MZstar = MZstar_spheroid + MZstar_disk!!!!'
                 count_Mzstar+=1
                 data['Mzstar']=data['Mzstar_spheroid']+data['Mzstar_disk']
 
@@ -1051,60 +1085,93 @@ class Pipeline:
               
         try:
             data['mstar'] = data['mstar_disk']+data['mstar_spheroid']
-            print 'mstar=mstar_disk+mstar_spheroid'
+            #print 'mstar=mstar_disk+mstar_spheroid'
         except:
              pass
         try:
             data['sfr'] = data['sfr_disk']+data['sfr_spheroid']
-            print 'sfr=sfr_disk+sfr_spheroid'            
+            #print 'sfr=sfr_disk+sfr_spheroid'            
         except:
             pass            
         try:
             data['mcold'] = data['mcold_disk']+data['mcold_spheroid']
-            print 'mcold=mcold_disk+mcold_spheroid'            
+            #print 'mcold=mcold_disk+mcold_spheroid'            
         except:
             pass
         try:
             data['Mzstar'] = data['Mzstar_disk']+data['Mzstar_spheroid']
-            print 'Mzstar=Mzstar_disk+Mzstar_spheroid'            
+            #print 'Mzstar=Mzstar_disk+Mzstar_spheroid'            
         except:
             pass        
         try:
             data['Mzgas'] = data['Mzgas_disk']+data['Mzgas_spheroid']
-            print 'Mzgas=Mzgas_disk+Mzgas_spheroid'            
+            #print 'Mzgas=Mzgas_disk+Mzgas_spheroid'            
         except:
             pass
+        try:
+            data['ssfr'] = data['sfr']/data['mstar']
+            print 'ssfr=sfr/mstar'
+            print 'ssfr min/max:', min(data['ssfr']), '/', max(data['ssfr'])            
+        except:
+            pass
+        try:
+            data['zcold']=8.69+np.log10(data['Mzgas']/(data['mcold']*0.0134))
+            print 'zcold=8.69+log10(Mzgas/Mcold/0.0134)'
+        except:
+            pass
+        try:
+            data['cgf']=data['mcold']/data['mstar']
+            print 'cgf=mcold/mstar'
+        except:
+            pass
+
+        #print 'vmax: min/max:', format(min(data['vmax']), '0.2f'), '/', format(max(data['vmax']), '0.2f')           
+        #print 'vdisp: min/max:', format(min(data['vdisp']), '0.2f'), '/', format(max(data['vdisp']), '0.2f')         
+
 #        try:
-#            data['ssfr'] = data['sfr']/data['mstar']
-#            print 'ssfr=sfr/mstar'
-#            print 'ssfr min/max:', min(data['ssfr']), '/', max(data['ssfr'])            
+#            data['mAB_dA_total_cut_r_i'] = data['MAB_dA_total_r']-data['MAB_dA_total_i']
+#            data['mAB_dA_total_cut_g_r'] = data['MAB_dA_total_g']-data['MAB_dA_total_r'] 
+#            data['mAB_dA_total_cut_g_i'] = data['MAB_dA_total_g']-data['MAB_dA_total_i']          
 #        except:
 #            pass
 #
-#
-#        try:
-#            if np.all(data['mean_age_stars']==-99):
-#                from cosmolopy import cparam, cd
-#                fidcosmo = cparam.Planck(flat=True, extras=False)
-#                data['mean_age_stars'] = cd.age(0.5574, **fidcosmo)-data['age_sfr_disk_int']/data['sfr_disk_int']
-#                print 'mean_age_stars=age_Universe(z)-age_sfr_int/sfr_disk_int'
-#                print 'mean_age_stars min/max:', min(data['mean_age_stars']), '/', max(data['mean_age_stars'])            
-#        except:
-#            pass
+        
+        try:
+            from cosmolopy import cparam, cd,cc
+            fidcosmo = cparam.Planck(flat=True, extras=False)    
+            data['mean_age_stars_disk'] = cd.age(redshift, **fidcosmo)/cc.Gyr_s-(data['age_sfr_int_disk']/data['sfr_int_disk']/1e9)
+            
+            print 'z=', redshift, 'age:', format(cd.age(redshift, **fidcosmo)/cc.Gyr_s, '0.2f'), 'mean_age_stars_disk=age_Universe(z)-age_sfr_int_disk/sfr_int_disk [Gyr]',
+            print 'min/max:', format(min(data['mean_age_stars_disk']), '0.2f'), '/', format(max(data['mean_age_stars_disk']), '0.2f')           
+        except:
+            pass
+
+        try:
+            from cosmolopy import cparam, cd,cc
+            fidcosmo = cparam.Planck(flat=True, extras=False)    
+            data['mean_age_stars_spheroid'] = cd.age(redshift, **fidcosmo)/cc.Gyr_s-(data['age_sfr_int_spheroid']/data['sfr_int_spheroid']/1e9)
+            
+            print 'z=', redshift, 'age:', format(cd.age(redshift, **fidcosmo)/cc.Gyr_s, '0.2f'), 'mean_age_stars_spheroid=age_Universe(z)-age_sfr_int_spheroid/sfr_int_spheroid [Gyr]',
+            print 'min/max:', format(min(data['mean_age_stars_spheroid']), '0.2f'), '/', format(max(data['mean_age_stars_spheroid']), '0.2f')           
+        except:
+            pass
+        
 #        
-#        try:
-#            if np.all(data['pop']==-99):
-#                print 'divide sample!'
-#                y=np.log10(data['ssfr'])
-#                x=np.log10(data['sfr'])
-#                prop=(y+11.16)/1.12-x
-#                print prop
-#                data['pop'][np.where(prop<=0.0)]=2
-#                data['pop'][np.where(prop>0.0)]=1
-#    
-#                print 'min/max', min(data['pop']), max(data['pop'])               
-#        except:
-#            pass        
+        try:
+            if np.all(data['pop']==-99):
+                print 'divide sample!'
+                y=np.log10(data['ssfr'])
+                x=np.log10(data['sfr'])
+                prop=(y+11.16)/1.12-x
+                print prop
+                data['pop'][np.where(prop<=0.0)]=2
+                data['pop'][np.where(prop>0.0)]=1
+    
+                print 'min/max', min(data['pop']), max(data['pop'])               
+        except:
+            pass   
+        
+        
 #
 #        try:
 #            if np.all(data['env_512']==-99.0) or np.all(data['env_1024']==-99.0):
@@ -1136,22 +1203,6 @@ class Pipeline:
 #        except:
 #            pass
 #
-        try:
-            data['NFW_con'] = mL.calculate_NFW_con_with_fit(data['mhalo'], float(myData.redshift), cosmology='Planck', overdens='vir')
-            print '\n+++++++++++++++++++\ncalculate approx. NFW concentration at z=', myData.redshift, '--> DONE!'             
-        except:
-            pass
-#
-#
-#        try:
-#            if np.all(data['mhalo_cents_200c']==-99.0):
-#                print '\n+++++++++++++++++++\nconvert mhalo from viral to 200c',
-#                data['mhalo_cents_200c'], data['NFW_con']=mL.convert_halo_mass(data['mhalo_cents'],
-#                                                                                 data['NFW_con'],
-#                                                                                 data['orphan'])
-#                print '--> DONE!\n'
-#        except:
-#            pass
 #            
 #        try:
 #
@@ -1175,18 +1226,52 @@ class Pipeline:
 #                print '--> DONE!\n'
 #        except:
 #            pass
-#
-#
-#        try:
-#            if np.all(data['mhalo_200c']==-99.0):
-#                print '\n+++++++++++++++++++\nconvert mhalo from viral to 200c',
-#                data['mhalo_200c'], data['NFW_con']=mL.convert_halo_mass(data['mhalo'],
-#                                                                         data['NFW_con'],
-#                                                                         data['orphan'])
-#                print '--> DONE!\n'
-#        except:
-#            pass
-#
+##
+ 
+#        data_cents=data[np.where(data['orphan']==0)[0][:]]     
+#        data_sats=data[np.where(data['orphan']==1)[0][:]]
+#        data_os=data[np.where(data['orphan']==2)[0][:]]
+#        print 'all:', data.size, 'centrals:', data_cents.size, 'sats:', data_sats.size+data_os.size, 'orphans:', data_os.size
+#        print 'fractions cent:', data_cents.size/float(data.size), 'sats:', (data_sats.size+data_os.size)/float(data.size), 'orphans in sats:', data_os.size/float(data_sats.size)
+#        
+#        
+#        data = mL.choose_random_sample(data,
+#                         int(data.size*0.10))     
+#        print np.info(data)
+      
+
+        print 'CHECK HERE: redshift=', redshift
+        #redshift=0.0
+        try:
+            if np.all(data['mhalo_200c']==-99.0):
+                data['NFW_con'] = mL.calculate_NFW_con_with_fit(data['mhalo'], 
+                                                       float(redshift),
+                                                       cosmology='Planck', 
+                                                       overdens='vir')
+            
+                data['mhalo_200c']=mL.convert_halo_mass(data['mhalo'], 
+                                                                    data['NFW_con'],
+                                                                    data['orphan'])
+            
+                print '--> DONE!\n'
+        except:
+            pass
+        
+        try:
+            if np.all(data['mhalo_cents_200c']==-99.0):
+                NFW_con = mL.calculate_NFW_con_with_fit(data['mhalo_cents'], 
+                                                       float(redshift),
+                                                       cosmology='Planck', 
+                                                       overdens='vir')
+                
+                data['mhalo_cents_200c']=mL.convert_halo_mass(data['mhalo_cents'], 
+                                                                    NFW_con,
+                                                                    data['orphan'])
+          
+                print '--> DONE!\n'
+        except:
+            pass 
+
 #
 #        try:
 #            if np.all(data['weight_tot']==-99.0):
@@ -1200,30 +1285,59 @@ class Pipeline:
 #                print '--> DONE!\n'                
 #
 #        except:
-#            try:
-#                if np.all(data['weight_tot']==-99.0):
-#                    print 'set weights to 1!',
-#                    data['weight_tot']=np.ones((data.size,), dtype=np.int8)
-#                    print '--> DONE!\n'
-#            except:
-#                pass
+        try:
+            if np.all(data['weight_tot']==-99.0):
+                print 'set weights to 1!',
+                data['weight_tot']=np.ones((data.size,), dtype=np.int8)
+                print '--> DONE!\n'
+        except:
+            pass
 #
+          
+#        import pandas as pd
+#        
+#        for n_cl in list(range(1,324)):
+#            print 'cluster number:', n_cl,
+#                
+#            filename=mycomp+'anaconda/pro/data/300/Galacticus/MDPL2_Galacticus_z0.00_region'+str(n_cl).zfill(4)+'.txt'
+#            print filename
+#            mydata_names=['z','hostid','haloid','orphan','x_pos','y_pos','z_pos','x_vel','y_vel','z_vel','mstar_spheroid','mstar_disk',\
+#                          'mcold_spheroid','mcold_disk','mhot','mbh','sfr','sfr_spheroid','sfr_disk','mean_age_stars','mhalo','rest',\
+#                          'Vmax','Vpeak','NFW_con','spin','MZstar_spheroid','Mzstar_disk', 'Mzgas_spheroid', 'Mzgas_disk','mzhot_halo',\
+#                          'L_SDSS_dA_total_u','L_SDSS_dA_total_g','L_SDSS_dA_total_r','L_SDSS_dA_total_i','L_SDSS_dA_total_z',\
+#                          'MAB_dA_total_u','MAB_dA_total_g','MAB_dA_total_r','MAB_dA_total_i','MAB_dA_total_z',\
+#                          'rdisk','rbulge','rhalf_mass','mhot_outflow']
+#            
+#            mydata = mL.df_to_sarray(pd.read_csv(filename, skiprows=2, names=mydata_names, sep='  '))                
+#            
+#            if n_cl==1:
+#                data=mydata
+#            else:
+#                data = np.append(data, mydata, axis=0)
+#                
+#            print 'size:', data.size
+        
 #        try:
 #            if np.all(data['zcold']==-99.0):
 #                print '\n+++++++++++++++++++\ncalculate gas-phase metallicity',
 #                data['zcold']=8.69+np.log10(data['Mzgas']/(data['mcold']*0.0134))
+#                #data['OH_gas_disk_bulge']=12.0+np.log10(data['OH_gas_disk_bulge']/16.0)
 #                print '--> DONE!\n'
 #        except:
-#            pass
-#
+#            print 'SAGE:',
+#            #data['zcold'] = 8.69+np.log10(data['Mzgas_disk']/(data['mcold_disk']*0.0134))
+#            data['zcold'] = 8.69+np.log10(data['zgas_disk']/0.0134)
+#            print '--> DONE\n'
+###
 #        try:
 #            if np.all(data['cgf']==-99.0):
 #                print '\n+++++++++++++++++++\ncalculate gas-phase metallicity',
 #                data['cgf']=data['mcold']/data['mstar']
 #                print '--> DONE!\n'
-#
 #        except:
-#            pass
+#            print 'SAGE:',
+#            data['cgf'] = (data['mcold_disk']/data['mstar'])
+#            print '--> DONE'
 #
 #        try:
 #            mags='mAB_dA_total_'
@@ -1255,15 +1369,128 @@ class Pipeline:
 #            print 'Mstar_IC+Mstar'            
 #        except:
 #            pass
-
+            
 
 ##########################################################################################################################################################
-        #data = mL.reduce_rand(data)
+#        data = data[np.where(data['mstar']>5e8)[:][0]]
+#        #data = data[np.where(data['mstar']<=9e11)[:][0]]
+#        print data.size        
+
+#        preprocessing_only=True
 #
-        #mL.give_galaxy_type_info(data['orphan'])      
-        #data=mL.downsample_SMF(data)
-        #mL.give_galaxy_type_info(data['orphan'])
-       
+#        print 'sample name:', 
+#        mL.give_galaxy_type_info(data['orphan'])
+#
+#
+#        mycut=myhdf5_filename[myhdf5_filename.find('CUT'):len(myhdf5_filename)-5]
+#        print 'mycut:', mycut
+#
+#        for item in ['mstar','sfr','ssfr','mhalo_cents_200c']:
+#            mydata = data[item][np.where(data[item]>0.0)[:][0]]
+#            print item, 'min/max:', format(np.log10(np.nanmin(mydata)), '0.2f') , '/', format(np.log10(np.nanmax(mydata)), '0.2f')
+#            print '\t\t', "{0:.2f}".format(np.log10(np.nanmedian(mydata))), '\t', "{0:.2f}".format(np.log10(np.nanmedian(mydata))-np.log10(np.nanpercentile(mydata, 32))), '/', "{0:.2f}".format(np.log10(np.nanpercentile(mydata, 68))-np.log10(np.nanmedian(mydata)))
+#
+#            stats=str(redshift)+'\t'+str("{0:.2f}".format(np.log10(np.nanmedian(mydata))))+'\t'+str("{0:.2f}".format(np.log10(np.nanmedian(mydata))-np.log10(np.nanpercentile(mydata, 32))))+'\t'+str("{0:.2f}".format(np.log10(np.nanpercentile(mydata, 68))-np.log10(np.nanmedian(mydata))))
+#            if redshift==0.0 or redshift=='0.0':
+#                myOutput.writeIntoFile(mycomp+'anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/'+self.myconfig_array['catname'+str(self.a)]+'_HOD-SFgalaxies_z-evolution_'+mycut+'_'+item+'.txt',
+#                           [stats],
+#                           myheader='HOD-SFGalaxies project z-evolution of properties! cat: '+self.myconfig_array['catname'+str(self.a)]+' cut: '+mycut+' prop: '+item+'\n(1) z (2) log10('+item+') (3) -dy (4) +dy',
+#                           append_mytext=False,
+#                           data_is_string=False,
+#                           data_format='%s')
+#            else:
+#                myOutput.writeIntoFile(mycomp+'anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/'+self.myconfig_array['catname'+str(self.a)]+'_HOD-SFgalaxies_z-evolution_'+mycut+'_'+item+'.txt',
+#                           stats+'\n',
+#                           append_mytext=True,
+#                           data_is_string=True,
+#                           data_format='%s')                
+#            
+
+        #exit()
+#        data=mL.downsample_SMF(data)
+#        mL.give_galaxy_type_info(data['orphan'])
+
+        
+        #ngal=int((self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_box_size']/0.6778)**3*0.008)
+        #number density: Gal400
+        #data = mL.choose_random_sample(data,3288480)#n=0.016
+        #data = mL.choose_random_sample(data,2466360)#n=0.012
+        #data = mL.choose_random_sample(data,1664240)#n=0.008
+     
+        #data = mL.choose_random_sample(data,ngal)        
+        #print 'randomly chosen:', data.size
+
+
+#        data = mL.test_haloids(data)
+###
+#        #data = data[np.where(data['orphan']==1)[0][:]]
+#        print np.info(data)
+#        mL.property_stats(data)
+#        myOutput.writeIntoFile(mycomp+'anaconda/pro/data/Galacticus_1Gpc_run2/Galacticus_1Gpc_run2_z_0.56_same_haloid_Gal-dens.txt',
+#                   data[['haloid','hostid','orphan','mhalo','mstar', 'haloid_test_against', 'hostid_test_against', 'orphan_test_against', 'env_512', 'env_1024', 'pop']],
+#                   myheader= 'Galacticus 1Gpc z='+str(format(redshift, '0.2f'))+' CMASS sample of Gal2-dens sample galaxies with same hostid as Gal-dens \n(1) haloid (2) hostid (3) orphan (4) mhalo_200c [Msun] (5) mstar [Msun] (6) haloid_Gal2 (7) hostid_Gal2 (8) orphan_Gal2 (9) env_512 (10) env_1024 (11) pop',
+#                   data_format="%i\t%i\t%i\t%0.8e\t%0.8e\t%i\t%i\t%i\t%i\t%i\t%i",
+#                   mydelimiter='\t')         
+#
+#        myOutput.writeIntoFile(mycomp+'anaconda/pro/data/Galacticus_1Gpc_run2/Galacticus_1Gpc_run2_z_0.56_CMASS_down_sample3_haloid_from_Gal-dens.txt',
+#                   data[['haloid','hostid']],
+#                   myheader= 'Galacticus 1Gpc z='+str(format(redshift, '0.2f'))+' CMASS down sample3 (color cut: Guo+13)\n(1) haloid (2) hostid',
+#                   data_format="%i\t%i",
+#                   mydelimiter='\t')  
+        
+#        myOutput.writeIntoFile(mycomp+'anaconda/pro/data/Galacticus_400Mpc/Galacticus_400Mpc_z_0.55_CMASS_down_sample3_haloid.txt',
+#                   data[['haloid','hostid']],
+#                   myheader= 'Galacticus 400Mpc z='+str(format(redshift, '0.2f'))+' CMASS down sample3\n(1) haloid (2) hostid',
+#                   data_format="%i\t%i",
+#                   mydelimiter='\t')  
+
+#        myOutput.writeIntoFile(mycomp+'anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/'+self.myconfig_array['catname'+str(self.a)]+'_z_'+str(format(redshift, '0.2f'))+'_rand-sample_n_0.016.txt',
+#                   data[['mhalo_200c','orphan','mstar','sfr','ssfr','mhalo_cents_200c', 'mbh', 'mAB_total_cut_g_i', 'rhalf_mass', 'rdisk']],
+#                   myheader= self.myconfig_array['catname'+str(self.a)]+' z='+str(format(redshift, '0.2f'))+' rand sample n=0.016 [Mpc-1] as TNG300-1 (Mstar>3e8 [h-1Msun]) \n(1) mhalo_200c [Msun] (2) orphan (3) mstar [Msun] (4) sfr [Msunyr-1] (5) ssfr [yr-1] (6) mhalo_cents_200c [Msun] (7) mbh [Msun] (8) mAB_total_cut_g_i [-] (9) rhalf_mass [Mpc] (10) rdisk/rbulge [-]',
+#                   data_format="%0.10e\t%i\t%0.10e\t%0.10e\t%0.10e\t%0.10e\t%0.10e",
+#                   mydelimiter='\t') 
+      
+#        exit()
+
+#        data.sort(order=['mcold'], axis=0)      
+#        data=data[data.size-530000:data.size]
+#        print 'size sorted arry:', data.size
+#        data = data[np.where(data['orphan']==0)[0][:]] 
+#        
+#        data = data[np.where(data['zcold']<=8.5)[0][:]]
+#        data = data[np.where(data['mstar']>4e10)[0][:]]
+#        print 'lowZ:', data.size      
+#        
+#
+#        try:
+#            if np.all(data['mhalo_200c']==-99.0):
+#                data['NFW_con'] = mL.calculate_NFW_con_with_fit(data['mhalo'], 
+#                                                       redshift,
+#                                                       cosmology='Planck', 
+#                                                       overdens='vir')
+#                
+#                data['mhalo_200c']=mL.convert_halo_mass(data['mhalo'], 
+#                                                                    data['NFW_con'],
+#                                                                    data['orphan'])
+#                print '--> DONE!\n'
+#        except:
+#            pass
+#
+#
+#        print 'mcold CUT3 centrals', data.size        
+#        mL.property_stats(data)
+#
+#                   
+##        mydata = data[np.where(data['zcold']>8.5)[0][:]]
+##        mydata = mydata[np.where(mydata['mstar']>1e11)[0][:]]
+##        print 'highZ:', mydata.size     
+##        mL.property_stats(mydata)
+#        
+#                            
+#
+#        
+#        mL.property_stats(mydata)
+#        exit()        
 
 ##########################################################################################################################################################        
 
@@ -1429,161 +1656,174 @@ class Pipeline:
         if self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_calcHistoSample']=='True':         
 
             #Calculate a histo from all coluumns!
-      
-            bands=['i']
-            cuts=[2.35]#,1.6,1.4,1.2]           
+
+            def lumHisto():      
+                bands=['i']
+                cuts=[2.35]#,1.6,1.4,1.2]           
+                
+                method='1'
+                for cut in cuts:
+                    try:
+                        mydata=data
+                        i=0
+                        for band in bands:
+                            print 'analyseTargetSelection() --> Calculate Histogramm ...'
+                            print '-------------------'
+                            print ' '
+                            print 'i:', i, 'name:',  myconds_array['name'+str(i)], 'sel_col:', myconds_array[myconds_array['name'+str(i)]+'_col_id'], mydata.shape
             
-            method='1'
-            for cut in cuts:
-                try:
-                    mydata=data
-                    i=0
-                    for band in bands:
-                        print 'analyseTargetSelection() --> Calculate Histogramm ...'
-                        print '-------------------'
-                        print ' '
-                        print 'i:', i, 'name:',  myconds_array['name'+str(i)], 'sel_col:', myconds_array[myconds_array['name'+str(i)]+'_col_id'], mydata.shape
-        
-
-                        name = 'MAB_dA_total_'+band
-                        #name='mstar'
-                        print 'name:', name
-                        
-                        lum_dist=cd.luminosity_distance(0.55, **fidcosmo)
-                        print fidcosmo
-                        DM = 5.0*np.log10(lum_dist*1e6/10.0)
-                        K_corr = -2.5*np.log10(1.0+0.555)
-                       
-                        if method=='1':
-                            print 'method 1:'
-                            mydata['MAB_dA_total_'+band] = -2.5*np.log10(mydata['L_SDSS_dA_total_'+band]) -(-2.5*np.log10(1.0+0.557)) + K_corr
-                            mydata['mAB_dA_total_i'] = -2.5*np.log10(mydata['L_SDSS_dA_total_i']) + DM + K_corr
-                            mydata['mAB_dA_total_r'] = -2.5*np.log10(mydata['L_SDSS_dA_total_r']) + DM + K_corr
-                            #mydata['mAB_dA_total_g'] = -2.5*np.log10(mydata['L_SDSS_dA_total_g']) + DM + K_corr                          
-
-                        elif method=='CM':
-                            mydata['MAB_dA_total_'+band]=mydata['mAB_dA_total_'+band]-DM+5.0*np.log10(0.7/0.6777)-(-2.5*np.log10(1.0+0.55))
-                            #print 18.055-DM+5.0*np.log10(0.7/0.6777)-(-2.5*np.log10(1.0+0.55))
-#                            mydata = mydata[(np.where(mydata['mAB_dA_total_i']>18.4999))[:][0]]
-#                            mydata = mydata[(np.where(mydata['mAB_dA_total_i']<18.5001))[:][0]] 
-#                            print mydata['mAB_dA_total_'+cut]
-#                            print mydata['MAB_dA_total_'+cut]                            
-                        else:
-#                            print 'method 2:'
-                            lum=mydata['L_SDSS_dA_total_'+cut]/(4.0*np.pi*(lum_dist*1e6*3.0857e16*100)**2)
-                            mydata['mAB_dA_total_'+cut] = -2.5*np.log10(lum*(1+0.56)/3631e-23)                                                
+    
+                            name = 'MAB_dA_total_'+band
+                            #name='mstar'
+                            print 'name:', name
                             
-                            mydata['MAB_dA_total_'+cut] = mydata['mAB_dA_total_'+cut] - DM -5*np.log10(0.6777) -(-2.5*np.log10(1.0+0.55)) 
-#
-#                        print mydata
-                        #x=mydata['mAB_dA_total_g']-mydata['mAB_dA_total_r']                        
-                        #y=mydata['mAB_dA_total_r']-mydata['mAB_dA_total_i']
-
-                        #test1
-                        #prop=-0.26+(y+0.7)/0.92857-x                        
-                        #test2
-                        #prop=-0.3+(y+0.7)/0.92857-x
-                        #test3
-                        #prop=(y+1.05)/1.3-x
-                        #mydata = mydata[np.where(prop<0.0)[:][0]]
-
-                        #mydata = mydata[np.where(mydata['orphan']<2)[:][0]]
-                        if cut=='Guo13':
-                            print 'cut:', cut
-                            mycut=0.679-0.082*(data['MAB_dA_total_i']+20.0)
-                            mydata=mydata[np.where(mydata['mAB_dA_total_r']-mydata['mAB_dA_total_i']>mycut)[0][:]]
-                        else:
-                            print 'g-i>', cut
-                            mydata = mydata[np.where(mydata['mAB_dA_total_g']-mydata['mAB_dA_total_i']>float(cut))[:][0]]                            
-
-                          
-                        print 'after color_cut:', mydata.shape
-                                             
-                        if name.find('MAB')!=-1:
-                            cond_min=-25
-                            cond_max=-19
-        
-                        else:
-                            cond_min=16
-                            cond_max=23
-        
-                        data_histo = myData.selectData2Compute(mydata, 
-                                                        selected_col=name, 
-                                                        operator='<', 
-                                                        condition=cond_max)
-                                                
-                                                        
-        
-                        data_histo = myData.selectData2Compute(data_histo, 
-                                                        selected_col=name, 
-                                                        operator='>', 
-                                                        condition=cond_min)
-                        print 'after max:', data_histo.shape         
-                        #data['mstar']*=1e10     
-                        nbins=30
-        
-                        if name.find('AB')!=-1:
-                            data_histo[name]=abs(data_histo[name])             
-                        else:
-                            data_histo[name]=np.log10(data_histo[name])
-                        data_min = min(data_histo[name])
-                        data_max = max(data_histo[name])
-        
-                        binsize = (data_max-data_min)/nbins
-                        print 'data min/max:', data_min, '/', data_max, 'binsize:', binsize,
-                        counts, edges = np.histogram(data_histo[name],nbins,weights=data_histo['weight_tot'])
-
-                        histo=np.zeros((nbins, 7), dtype=np.float64)
-                        if name.find('AB')!=-1:
-                            if name.startswith('MAB'):
-                                histo[:,0]= -(edges[1:]+edges[:-1])/2
+                            lum_dist=cd.luminosity_distance(0.55, **fidcosmo)
+                            print fidcosmo
+                            DM = 5.0*np.log10(lum_dist*1e6/10.0)
+                            K_corr = -2.5*np.log10(1.0+0.555)
+                           
+                            if method=='1':
+                                print 'method 1:'
+                                mydata['MAB_dA_total_'+band] = -2.5*np.log10(mydata['L_SDSS_dA_total_'+band]) -(-2.5*np.log10(1.0+0.557)) + K_corr
+                                mydata['mAB_dA_total_i'] = -2.5*np.log10(mydata['L_SDSS_dA_total_i']) + DM + K_corr
+                                mydata['mAB_dA_total_r'] = -2.5*np.log10(mydata['L_SDSS_dA_total_r']) + DM + K_corr
+                                #mydata['mAB_dA_total_g'] = -2.5*np.log10(mydata['L_SDSS_dA_total_g']) + DM + K_corr                          
+    
+                            elif method=='CM':
+                                mydata['MAB_dA_total_'+band]=mydata['mAB_dA_total_'+band]-DM+5.0*np.log10(0.7/0.6777)-(-2.5*np.log10(1.0+0.55))
+                                #print 18.055-DM+5.0*np.log10(0.7/0.6777)-(-2.5*np.log10(1.0+0.55))
+    #                            mydata = mydata[(np.where(mydata['mAB_dA_total_i']>18.4999))[:][0]]
+    #                            mydata = mydata[(np.where(mydata['mAB_dA_total_i']<18.5001))[:][0]] 
+    #                            print mydata['mAB_dA_total_'+cut]
+    #                            print mydata['MAB_dA_total_'+cut]                            
                             else:
-                                histo[:,0]= (edges[1:]+edges[:-1])/2
-                        else:
-                            histo[:,0]= (10**edges[1:]*10**edges[:-1])**0.5
-                        
-                        if method=='CM':
-                            Vol=4.147e9 #CMASS DR12 
-                        else:
-                            Vol  = (float(self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_box_size'])/0.6777)**3
-                            print 'Vol:', Vol, 'box_size:', self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_box_size'], 'data_min:', data_min, 'data_max:', data_max, 'binsize:', binsize
-
-                                                   
-                        histo[:,1]= counts/(Vol*binsize)
-                        histo[:,4]=histo[:,1]/counts**0.5
-                        histo[:,5]=histo[:,4]
-                        histo[:,6]= counts
-                        k=0
-                        for cols in histo[:,6]:
-                            #print cols
-                            if cols<25.0:
-                                histo[k,2]=1.0
-                            k+=1
-                        
-                        #print_5logh=' 5logh'
-                        print_5logh=''
-                        #selection='_-Kcorr_047_i_g-i_'+str(cut)+'_'
-                        #selection='_g-i_gt_'+str(cut)+'_'                
-                        selection=''
-                        #key='_350Mpc_run_1235'
-                        key='_'+str(cut)
-                        key='_g-i_gt_'+str(cut)
-                        
-                        #filename=mycomp+'anaconda/pro/myRun/histos/analyseTargetSelection/histo_'+self.myconfig_array['catname'+str(self.a)]+'_v3_z_0.1_'+name+'-5logh_h-units.txt'
-                        filename=mycomp+'anaconda/pro/myRun/histos/analyseTargetSelection/histo_'+self.myconfig_array['catname'+str(self.a)]+'_z_'+str(redshift)+'_'+self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_tarsel_code']+'_'+selection+name+key+'.txt'
-        
-                        print 'name:', name, 'z:', redshift, 'format:', myconds_array[name+'_format'], 'unit:', myconds_array[name+'_unit']
-                        myOutput.writeIntoFile(filename,
-                                       histo,
-                                       myheader= self.myconfig_array['catname'+str(self.a)]+' z '+str(redshift)+' '+self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_tarsel_code']+' '+name+' histo\n(1) '+name+print_5logh+' ['+myconds_array[name+'_unit']+']\t(2) Phi [Mpc-3 dex-1]\t(3) -dx\t(4) dx\t(5) -dy\t(6) +dy\t(7) N count',
-                                       data_format='%0.8e',
-                                       mydelimiter='\t')
+    #                            print 'method 2:'
+                                lum=mydata['L_SDSS_dA_total_'+cut]/(4.0*np.pi*(lum_dist*1e6*3.0857e16*100)**2)
+                                mydata['mAB_dA_total_'+cut] = -2.5*np.log10(lum*(1+0.56)/3631e-23)                                                
+                                
+                                mydata['MAB_dA_total_'+cut] = mydata['mAB_dA_total_'+cut] - DM -5*np.log10(0.6777) -(-2.5*np.log10(1.0+0.55)) 
+    #
+    #                        print mydata
+                            #x=mydata['mAB_dA_total_g']-mydata['mAB_dA_total_r']                        
+                            #y=mydata['mAB_dA_total_r']-mydata['mAB_dA_total_i']
+    
+                            #test1
+                            #prop=-0.26+(y+0.7)/0.92857-x                        
+                            #test2
+                            #prop=-0.3+(y+0.7)/0.92857-x
+                            #test3
+                            #prop=(y+1.05)/1.3-x
+                            #mydata = mydata[np.where(prop<0.0)[:][0]]
+    
+                            #mydata = mydata[np.where(mydata['orphan']<2)[:][0]]
+                            if cut=='Guo13':
+                                print 'cut:', cut
+                                mycut=0.679-0.082*(data['MAB_dA_total_i']+20.0)
+                                mydata=mydata[np.where(mydata['mAB_dA_total_r']-mydata['mAB_dA_total_i']>mycut)[0][:]]
+                            else:
+                                print 'g-i>', cut
+                                mydata = mydata[np.where(mydata['mAB_dA_total_g']-mydata['mAB_dA_total_i']>float(cut))[:][0]]                            
+    
+                              
+                            print 'after color_cut:', mydata.shape
+                                                 
+                            if name.find('MAB')!=-1:
+                                cond_min=-25
+                                cond_max=-19
             
-                        print '--------------'
-                        print ' '
-                        i+=1
-                except:
-                    print 'cut:', cut, 'not possible!'    
+                            else:
+                                cond_min=16
+                                cond_max=23
+            
+                            data_histo = myData.selectData2Compute(mydata, 
+                                                            selected_col=name, 
+                                                            operator='<', 
+                                                            condition=cond_max)
+                                                    
+                                                            
+            
+                            data_histo = myData.selectData2Compute(data_histo, 
+                                                            selected_col=name, 
+                                                            operator='>', 
+                                                            condition=cond_min)
+                            print 'after max:', data_histo.shape         
+                            #data['mstar']*=1e10     
+                            nbins=30
+            
+                            if name.find('AB')!=-1:
+                                data_histo[name]=abs(data_histo[name])             
+                            else:
+                                data_histo[name]=np.log10(data_histo[name])
+                            data_min = min(data_histo[name])
+                            data_max = max(data_histo[name])
+            
+                            binsize = (data_max-data_min)/nbins
+                            print 'data min/max:', data_min, '/', data_max, 'binsize:', binsize,
+                            counts, edges = np.histogram(data_histo[name],nbins,weights=data_histo['weight_tot'])
+    
+                            histo=np.zeros((nbins, 7), dtype=np.float64)
+                            if name.find('AB')!=-1:
+                                if name.startswith('MAB'):
+                                    histo[:,0]= -(edges[1:]+edges[:-1])/2
+                                else:
+                                    histo[:,0]= (edges[1:]+edges[:-1])/2
+                            else:
+                                histo[:,0]= (10**edges[1:]*10**edges[:-1])**0.5
+                            
+                            if method=='CM':
+                                Vol=4.147e9 #CMASS DR12 
+                            else:
+                                Vol  = (float(self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_box_size'])/0.6777)**3
+                                print 'Vol:', Vol, 'box_size:', self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_box_size'], 'data_min:', data_min, 'data_max:', data_max, 'binsize:', binsize
+    
+                                                       
+                            histo[:,1]= counts/(Vol*binsize)
+                            histo[:,4]=histo[:,1]/counts**0.5
+                            histo[:,5]=histo[:,4]
+                            histo[:,6]= counts
+                            k=0
+                            for cols in histo[:,6]:
+                                #print cols
+                                if cols<25.0:
+                                    histo[k,2]=1.0
+                                k+=1
+                            
+                            #print_5logh=' 5logh'
+                            print_5logh=''
+                            #selection='_-Kcorr_047_i_g-i_'+str(cut)+'_'
+                            #selection='_g-i_gt_'+str(cut)+'_'                
+                            selection=''
+                            #key='_350Mpc_run_1235'
+                            key='_'+str(cut)
+                            key='_g-i_gt_'+str(cut)
+                            
+                            #filename=mycomp+'anaconda/pro/myRun/histos/analyseTargetSelection/histo_'+self.myconfig_array['catname'+str(self.a)]+'_v3_z_0.1_'+name+'-5logh_h-units.txt'
+                            filename=mycomp+'anaconda/pro/myRun/histos/analyseTargetSelection/histo_'+self.myconfig_array['catname'+str(self.a)]+'_z_'+str(redshift)+'_'+self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_tarsel_code']+'_'+selection+name+key+'.txt'
+            
+                            print 'name:', name, 'z:', redshift, 'format:', myconds_array[name+'_format'], 'unit:', myconds_array[name+'_unit']
+                            myOutput.writeIntoFile(filename,
+                                           histo,
+                                           myheader= self.myconfig_array['catname'+str(self.a)]+' z '+str(redshift)+' '+self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_tarsel_code']+' '+name+' histo\n(1) '+name+print_5logh+' ['+myconds_array[name+'_unit']+']\t(2) Phi [Mpc-3 dex-1]\t(3) -dx\t(4) dx\t(5) -dy\t(6) +dy\t(7) N count',
+                                           data_format='%0.8e',
+                                           mydelimiter='\t')
+                
+                            print '--------------'
+                            print ' '
+                            i+=1
+                    except:
+                        print 'cut:', cut, 'not possible!'    
+
+            def caseSwitcher(histo_method):
+            
+                choose = {
+                    'lum':   lumHisto,
+                    'fast':  self.calcFastHisto,               
+                    }
+                    
+                func = choose.get(histo_method)
+                return func()
+            
+            caseSwitcher('fast')
 
                        
         if self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_plotSample']=='True':
@@ -1625,7 +1865,7 @@ class Pipeline:
                         data['mcold']=data['mcold_disk']+data['mcold_spheroid']
                         data['Mzgas']=data['Mzgas_disk']+data['Mzgas_spheroid']
 
-                    mstar_min=10
+                    mstar_min=1e10
                     #mstar_min=10**(11.29-0.039+np.log10((0.73/0.6777)**2))                        
                     print 'Mstar > ', mstar_min, 'selection:', data.shape, '-->',
                     data = myData.selectData2Compute(data, 
@@ -1826,9 +2066,13 @@ class Pipeline:
 
                 if tarsel_plot_name.find('ssfr')!=-1 or tarsel_plot_name.find('zcold')!=-1 or tarsel_plot_name.find('mhalo')!=-1:
                     print 'name_x:',
-                    if tarsel_plot_name.find('ssfr')!=-1:
-                        name_x='ssfr'
-                        data[name_x]=np.log10(data['ssfr'])
+                    if tarsel_plot_name.find('ssfr')!=-1 and tarsel_plot_name.find('mstar')==-1:
+                        try:
+                            name_x='ssfr'
+                            data[name_x]=np.log10(data['ssfr'])
+                        except:
+                            name_x='sfr'
+                            data[name_x]=np.log10(data['sfr']/data['mstar'])                            
                         print  name_x, 'name_y:', name_y
     
                         data = myData.selectData2Compute(data, 
@@ -1868,9 +2112,17 @@ class Pipeline:
                         name_x='mstar'                                              
                         data['mstar']= np.log10(data['mstar'])
 
-                    if tarsel_plot_name.find('ssfr_mstar')!=-1:
+                    if tarsel_plot_name.find('ssfr_mstar')!=-1:                       
                         name_y='ssfr'                                              
-                        
+                        try:
+                            data[name_y]=np.log10(data['ssfr'])
+                        except:
+                            print 'except 1893'
+                            name_y='sfr'
+                            data[name_y]=np.log10(data['sfr']/data['mstar'])                        
+
+                        name_x='mstar'                                              
+                        data['mstar']=np.log10(data['mstar']) 
                         
                     if tarsel_plot_name.find('_sfr')!=-1:
                         name_x='sfr'
@@ -1971,7 +2223,7 @@ class Pipeline:
                 for name in [name_x,name_y,name_z]:
                     print 'set axis labels! name:', name
                     if name=='mstar':
-                        if tarsel_plot_name.find('mbar'):
+                        if tarsel_plot_name.find('mbar')!=-1:
                             myconds_array[name+'_name_in_plot']='$\log_{10}$ ($M_{bar}$ [$M_{\odot}$])'
                         else:
                             myconds_array[name+'_name_in_plot']='$\log_{10}$ ($M_{_*}$ [$M_{\odot}$])'
@@ -1992,9 +2244,9 @@ class Pipeline:
                         myconds_array[name+'_name_in_plot']='$m_{AB_i}$'                        
                     elif name=='mAB_dA_total_r':                       
                         myconds_array[name+'_name_in_plot']='$m_{AB_r}$'
-                    elif name=='sfr':
+                    elif name=='sfr' and str(tarsel_plot_name).find('ssfr_mstar')==-1:
                         myconds_array[name+'_name_in_plot'] = '$\log_{10}$ ($SFR$ [$M_{\odot}$ $yr^{-1}$])'
-                    elif name=='ssfr':                 
+                    elif name=='ssfr' or str(tarsel_plot_name).find('ssfr_mstar')!=-1:                 
                         myconds_array[name+'_name_in_plot'] = '$\log_{10}$ ($sSFR$ [$yr^{-1}$])'                            
                     elif name=='rdisk':
                         myconds_array[name+'_name_in_plot'] = '$\log_{10}$ ($r_{disk}$ [$kpc$])'                       
@@ -2047,13 +2299,13 @@ class Pipeline:
                 data=data[mask[:][0]]
                 mask=np.where(np.isfinite(data[name_y]))
                 data=data[mask[:][0]]                
-                    
+                
                 print 'min/max x:', min(data[name_x]), max(data[name_x])            
                 print 'min/max y:', min(data[name_y]), max(data[name_y])
                 print 'name y/x:', name_y, name_x, 'name_in_plot y/x:', myconds_array[name_y+'_name_in_plot'], myconds_array[name_x+'_name_in_plot'], 'data.shape:', data.shape
                 #if len(data[0])>1e6:
                     #data = mL.choose_random_sample(data, 100000)
-                if np.all(data[name_weights]==-99.0):
+                if np.all(data[name_weights]==-99.0) or np.all(data[name_weights]==0.0):
                     print 'set weights to 1!'
                     data[name_weights]=np.ones((data.size,), dtype=np.int8)
    
@@ -2313,6 +2565,64 @@ class Pipeline:
             pp = PdfPages(mycomp+'anaconda/pro/myRun/plots/plotXY/plot_oply.pdf')
             plt.savefig(pp, format='pdf', rasterized=True, dpi=20, pad_inches=0.05, transparent=True)
             pp.close()
+
+        def test_300():
+            import pandas as pd
+            print 'here 300'
+            
+
+            
+            for n_cl in list(range(1,325)):
+                print 'cluster number:', n_cl,
+                    
+                filename=mycomp+'anaconda/pro/data/300/Galacticus/MDPL2_Galacticus_z0.00_region'+str(n_cl).zfill(4)+'.txt'
+                print filename
+                mydata_names=['ID','hostid','haloid','orphan','x_pos','y_pos','z_pos','x_vel','y_vel','z_vel','mstar','mstar_disk',\
+                              'mcold_spheroid','mcold_disk','mhot','mbh','sfr','sfr_spheroid','sfr_disk','mean_age_stars','mhalo','rest',\
+                              'Vmax','Vpeak','NFW_con','spin','MZstar_spheroid','Mzstar_disk', 'Mzgas_spheroid', 'Mzgas_disk','mzhot_halo',\
+                              'L_SDSS_dA_total_u','L_SDSS_dA_total_g','L_SDSS_dA_total_r','L_SDSS_dA_total_i','L_SDSS_dA_total_z',\
+                              'MAB_dA_total_u','MAB_dA_total_g','MAB_dA_total_r','MAB_dA_total_i','MAB_dA_total_z',\
+                              'rdisk','rbulge','rhalf_mass','mhot_outflow']
+                
+                df=pd.read_csv(filename, skiprows=2, names=mydata_names, sep='  ')
+                df['ID']=n_cl
+                df['ID']=df['ID'].apply(lambda x: '{0:0>4}'.format(x))
+                
+                data = mL.df_to_sarray(df)                
+                
+                
+                data=data[np.where(data['mhalo']==max(data['mhalo']))[:][0]]
+
+
+                print data['ID'][0]
+                data['mstar']+=data['mstar_disk']
+                #print 'data:', data[['haloid','hostid','orphan','mhalo','mstar']]
+                
+                
+                
+                if n_cl==1:
+                    mydata=data
+                else:
+                    mydata = np.append(mydata, data, axis=0)
+                    
+                
+
+                 
+            print 'size:', mydata.size
+            #print mydata
+            
+            mydata['mhalo']/=0.6777
+            mydata['mstar']/=0.6777
+
+            mydata[::-1].sort(order=['mhalo'], axis=0)
+
+            myOutput.writeIntoFile(mycomp+'anaconda/pro/data/300/Galacticus/MDPL2_Galacticus_z0.00_cluster_regions_haloids.txt',
+                       mydata[['ID','haloid','hostid','orphan','mhalo','mstar']],
+                       myheader= 'z=0.0 \n(1) cluster (2) haloid (3) hostid (4) orphan (5) mhalo [Msun] (6) mstar [Msun]',
+                       data_format="%s\t%i\t%i\t%i\t%0.8e\t%0.8e",
+                       mydelimiter='\t')                
+                
+
             
         
         def caseSwitcher(myplotXY):
@@ -2328,14 +2638,95 @@ class Pipeline:
                 'test_kcorrect_blanton': test_kcorrect_blanton,
                 'test_MDreadin': test_MDreadin,
                 'plot_scatter': plot_scatter,
-                'plot_only': plot_only                 
+                'plot_only': plot_only,
+                'test_300': test_300                 
                 }
                 
             func = choose.get(myplotXY)
             return func()
         
-        caseSwitcher('plot_only')
+        caseSwitcher('test_300')
 
+    def cSFRD(
+            self,
+            data,
+            histo_data_min=0.0,
+            histo_data_max=0.0,
+            mycond_min=0.0,
+            mycond_max=0.0,
+            data_offset=0,
+            ssfr_cut=None,
+            histo_output_offset=0,
+            log10_xaxis=False,
+            log10_yaxis=False,
+            norm_z0=False,
+            sfr_cut_min='min',
+            sfr_cut_max='max'):
+                    
+        print ' ' 
+        print ' '                    
+        print 'SFR vs Redshift(): -->  self.i:', self.i, 'self.a:', self.a
+        print '++++++++++++++++++++++++++++++++++++++++++++++'   
+        
+        self.histo_data_ZvsSFR = data
+        print 'mstar min/max:', mycond_min, '/', mycond_max, '\t',
+        myfiltered_data = mL.filter_data_before_analysis(self.myData2Process, 
+                                                         mycond_min, 
+                                                         mycond_max, 
+                                                         'mstar')
+        
+        print 'sfr min/max:', sfr_cut_min, '/', sfr_cut_max, '\t',
+        myfiltered_data = mL.filter_data_before_analysis(myfiltered_data, 
+                                                         sfr_cut_min, 
+                                                         sfr_cut_max, 
+                                                         'sfr')
+        print 'ngal after selection -->', myfiltered_data.shape
+        
+        print 'mstar min/max:', format(min(myfiltered_data['mstar']),'0.4e') ,'/', format(max(myfiltered_data['mstar']),'0.4e')
+        print 'sfr min/max:', format(min(myfiltered_data['sfr']),'0.4e') ,'/', format(max(myfiltered_data['sfr']),'0.4e')        
+        
+        if ssfr_cut!=None:
+            import numpy.lib.recfunctions as rcfuncs
+            myfiltered_data = rcfuncs.append_fields([myfiltered_data], ['ssfr'] ,[myfiltered_data['sfr']], usemask=False)
+            #print myfiltered_data[0:5]
+            print 'expand -->', np.info(myfiltered_data),
+            
+            myfiltered_data['ssfr']/=myfiltered_data['mstar']
+            #print myfiltered_data[0:5]
+    
+            #MD-paper ssfr >1e-11
+            myfiltered_data = myfiltered_data[np.where(myfiltered_data['ssfr']>1e-11)[0]]
+            #MD-paper ssfr >2.17e-11
+            #myfiltered_data = myfiltered_data[np.where(myfiltered_data['ssfr']>2.17e-11)[0]]        
+            
+            print 'ssfr max:', max(myfiltered_data['ssfr']), 'min:', min(myfiltered_data['ssfr'])
+    
+            print 'after selection:', myfiltered_data.shape
+        #Attention!
+        #This routine is only running if z=0 is calculated first. Although the normalisation of the volume in wrong!
+        if self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(0)]+'_snapid'+str(0)]['z']!=0.0:
+            print 'Self construction sequence initiated ..... you have 5 sec to overthink your choices of redshifts!'
+            print ' '
+            print '... in order to abort self construct choose z=0 as the first redshift to calculate cosmic star formation history!'
+            print 'This routine is only running if z=0 is calculated first or otherwise the normalisation of the volume will be wrong!'
+            exit()
+
+        self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +4] = self.volume
+        print 'self.volume:', format(self.volume, '0.2e'), 'sum sfr:', format(np.sum(myfiltered_data['sfr']),'0.2e'), ' / volume z=0:', format(self.histo_data_ZvsSFR[0, data_offset*(self.a) +4], '0.2e'), '=', format(np.sum(myfiltered_data['sfr'])/self.histo_data_ZvsSFR[0, data_offset*(self.a) +4], '0.2e')  
+        
+        self.histo_data_ZvsSFR[self.i, data_offset*(self.a)] = self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z']
+        self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +1] = np.sum(myfiltered_data['sfr'])/self.histo_data_ZvsSFR[0, data_offset*(self.a) +4]    
+        self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +2] = np.sum(myfiltered_data['sfr']) 
+    
+        #normalise sfr to sfr(z=0)
+        self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +3] =  self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +1] / self.histo_data_ZvsSFR[0, data_offset*(self.a) +1]
+             
+        print 'z:', format(self.histo_data_ZvsSFR[self.i, data_offset*(self.a)], '0.3f')
+        print 'sum sfr / volume(z=0) [Msun yr-1 Mpc-3]', format(self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +1], '0.2e')
+        print 'sum sfr [Msun yr-1]', format(self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +2], '0.2e')
+        print 'sum sfr/sfr(z=0):', format(self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +3], '0.2e')
+        print 'volume [Mpc3]:', format(self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +4], '0.2e')
+        
     def SFR2Z(
             self,
             data,
@@ -2356,7 +2747,7 @@ class Pipeline:
             method=''):
                     
                   
-        print 'SFR vs Redshift(): --> Selection:', SFH_key,  'self.i:', self.i, 'self.a:', self.a
+        print 'SFR vs Redshift(): --> Selection:', SFH_key,  'method:', method, 'self.i:', self.i, 'self.a:', self.a
         print '++++++++++++++++++++++++++++++++++++++++++++++++++'   
 
         def sample_selection(data,
@@ -2365,31 +2756,46 @@ class Pipeline:
                              prop='sfr',
                              filename_indices=''): 
 
-            Hubble_z=cd.hubble_z(self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z'], **fidcosmo)
-            ssfr_cut=0.3*Hubble_z*31536000.0
-            
-            print 'SELECTION:'
-            #passive / red selection   
-            if sample_key=='passive':
-                print 'select passive galaxies ssfr<=0.3*Hubble_z',
-                try:
-                    print 'ssfr_cut:', ssfr_cut, max(data['ssfr'][np.where(data['ssfr']<=ssfr_cut)[:][0]]), 'min:', min(data['ssfr'][np.where(data['ssfr']<=ssfr_cut)[:][0]]) 
-                    data = data[np.where(data['ssfr']<=ssfr_cut)[0][:]]        
-                except:
-                    print 'NO PASSIVE SELECTION POSSIBLE!'
-                    data=data[0:3]
-                    
-            elif sample_key=='active':
-                print 'select active galaxies ssfr>0.3*Hubble_z'
-                try: 
-                    print 'ssfr_cut:', ssfr_cut, max(data['ssfr'][np.where(data['ssfr']>ssfr_cut)[:][0]]), 'min:', min(data['ssfr'][np.where(data['ssfr']>ssfr_cut)[:][0]]) 
-                    data = data[np.where(data['ssfr']>ssfr_cut)[0][:]]        
-                except:
-                    print 'NO ACTIVE SELECTION POSSIBLE!'
-                    data=data[0:3]
 
-              
-       
+            
+            print 'SELECTION',
+
+            if sample_key=='passive2' or sample_key=='active2':
+                Hubble_z=cd.hubble_z(self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z'], **fidcosmo)
+                ssfr_cut=0.3*Hubble_z*31536000.0                                
+                
+                print 'ssfr_cut:', format(ssfr_cut, '.3e'), 'max:', format(max(data['ssfr']), '.3e'), 'min:', format(min(data['ssfr']), '.3e')
+                if sample_key=='passive2':
+                    try:
+                        print 'select passive galaxies ssfr<=0.3*Hubble_z',
+                        data = data[np.where(data['ssfr']<=ssfr_cut)[:][0]]                      
+                    except:
+                        print 'NO PASSIVE SELECTION POSSIBLE!'
+                  
+                elif sample_key=='active2':
+                    print 'select active galaxies ssfr>0.3*Hubble_z'
+                    try: 
+                        data = data[np.where(data['ssfr']>ssfr_cut)[0][:]]        
+                    except:
+                        print 'NO ACTIVE SELECTION POSSIBLE!'
+                        
+                print 'ngalaxies selected: ', data.size
+
+            elif sample_key=='passive' or sample_key=='active':
+                print 'select galaxies by ssfr!',
+                
+                frac_to_select=int(np.floor(data.size/100.0*20.0)) 
+                data = data[np.argsort(data['ssfr'])]
+  
+                if sample_key=='active':
+                    print '--> select 20% most active galaxies >>'
+                    start_size=data.size-frac_to_select                       
+                    data=data[start_size:data.size]
+
+                elif sample_key=='passive':
+                    print '--> select 20% most passive galaxies <<'
+                    data=data[0:int(frac_to_select)]
+
             elif sample_key=='red' or sample_key=='blue':
                 print 'select galaxies by color!'
                 
@@ -2407,7 +2813,7 @@ class Pipeline:
                
     
             #sample selection
-            elif sample_key.startswith('h') or sample_key.startswith('l'):
+            elif sample_key=='low' or sample_key=='high':
                 frac_to_select=int(np.floor(data.size/100.0*20.0)) 
                 data = data[np.argsort(data[prop])]
                                    
@@ -2422,8 +2828,8 @@ class Pipeline:
                 
             elif sample_key=='SFR3gt':
                 test = str(format(redshift, '0.2f'))
-                if test=='1.48':
-                    print '--> SFR>=2 [Msun yr-1]',
+                if test==ext_redshift:
+                    print sample_key, '--> SFR>=2 [Msun yr-1]',
                     data = data[np.where(data['sfr']>=2.0)[0][:]]
                     print 'size:', data.size
                 else:
@@ -2431,192 +2837,317 @@ class Pipeline:
      
             elif sample_key=='SFR3st':
                 test = str(format(redshift, '0.2f'))
-                if test=='1.48':
-                    print 'select --> SFR<2 [Msun yr-1]',
+                if test==ext_redshift:
+                #if test=='1.48':
+                    print sample_key, 'select --> SFR<2 [Msun yr-1]',
                     data = data[np.where(data['sfr']<2.0)[0][:]]
                     print 'size:', data.size
                 else:
                     print 'DO NOTHING!'
 
-            elif sample_key=='pro':
-                print '--> select progenitors!' 
+            elif sample_key=='mstar11gt':
+                test = str(format(redshift, '0.2f'))
+                if test==ext_redshift:
+                    print sample_key, 'select --> log10 (Mstar [Msun]) >= 11',
+                    data = data[np.where(data['mstar']>=10**11)[0][:]]
+                    print 'size:', data.size
+                else:
+                    print 'DO NOTHING!'                    
+     
+            elif sample_key=='mstar11st':
+                #old name was 'mstar10st'
+                test = str(format(redshift, '0.2f'))
+                if test==ext_redshift:
+                    print sample_key, 'select --> log10 (Mstar [Msun]) < 11',
+                    data = data[np.where(data['mstar']<10**11)[0][:]]
+                    print 'size:', data.size
+                else:
+                    print 'DO NOTHING!'
 
-                #data = data[np.where(data['orphan']<2)[:][0]]
-                #print 'from file:', filename_indices
-                indices = myData.readAnyFormat(config=False, mypath=filename_indices, data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.uint64, skiprow=2) 
-                print 'nr indices:', indices[:,0].size
+            elif sample_key=='mhalo12gt':
+                test = str(format(redshift, '0.2f'))
+                if test==ext_redshift:
+                    print sample_key, 'select --> log10 (Mvir [Msun]) >= 12.3',
+                    data = data[np.where(data['mhalo']>=10**12.3)[0][:]]
+                    print 'size:', data.size
+                else:
+                    print 'DO NOTHING!'                    
+     
+            elif sample_key=='mhalo12st':
+                test = str(format(redshift, '0.2f'))
+                if test==ext_redshift:
+                    print sample_key, 'select --> log10 (Mvir [Msun]) < 12.3',
+                    data = data[np.where(data['mhalo']<10**12.3)[0][:]]
+                    print 'size:', data.size
+                else:
+                    print 'DO NOTHING!'
+
+            elif sample_key=='high-zcold':
+                frac_to_select=int(np.floor(data.size/100.0*20.0)) 
+                data = data[np.argsort(data['zcold'])]               
+
+                print '--> select 20% highest zcold metallicities >>'
+                start_size=data.size-frac_to_select                       
+                data=data[start_size:data.size]
+
+
+            elif sample_key=='low-zcold':
+                frac_to_select=int(np.floor(data.size/100.0*20.0)) 
+                data = data[np.argsort(data['zcold'])]
+
+                print '--> select 20% lowest zcold metallicities <<'
+                data=data[0:int(frac_to_select)]
+
+
+            elif sample_key=='zcold9gt':
+                test = str(format(redshift, '0.2f'))
+                if test==ext_redshift:
+                    print sample_key, 'select --> zcold >= 9.6 (Gal-dens, Gal2-dens) >=9.1 (Gal400-dens)',
+                    data = data[np.where(data['zcold']>=9.0)[0][:]]
+                    print 'size:', data.size
+                else:
+                    print 'DO NOTHING!'                    
+     
+            elif sample_key=='zcold9st':
+                test = str(format(redshift, '0.2f'))
                 
-                #print indices[:,[0,1,2]]
+                if test==ext_redshift:
+                    print sample_key, 'select --> zcold < 9.6 (Gal-dens, Gal2-dens) <9.1 (Gal400-dens)',
+                    data = data[np.where(data['zcold']<9.0)[0][:]]
+                    print 'size:', data.size
+                else:
+                    print 'DO NOTHING!'
 
-                #general selection
-                #-------------------------                                            
-                parentIndices, index1, index2 = np.intersect1d(data['parentIndex'], indices[:,1], return_indices=True)             
+            elif sample_key=='redmstar11':
+                test = str(format(redshift, '0.2f'))
+                print sample_key, '1st step',
+                frac_to_select=int(np.floor(data.size/100.0*20.0)) 
+                data = data[np.argsort(data['color'])]
 
-                test = np.in1d(data['parentIndex'], data['nodeIndex'][index1])                          
-                index1 = np.hstack((index1,np.where(test==True)[:][0]))
-                #print 'index1:', index1
-
-
-                #id progenitors with the same parentIndex
-                #-------------------------
-                find_non_unique = np.in1d(data['parentIndex'], indices[:,0])
+                print '--> select 20% reddest (g-i)>>',
+                start_size=data.size-frac_to_select                       
+                data=data[start_size:data.size]
+                print 'size:', data.size
                 
-                #print find_non_unique
-                #-------------------------
-                #new version (fast)
-                #print 'index1:', index1, '\n-----------\n'
-                non_unique, index, count = np.unique(data['parentIndex'][find_non_unique], return_index=True, return_counts=True)
-                #print 'n non_unique:', non_unique, 'check:', non_unique[np.where(count>1)[:][0]], 'index:', index, 'count:', count, '\n------------\n'
+                if test==ext_redshift:
+                    print  '2nd step --> red sample  10.6 >= log10 (Mstar [Msun]) < 11.3',
+                    data = data[np.where(data['mstar']>=10**10.6)[0][:]]
+                    data = data[np.where(data['mstar']<10**11.3)[0][:]]                    
+                    print 'size:', data.size
+                else:
+                    print 'DO NOTHING!'                    
+     
+
+            elif sample_key=='redmhalo13':
+                test = str(format(redshift, '0.2f'))
+                print sample_key, '1st step',
+                frac_to_select=int(np.floor(data.size/100.0*20.0)) 
+                data = data[np.argsort(data['color'])]
+
+                print '--> select 20% reddest (g-i)>>',
+                start_size=data.size-frac_to_select                       
+                data=data[start_size:data.size]
+                print 'size:', data.size
                 
-                nodeIndices_nu, index_nu1, index_nu2 = np.intersect1d(data['parentIndex'], non_unique[np.where(count>1)[:][0]], return_indices=True)               
-                #print 'nodeIndices_nu:', nodeIndices_nu, 'index_nu1:', index_nu1, 'index_nu2:', index_nu2
-                non_unique_indices = np.in1d(data['parentIndex'], nodeIndices_nu)
+                if test==ext_redshift:
+                    print  '2nd step --> red sample  12.3 >= log10 (Mvir [Msun]) < 13.6',
+                    data = data[np.where(data['mhalo']>=10**12.3)[0][:]]
+                    data = data[np.where(data['mhalo']<10**13.6)[0][:]]                    
+                    print 'size:', data.size
+                else:
+                    print 'DO NOTHING!'                      
 
-                #print 'non_unique_indices:', np.where(non_unique_indices==True)[:][0], data[['parentIndex', 'nodeIndex', 'mhalo','mstar','SHMR', 'orphan']][np.where(non_unique_indices==True)[:][0]] 
-                          
-                index_nu = np.where(non_unique_indices==True)[:][0] 
-                test = np.in1d(index_nu, index1)
-                #print 'test:', test,
-                index1 = np.hstack((index1,index_nu[np.where(test==False)[:][0]]))
+            elif sample_key=='lowmstar11':
+                test = str(format(redshift, '0.2f'))
+                print sample_key, '1st step',
+                frac_to_select=int(np.floor(data.size/100.0*20.0)) 
+                data = data[np.argsort(data['sfr'])]
 
-                #intermediate version (slow)              
-#                for galID in non_unique[np.where(count>1)[:][0]]:
-#                    print '#####################'
-#                    print 'non-unique galID:', galID
-#                    #find the index of the galaxies are centrals and have the same parentIndex
-#                    non_unique_indices = np.where(data['parentIndex']==galID)[:][0]
-#                    #properties of that galaxies
-#                    print 'indices:', non_unique_indices
-#                    print data[['parentIndex', 'nodeIndex', 'mhalo', 'SHMR', 'orphan']][np.where(data['parentIndex']==galID)[:][0]]
-#                    
-#                    print 'index1 start:', np.sort(index1), len(index1)
-#                    #find the indices of the galaxies which have same parentIndex and delete them from the general list of indices. Crossmatch them first with index1
-#                    delete_nu_indices, delete_nu1, delete_nu2 = np.intersect1d(index1, non_unique_indices, return_indices=True)
-#                    print 'delete_nu_indices:', delete_nu_indices, delete_nu1
-#                    index1=np.delete(index1, delete_nu1)
-#                    print np.sort(index1), len(index1)                  
-#                  
-#                    max_mhalo_index=np.where(data['mhalo'][non_unique_indices]==max(data['mhalo'][non_unique_indices]))
-#                    min_SHMR_index=np.where(data['SHMR'][non_unique_indices]==min(data['SHMR'][non_unique_indices]))
-#
-#                    print data['nodeIndex'][non_unique_indices]
-#                    #nodeIndices_has_sats, index_has_sats1, index_has_sats2 = np.intersect1d(data['parentIndex'], data['nodeIndex'][non_unique_indices], return_indices=True)
-#                    nodeIndices_has_sats = np.in1d(data['parentIndex'], data['nodeIndex'][non_unique_indices])
-#                    has_sats, index_has_sats, count_has_sats = np.unique(data['parentIndex'][nodeIndices_has_sats], return_index=True, return_counts=True)
-# 
-#                    print 'max_mhalo:', data[['parentIndex', 'nodeIndex', 'mhalo', 'SHMR', 'orphan']][non_unique_indices][max_mhalo_index], max_mhalo_index
-#                    print 'min_SHMR_index:', data[['parentIndex', 'nodeIndex', 'mhalo', 'SHMR', 'orphan']][non_unique_indices][min_SHMR_index], min_SHMR_index
-#                    #print 'nodeIndices_has_sats:', np.where(count_has_sats>1)[:][0], count_has_sats
-#                    print 'galID with sats:', has_sats, 'nsats:', count_has_sats
-#                    nodeIndex_with_more_sats=data['nodeIndex'][np.where(data['nodeIndex']==has_sats[np.where(count_has_sats==max(count_has_sats))[:][0]])[:][0]]
-#                    
-#                    print 'found index:', max_mhalo_index[:][0], min_SHMR_index[:][0], np.where(data['nodeIndex'][non_unique_indices]==nodeIndex_with_more_sats)[:][0]
-#                    
-#                    if max_mhalo_index[:][0]==min_SHMR_index[:][0]:
-#                        found_prog_index=non_unique_indices[max_mhalo_index]
-#                    elif max_mhalo_index[:][0]==np.where(data['nodeIndex'][non_unique_indices]==nodeIndex_with_more_sats)[:][0]:
-#                        found_prog_index=non_unique_indices[max_mhalo_index]
-#                    elif min_SHMR_index[:][0]==np.where(data['nodeIndex'][non_unique_indices]==nodeIndex_with_more_sats)[:][0]:
-#                        found_prog_index=min_SHMR_index[:][0]
-#                    else:
-#                        error_count+=1
-#                        
-#                    print 'found progenitor index!', found_prog_index
-#                    index1 = np.hstack((index1,found_prog_index))
-                    
-                    #print 'final index1:', index1, len(index1)
-                                                
-                    
-                    
-                    #except:
-                        #pass                    
-                    
-                    
+                print '--> select 20% lowest sfr',
+                start_size=data.size-frac_to_select                       
+                data=data[0:int(frac_to_select)]
+                print 'size:', data.size
                 
-                    #test = np.in1d(non_unique_indices, index1)
-                    #index1 = np.hstack((index1,non_unique_indices[np.where(test==False)[:][0]]))
- 
-                #old version (very slow)
-#                for gal in non_unique[np.where(count>1)[:][0]]:
-#                    print gal
-#                    nodeIndex = self.myData2Process[np.where(self.myData2Process['parentIndex']==gal)[:][0]]['nodeIndex']
-#                    for Id in nodeIndex:
-#                        #print Id, np.where(data['nodeIndex']==Id)[:][0]
-#                        find_Id = np.isin(index1, np.where(data['nodeIndex']==Id)[:][0])
-#                        #print find_Id
-#                        if np.all(find_Id==False):
-#                            #print 'add ID!'
-#                            index1 = np.hstack((index1,np.where(data['nodeIndex']==Id)[:][0]))
-                            
+                if test==ext_redshift:
+                    print  '2nd step --> low sfr sample  10.6 >= log10 (Mstar [Msun]) < 11.3',
+                    data = data[np.where(data['mstar']>=10**10.6)[0][:]]
+                    data = data[np.where(data['mstar']<10**11.3)[0][:]]                    
+                    print 'size:', data.size
+                else:
+                    print 'DO NOTHING!'                    
+     
 
-                #print 'index1:', index1
-                data=data[index1]
+            elif sample_key=='lowmhalo13':
+                test = str(format(redshift, '0.2f'))
+                print sample_key, '1st step',
+                frac_to_select=int(np.floor(data.size/100.0*20.0)) 
+                data = data[np.argsort(data['sfr'])]
 
-
-                #data = data[np.where(data['orphan']==0)[:][0]]
-                #print 'write to file! ', data.shape, '-->', filename_indices             
-                write_progenitors(data,
-                                  filename_indices)
+                print '--> select 20% lowest sfr',
+                start_size=data.size-frac_to_select                       
+                data=data[0:int(frac_to_select)]
+                print 'size:', data.size
                 
-                write_progenitors(data,
-                                  mycomp+'/anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/SFH_Index_'+str(format(redshift, '0.2f'))+'.txt')
+                if test==ext_redshift:
+                    print  '2nd step --> low sfr sample  12.3 >= log10 (Mvir [Msun]) < 13.6',
+                    data = data[np.where(data['mhalo']>=10**12.3)[0][:]]
+                    data = data[np.where(data['mhalo']<10**13.6)[0][:]]                    
+                    print 'size:', data.size
+                else:
+                    print 'DO NOTHING!'  
+     
+            elif sample_key=='mhalo12st':
+                test = str(format(redshift, '0.2f'))
+                if test==ext_redshift:
+                    print sample_key, 'select --> log10 (Mvir [Msun]) < 12.3',
+                    data = data[np.where(data['mhalo']<10**12.3)[0][:]]
+                    print 'size:', data.size
+                else:
+                    print 'DO NOTHING!'
+
+            elif sample_key=='lowZcold-lowMstar':
+                test = str(format(redshift, '0.2f'))
+                if test==ext_redshift:
+                    print sample_key, 'here--> low Zcold / low Mstar',
+                    data = data[np.where(data['orphan']==0)[0][:]]
+                    data = data[np.where(data['zcold']<=8.5)[0][:]]
+                    data = data[np.where(data['mstar']<=4e10)[0][:]]
+                    print 'size:', data.size
+                else:
+                    print 'DO NOTHING!'
+
+            elif sample_key=='lowZcold-highMstar':
+                test = str(format(redshift, '0.2f'))
+                if test==ext_redshift:
+                    print sample_key, 'here--> low Zcold / high Mstar',
+                    data = data[np.where(data['orphan']==0)[0][:]]                    
+                    data = data[np.where(data['zcold']<=8.5)[0][:]]
+                    data = data[np.where(data['mstar']>4e10)[0][:]]
+                    print 'size:', data.size
+                else:
+                    print 'DO NOTHING!'
+                                    
+
+            elif sample_key=='highZcold-lowMstar':
+                test = str(format(redshift, '0.2f'))
+                if test==ext_redshift:
+                    print sample_key, 'here--> high Zcold / low Mstar',
+                    data = data[np.where(data['orphan']==0)[0][:]]
+                    data = data[np.where(data['zcold']>8.5)[0][:]]
+                    data = data[np.where(data['mstar']>1.95e9)[0][:]]
+                    data = data[np.where(data['mstar']<=1e11)[0][:]]
+                    print 'size:', data.size
+                else:
+                    print 'DO NOTHING!'
+
+            elif sample_key=='highZcold-highMstar':
+                test = str(format(redshift, '0.2f'))
+                if test==ext_redshift:
+                    print sample_key, 'here--> high Zcold / high Mstar',
+                    data = data[np.where(data['orphan']==0)[0][:]]                    
+                    data = data[np.where(data['zcold']>8.5)[0][:]]
+                    data = data[np.where(data['mstar']>1e11)[0][:]]
+                    print 'size:', data.size
+                else:
+                    print 'DO NOTHING!'                    
+                    
 
             elif sample_key=='main' or sample_key=='massive':
-                print 'filename_indices:', filename_indices
-                indices = myData.readAnyFormat(config=False, mypath=filename_indices, data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.uint64, skiprow=2) 
-                print 'nr indices:', indices[:,0].size
-
-                #general selection
-                #-------------------------
-                #we have all galaxies located which have a parentIndex as in the nodeIndex-list from the snapshot before.                                           
-                parentIndices, index1, index2 = np.intersect1d(data['parentIndex'], indices[:,1], return_indices=True)             
-
-                #we look for all galaxies which are linked with the parentIndex to the nodeIndex of this snapshot, those should be the central halos in this snapshot                
-                test = np.in1d(data['parentIndex'], data['nodeIndex'][index1])
-                #if the nodeIndex of this snapshot is in any parentIndex in this snapshot we store those indices in 'index1'                        
-                index1 = np.hstack((index1,np.where(test==True)[:][0]))
-
-                #id progenitors with the same parentIndex, we look if some parentIndexes are double, the halo in the snapshot before has then more
-                #central halos/progenitors linked to them and we have to choose the main one!
-                #-------------------------
-                #we do not need to look through all of them, but only those who have been parents a snapshot before --> that is stored in the indices list
-                find_non_unique = np.in1d(data['parentIndex'], indices[:,0])
                 
-                non_unique, index, count = np.unique(data['parentIndex'][find_non_unique], return_index=True, return_counts=True)
-                #we intersect our found parents and look for their indicies in the original array data
-                nodeIndices_nu, index_nu1, index_nu2 = np.intersect1d(data['parentIndex'], non_unique[np.where(count>1)[:][0]], return_indices=True)             
-
-                #if the halo is unique it is automatically chosen because there cannot be any confusion with the main progenitors, those indices
-                #stay in index1. For the others we have to choose a main progenitor
-                #-------------------------              
-                non_unique_indices = np.in1d(data['parentIndex'], nodeIndices_nu)                          
-                index_nu = np.where(non_unique_indices==True)[:][0] 
-                test = np.in1d(index_nu, index1)
-
-                index1 = np.hstack((index1,index_nu[np.where(test==False)[:][0]]))
-                data=data[index1]
-
-                #calculate subhalos/sats for each parent                
-#                has_sats, index_has_sats, count_has_sats = np.unique(data['parentIndex'], return_index=True, return_counts=True)               
-#                indices_has_sats, index_has_sat1, index_has_sat2 = np.intersect1d(data['nodeIndex'], has_sats, return_indices=True)
-#                data['nSub'][index_has_sat1]=count_has_sats[index_has_sat2]              
-               
-                
-                
-                data[::-1].sort(order=['haloid','parentIndex','hostid'], axis=0)
-
-#                myOutput.writeIntoFile(mycomp+'/anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/SFH_Index_'+str(format(redshift, '0.2f'))+'_mstar'+sample_key+'.txt',
+#                myOutput.writeIntoFile(mycomp+'/anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/SFH_Index_'+str(format(redshift, '0.2f'))+'_mstar0'+sample_key+'.txt',
 #                           data[['haloid','parentIndex', 'hostid', 'nodeIndex', 'satelliteNodeIndex', 'orphan', 'mhalo', 'mstar', 'SHMR']],
 #                           myheader= 'z='+str(format(redshift, '0.2f'))+'\n(0) haloid  (2) parentIndex (1) hostid (3) nodeIndex (4) satelliteNodeIndex (5) orphan (6) Mvir [Msun] (7) Mstar [Msun] (8) SHMR [-]',
 #                           data_format="%i\t%i\t%i\t%i\t%i\t%i\t%0.5e\t%0.5e\t%0.1f",
-#                           mydelimiter='\t')             
-  
-
-      
+#                           mydelimiter='\t')     
                 
+                
+                print 'filename_indices:', filename_indices
+                indices = myData.readAnyFormat(config=False, mypath=filename_indices, data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.uint64, skiprow=2) 
+                #indices[:,0]-> parentIndex one snapshot before
+                #indices[:,1]-> nodeIndex one snapshot before
+                
+                #expand dimension of the numpy-array if it has only 1 row!
+                if np.sum(indices.size)==2:
+                    indices = np.expand_dims(indices, axis=0)
+
+                print 'nr indices:', indices[:,0].size
+                data = data[np.where(data['orphan']==0)[:][0]] 
+                #general selection
+                #-------------------------
+                #we intersect the current parentIndices with the nodeIndices a snapshot before, a unique array of parentIndices
+                #which are present in both arrays are returned. Index1 gives the first occurance of the common IDs in parentIndex,
+                #index2 of the same in the nodeIndex a snapshot before
+                parentIndices, index1, index2 = np.intersect1d(data['parentIndex'], indices[:,1], return_indices=True)             
+
+                #we test wheater the nodeIndex of this snapshot, in particular, those we already found in the first step 
+                #(stored in index1) are linked to the a parentIndex. Thereby we check if those nodeIndices con be found in the
+                #parentIndex at any position.          
+                test = np.in1d(data['parentIndex'], data['nodeIndex'][index1])
+                #if that is true we include those indices in 'index1' too. In other words we have found all satellites to a certain halo                    
+                index1 = np.hstack((index1,np.where(test==True)[:][0]))
+
+                #if we find galaxies with the same parentIndex, this means that there are two or more progenitors and we need to find
+                #a correct 'main' progenitor.
+                #-------------------------
+                #we do not need to look through all of them, but only those who have been parents a snapshot before --> that is stored
+                #parentIndex (indices[:,0]) a snapshot before. We test of parentIndices a snapshot before are still in the parentIndex
+                #of this snapshot
+                test_find_non_unique = np.in1d(data['parentIndex'], indices[:,0])
+                
+                #We indentfy the unique parentIndices among them and store the index of their first occurence (index) of the unique
+                #parentIndices and how often they appear (count)
+                non_unique, index, count = np.unique(data['parentIndex'][test_find_non_unique], return_index=True, return_counts=True)
+                
+                #we intersect the parentIndices which are non-unique we found at this snapshot (non-unique) and look for their indicies
+                #in the original array data. We only compare those which occure more than one time (coun>1), because if the parentIndex
+                #is unique it is automatically chosen since it is the only progenitor.
+                #nodeIndices_nu, index_nu1, index_nu2 = np.intersect1d(data['parentIndex'], non_unique[np.where(count>1)[:][0]], return_indices=True)             
+                nodeIndices_nu = np.intersect1d(data['parentIndex'], non_unique[np.where(count>1)[:][0]]) 
+                #For the others (count>1) we have to choose a main progenitor. So we test where the non-unique nodeIndices are located in the
+                #parentIndices of the total array of parentIndecies. 'index_nu' identifies the positions of the non-unique parentIndices
+                #-------------------------              
+                test_non_unique_indices = np.in1d(data['parentIndex'], nodeIndices_nu)                          
+                index_nu = np.where(test_non_unique_indices==True)[:][0]
+                #We test if the index of the non-unique (index_nu) is already represented in our index1 list (the list of all progenitors
+                #we identified so far)
+                test = np.in1d(index_nu, index1)
+
+                #We include those which are not already included
+                index1 = np.hstack((index1,index_nu[np.where(test==False)[:][0]]))
+                #now we have all progenitors indices linked to the snapshot before and we can withdraw the rest of the IDs
+                data=data[index1]
+                
+             
+             
+                #We reverse the ordering of the indices starting with the highest and then then first according to the haloid,
+                #then parentIndex, and the hostid. This order the indices putting allways the central halo in fron
+                
+                # (0) haloid  (2) parentIndex (1) hostid (3) nodeIndex (4) satelliteNodeIndex (5) orphan (6) Mvir [Msun] (7) Mstar [Msun] (8) SHMR [-]
+                #9416439760	9583218894	9416439760	9416439760	9416439760	0	4.41088e+12	6.51122e+10	67.7
+                #9416439760	9416439760	9416439761	6987007766	9416439761	1	4.88697e+10	3.29770e+10	1.5
+                #9416439760	9416439760	8394714535	6272408496	8394714535	2	2.44356e+10	4.07484e+09	6.0
+
+                data[::-1].sort(order=['haloid','parentIndex','hostid'], axis=0)
+              
+
+#                myOutput.writeIntoFile(mycomp+'/anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/SFH_Index_'+str(format(redshift, '0.2f'))+'_step1_'+sample_key+'.txt',
+#                           data[['haloid','parentIndex', 'hostid', 'nodeIndex', 'satelliteNodeIndex', 'orphan', 'mhalo', 'mstar', 'SHMR']],
+#                           myheader= 'z='+str(format(redshift, '0.2f'))+'--> step1: selecting all haloids linked to a progenitors and sorting remaining halos firstly to haloid, then parentIndex, and final hostid descending\n(0) haloid  (2) parentIndex (1) hostid (3) nodeIndex (4) satelliteNodeIndex (5) orphan (6) Mvir [Msun] (7) Mstar [Msun] (8) SHMR [-]',
+#                           data_format="%i\t%i\t%i\t%i\t%i\t%i\t%0.5e\t%0.5e\t%0.1f",
+#                           mydelimiter='\t')             
+                
+                #now we select all unique haloids again, which will atomatically select the central halos!
                 unique_parent_id, index1, count_parentIndex = np.unique(data['haloid'], return_index=True, return_counts=True)
                 data=data[index1][::-1]
-                
+ 
+#                myOutput.writeIntoFile(mycomp+'/anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/SFH_Index_'+str(format(redshift, '0.2f'))+'_step2_'+sample_key+'.txt',
+#                           data[['haloid','parentIndex', 'hostid', 'nodeIndex', 'satelliteNodeIndex', 'orphan', 'mhalo', 'mstar', 'SHMR']],
+#                           myheader= 'z='+str(format(redshift, '0.2f'))+'--> step2: extracting unique haloids\n(0) haloid  (2) parentIndex (1) hostid (3) nodeIndex (4) satelliteNodeIndex (5) orphan (6) Mvir [Msun] (7) Mstar [Msun] (8) SHMR [-]',
+#                           data_format="%i\t%i\t%i\t%i\t%i\t%i\t%0.5e\t%0.5e\t%0.1f",
+#                           mydelimiter='\t')                  
+#
+#                if str(format(redshift, '0.2f'))=='0.59':
+#                    data=data[np.where(data['nodeIndex']==8567381780)[:][0]]
                 
                 if sample_key=='main':
                     print 'SELECT MAIN PROGENITOR!'                               
@@ -2624,9 +3155,9 @@ class Pipeline:
                     
                     data.sort(order=['parentIndex','satelliteNodeIndex'], axis=0)
               
-#                    myOutput.writeIntoFile(mycomp+'/anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/SFH_Index_'+str(format(redshift, '0.2f'))+'_mstar2'+sample_key+'.txt',
+#                    myOutput.writeIntoFile(mycomp+'/anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/SFH_Index_'+str(format(redshift, '0.2f'))+'_step3_'+sample_key+'.txt',
 #                           data[['haloid','parentIndex', 'hostid', 'nodeIndex', 'satelliteNodeIndex', 'orphan', 'mhalo', 'mstar', 'SHMR']],
-#                           myheader= 'z='+str(format(redshift, '0.2f'))+'\n(0) haloid  (2) parentIndex (1) hostid (3) nodeIndex (4) satelliteNodeIndex (5) orphan (6) Mvir [Msun] (7) Mstar [Msun] (8) SHMR [-]',
+#                           myheader= 'z='+str(format(redshift, '0.2f'))+'--> step3: sorint first parentIndex and then satelliteNodeIndex descending\n(0) haloid  (2) parentIndex (1) hostid (3) nodeIndex (4) satelliteNodeIndex (5) orphan (6) Mvir [Msun] (7) Mstar [Msun] (8) SHMR [-]',
 #                           data_format="%i\t%i\t%i\t%i\t%i\t%i\t%0.5e\t%0.5e\t%0.1f",
 #                           mydelimiter='\t')                  
                   
@@ -2644,25 +3175,24 @@ class Pipeline:
                     
                 unique_parent_id, index1, count_parentIndex = np.unique(data['parentIndex'], return_index=True, return_counts=True)
                 data=data[index1][::-1]
-                data = data[np.where(data['orphan']<2)[:][0]]                               
-#                myOutput.writeIntoFile(mycomp+'/anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/SFH_Index_'+str(format(redshift, '0.2f'))+'_mstar3'+sample_key+'.txt',
+                
+                                              
+#                myOutput.writeIntoFile(mycomp+'/anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/SFH_Index_'+str(format(redshift, '0.2f'))+'_step4_'+sample_key+'.txt',
 #                           data[['haloid','parentIndex', 'hostid', 'nodeIndex', 'satelliteNodeIndex', 'orphan', 'mhalo', 'mstar', 'SHMR']],
-#                           myheader= 'z='+str(format(redshift, '0.2f'))+'\n(0) haloid  (2) parentIndex (1) hostid (3) nodeIndex (4) satelliteNodeIndex (5) orphan (6) Mvir [Msun] (7) Mstar [Msun] (8) SHMR [-]',
+#                           myheader= 'z='+str(format(redshift, '0.2f'))+'--> step4: final selection of progenitors via unique parentIndex\n(0) haloid  (2) parentIndex (1) hostid (3) nodeIndex (4) satelliteNodeIndex (5) orphan (6) Mvir [Msun] (7) Mstar [Msun] (8) SHMR [-]',
 #                           data_format="%i\t%i\t%i\t%i\t%i\t%i\t%0.5e\t%0.5e\t%0.1f",
 #                           mydelimiter='\t')              
-
-
-       
-                
+                     
                 write_progenitors(data,
                                   filename_indices)
                 
 #                write_progenitors(data,
-#                                  mycomp+'/anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/SFH_Index_'+str(format(redshift, '0.2f'))+'.txt')                        
+#                                  mycomp+'/anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/SFH_Index_'+str(format(redshift, '0.2f'))+'_final'+'.txt')                        
 
             elif sample_key=='valid':
                 print 'check if hostids are valid!'
                 data = data[np.where(data['hostid']>-2)[:][0]]
+               
  
             else:
                 print '--> NO SAMPLE SELECTION DONE!'
@@ -2681,35 +3211,54 @@ class Pipeline:
            
 
         def select_CMASS_z056():
-            if self.myconfig_array['catname'+str(self.a)].find('Gala')!=-1:                         
-                CMASS_IDs = myData.readAnyFormat(config=False, mypath=mycomp+'/anaconda/pro/data/Galacticus_1Gpc/Galacticus_1Gpc_z_0.56_tarsel_new_mags_CMASS_down_sample3_haloid.txt', data_format='ASCII', data_shape='shaped', delim='  ', mydtype=np.uint64, skiprow=2)
+            if self.myconfig_array['catname'+str(self.a)].find('Gala')!=-1:
+                #CMASS_IDs = myData.readAnyFormat(config=False, mypath=mycomp+'/anaconda/pro/data/Galacticus_400Mpc/Galacticus_400Mpc_z_0.55_CMASS_down_sample3_haloid.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.uint64, skiprow=2)                         
+                #CMASS_IDs = myData.readAnyFormat(config=False, mypath=mycomp+'/anaconda/pro/data/Galacticus_1Gpc/Galacticus_1Gpc_z_0.56_tarsel_new_mags_CMASS_down_sample3_haloid.txt', data_format='ASCII', data_shape='shaped', delim='  ', mydtype=np.uint64, skiprow=2)
+                #CMASS_IDs = myData.readAnyFormat(config=False, mypath=mycomp+'/anaconda/pro/data/Galacticus_1Gpc/Galacticus_1Gpc_z_0.09_tarsel_CUT3_Contreras+13_mcold_haloid.txt', data_format='ASCII', data_shape='shaped', delim='  ', mydtype=np.uint64, skiprow=2)
+                CMASS_IDs = myData.readAnyFormat(config=False, mypath=mycomp+'/anaconda/pro/data/300/1h-1Mpc/Galacticus/log/00_MDPL2_Galacticus_z0.00_subsamples_r_1h-1Mpc_log.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.str_, skiprow=8)
+                print CMASS_IDs
+                exit()
+                #indices = np.in1d(self.myData2Process['hostid'], CMASS_IDs[:,1])
 
-                indices = np.in1d(self.myData2Process['hostid'], CMASS_IDs[:,1])
-
-                self.myData2Process = self.myData2Process[np.where(indices==True)[:][0]]
-                print 'shape of data afte CMASS_ID selection:', self.myData2Process.shape
-                self.myData2Process = self.myData2Process[np.where(self.myData2Process['orphan']<2)[:][0]]
+                #self.myData2Process = self.myData2Process[np.where(indices==True)[:][0]]
+                print 'shape of data after CMASS_ID selection:', self.myData2Process.shape
+                #self.myData2Process = self.myData2Process[np.where(self.myData2Process['orphan']==0)[:][0]]
                 #test sample                
                 #self.myData2Process=self.myData2Process[0:107]
-                
-                if method=='subsamples':
-                    print 'select samples and follow progenitors! SFH_key:', SFH_key
+                #test1
+                #self.myData2Process=self.myData2Process[np.where(self.myData2Process['haloid']==9583213112)[:][0]]
+                #test2
+                #self.myData2Process=self.myData2Process[np.where(self.myData2Process['haloid']==9583213304)[:][0]]
+                #test3
+                #self.myData2Process=self.myData2Process[np.where(self.myData2Process['haloid']==9583212851)[:][0]]
+                #test4
+                #self.myData2Process=self.myData2Process[np.where(self.myData2Process['haloid']==9583212725)[:][0]]
+                #test5
+                #self.myData2Process=self.myData2Process[np.where(self.myData2Process['haloid']==9583212324)[:][0]]                
+                #test6
+                #self.myData2Process=self.myData2Process[np.where(self.myData2Process['haloid']==9583210676)[:][0]]                 
+                #test7
+                #self.myData2Process=self.myData2Process[np.where(self.myData2Process['haloid']==9583213190)[:][0]]
+                self.myData2Process=self.myData2Process[np.where(self.myData2Process['hostid']==12663401752)[:][0]]
+  
+                print 'method: ', method, '--> select samples and follow progenitors! SFH_key:', SFH_key
+                if method=='M2':
                     data=sample_selection(self.myData2Process, sample_key=SFH_key)
                 
-#                    myOutput.writeIntoFile(mycomp+'/anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/SFH_Index_'+str(format(redshift, '0.2f'))+'_mstar.txt',
-#                               data[['haloid','parentIndex', 'hostid', 'nodeIndex', 'satelliteNodeIndex', 'orphan', 'mhalo', 'mstar', 'SHMR']],
-#                               myheader= 'z='+str(format(redshift, '0.2f'))+'\n(0) haloid  (2) parentIndex (1) hostid (3) nodeIndex (4) satelliteNodeIndex (5) orphan (6) Mvir [Msun] (7) Mstar [Msun] (8) SHMR [-]',
-#                               data_format="%i\t%i\t%i\t%i\t%i\t%i\t%0.5e\t%0.5e\t%0.1f",
-#                               mydelimiter='\t')
+                    myOutput.writeIntoFile(mycomp+'/anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/SFH_Index_'+str(format(redshift, '0.2f'))+'_'+SFH_key+'_props_'+method+'.txt',
+                               data[['haloid','parentIndex', 'hostid', 'nodeIndex', 'satelliteNodeIndex', 'orphan', 'mhalo', 'mstar', 'SHMR', 'mcold', 'Mzgas', 'zcold', 'color', 'sfr', 'ssfr']],
+                               myheader= 'z='+str(format(redshift, '0.2f'))+'\n(0) haloid  (2) parentIndex (1) hostid (3) nodeIndex (4) satelliteNodeIndex (5) orphan (6) Mvir [Msun] (7) Mstar [Msun] (8) SHMR [-] (9) mcold [Msun] (10) Mzgas [Msun] (11) zcold [-] (12) g-i [-] (13) sfr [Msun yr-1] (14) ssfr [yr-1]',
+                               data_format="%i\t%i\t%i\t%i\t%i\t%i\t%0.5e\t%0.5e\t%0.5f\t%0.8e\t%0.8e\t%0.5f\t%0.5f\t%0.8e\t%0.8e",
+                               mydelimiter='\t')
                     
                     return data
                 
                 else:
-#                     myOutput.writeIntoFile(mycomp+'/anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/SFH_Index_'+str(format(redshift, '0.2f'))+'_mstar.txt',
-#                               self.myData2Process[['haloid','parentIndex', 'hostid', 'nodeIndex', 'satelliteNodeIndex', 'orphan', 'mhalo', 'mstar', 'SHMR']],
-#                               myheader= 'z='+str(format(redshift, '0.2f'))+'\n(0) haloid  (2) parentIndex (1) hostid (3) nodeIndex (4) satelliteNodeIndex (5) orphan (6) Mvir [Msun] (7) Mstar [Msun] (8) SHMR [-]',
-#                               data_format="%i\t%i\t%i\t%i\t%i\t%i\t%0.5e\t%0.5e\t%0.1f",
-#                               mydelimiter='\t')                   
+                     myOutput.writeIntoFile(mycomp+'/anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/SFH_Index_'+str(format(redshift, '0.2f'))+'_props_'+method+'.txt',
+                               self.myData2Process[['haloid','parentIndex', 'hostid', 'nodeIndex', 'satelliteNodeIndex', 'orphan', 'mhalo', 'mstar', 'SHMR', 'mcold', 'Mzgas', 'zcold', 'color', 'sfr', 'ssfr']],
+                               myheader= 'z='+str(format(redshift, '0.2f'))+'\n(0) haloid  (2) parentIndex (1) hostid (3) nodeIndex (4) satelliteNodeIndex (5) orphan (6) Mvir [Msun] (7) Mstar [Msun] (8) SHMR [-] (9) mcold [Msun] (10) Mzgas [Msun] (11) zcold [-] (12) g-i [-] (13) sfr [Msun yr-1] (14) ssfr [yr-1]',
+                               data_format="%i\t%i\t%i\t%i\t%i\t%i\t%0.5e\t%0.5e\t%0.5f\t%0.8e\t%0.8e\t%0.5f\t%0.5f\t%0.8e\t%0.8e",
+                               mydelimiter='\t')                   
                      return self.myData2Process               
 
             else:
@@ -2724,18 +3273,21 @@ class Pipeline:
             
 
         def calc_extra_props(): 
-            import numpy.lib.recfunctions as rcfuncs
-
+            
             try:
-                print 'expand array!',
-                self.myData2Process = rcfuncs.append_fields([self.myData2Process], ['ssfr','SHMR','zcold', 'color'] ,[self.myData2Process['sfr'],self.myData2Process['mhalo'],self.myData2Process['spinParameter'],self.myData2Process['mAB_dA_total_i']], usemask=False)
-                
-
-                #self.myData2Process['NFW_con'] = mL.calculate_NFW_con_with_fit(self.myData2Process['mhalo'],redshift, cosmology='Planck', overdens='vir')
-                self.myData2Process['ssfr']=self.myData2Process['sfr']/self.myData2Process['mstar']
+                #self.myData2Process = rcfuncs.append_fields([self.myData2Process], ['ssfr','SHMR','zcold', 'color', 'mhalo_200c', 'NFW_con'] ,[self.myData2Process['sfr'],self.myData2Process['mhalo'],self.myData2Process['spinParameter'],self.myData2Process[mag_prefix+'i'],self.myData2Process['mhalo'],self.myData2Process['sfr']], usemask=False)
+    
+                self.myData2Process = rcfuncs.append_fields([self.myData2Process], ['SHMR','color', 'z', 'nsats'] ,[self.myData2Process['mhalo'],self.myData2Process[mag_prefix+'i'],self.myData2Process[mag_prefix+'i'],self.myData2Process['orphan']], usemask=False)
+     
+                print 'expand array!',               
+                #self.myData2Process['ssfr']=self.myData2Process['sfr']/self.myData2Process['mstar']
                 self.myData2Process['SHMR']=self.myData2Process['mhalo']/self.myData2Process['mstar']
-                self.myData2Process['zcold']=8.69+np.log10(self.myData2Process['Mzgas']/(self.myData2Process['mcold']*0.0134))         
-                self.myData2Process['color']=self.myData2Process['mAB_dA_total_g']-self.myData2Process['mAB_dA_total_i']
+                #self.myData2Process['zcold']=8.69+np.log10(self.myData2Process['Mzgas']/(self.myData2Process['mcold']*0.0134))
+                try:
+                    self.myData2Process['color']=self.myData2Process[mag_prefix+'g']-self.myData2Process[mag_prefix+'i']
+                except:
+                    self.myData2Process['color']=self.myData2Process[mag_prefix+'g']-self.myData2Process[mag_prefix+'i'] 
+                                  
                 print '--> DONE!'
             except:
                 pass
@@ -2743,38 +3295,75 @@ class Pipeline:
         #print self.myData2Process.shape
         #print np.info(self.myData2Process)
         redshift = self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z']
+        ext_redshift = '0.0'
+        mag_prefix='mAB_dA_total_'
         
-        from cosmolopy import cparam, cd
+        import numpy.lib.recfunctions as rcfuncs
+        from cosmolopy import cparam, cd, cc
         fidcosmo = cparam.Planck(flat=True, extras=True)
         #print 'lum_dist:', cd.luminosity_distance(redshift, **fidcosmo), 'z=', redshift
-        print 'SFH_key:', SFH_key, 'method:', method,
+        #print 'SFH_key:', SFH_key, 'method:', method,
         
-        if method=='subsamples':
+        if method=='M2':
             filename_indices=mycomp+'anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/SFH_Index'+SFH_key+'.txt'
         else:
             filename_indices=mycomp+'anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/SFH_Index.txt'
-             
-        print 'filename_indices:', filename_indices
-        
+            
+        print '\n++++++++++++++++++++++++++++++++++++++++++++++++++\nfilename_indices:', filename_indices, '\n++++++++++++++++++++++++++++++++++++++++++++++++++\n'      
                 
         calc_extra_props()
-        
-        if self.i==0 and SFH_key_count==0 and method!='subsamples':
+        z_test = str(format(redshift, '0.2f'))
+
+        if method=='FT':
+
+            self.myData2Process['z'] = redshift            
+            IDs = myData.readAnyFormat(config=False, mypath=mycomp+'/anaconda/pro/data/ROCKSTAR/MDPL2_merger_tree_info_300-'+SFH_key+'.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.str_, skiprow=2)
+
+            centralID=IDs[np.where(IDs[:,1]==z_test)[:][0]][:,2][0]
+            print 'centralID:', centralID,
+
             
-            select_CMASS_z056()
+            myfiltered_data=self.myData2Process[np.where(self.myData2Process['haloid']==int(centralID))[:][0]]
+            print 'HERE! size: ', myfiltered_data.size
+            if myfiltered_data.size>0:               
+                myfiltered_data['nsats']=myfiltered_data[np.where(myfiltered_data['orphan']!=0)[:][0]].size
+                print 'nsats', myfiltered_data['nsats'][0]
+                if myfiltered_data.size>1:
+                    print 'more than one central!'
+                    myfiltered_data=self.myData2Process[np.where(self.myData2Process['hostid']==int(centralID))[:][0]]
+                
+                print 'final galaxy found:\n', myfiltered_data
+                if z_test==0.0 or z_test=='0.00' or z_test=='0.0':
+                    myOutput.writeIntoFile(mycomp+'/anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/SFH_Index_300_test_'+method+'_'+SFH_key+'.txt',
+                               myfiltered_data[['z', 'haloid','parentIndex', 'hostid', 'orphan', 'mhalo', 'mstar', 'SHMR', 'mcold', 'Mzgas', 'zcold', 'color', 'sfr', 'ssfr', 'x_pos', 'y_pos', 'z_pos', 'nsats']],
+                               myheader= self.myconfig_array['catname'+str(self.a)]+'300 cluster region: '+SFH_key+'z='+str(format(redshift, '0.2f'))+'\n(1) z (2) haloid  (3) parentIndex (4) hostid (5) orphan (6) Mvir [Msun] (7) Mstar [Msun] (8) SHMR [-] (9) mcold [Msun] (10) Mzgas [Msun] (11) zcold [-] (12) g-i [-] (13) sfr [Msun yr-1] (14) ssfr [yr-1] (15) x [comvMpc] (16) y [comvMpc] (17) z [comvMpc] (18) nsats',
+                               data_format="%0.2f\t%i\t%i\t%i\t%i\t%0.5e\t%0.5e\t%0.5f\t%0.8e\t%0.8e\t%0.5f\t%0.5f\t%0.8e\t%0.8e\t%0.6f\t%0.6f\t%0.6f\t%i",
+                               mydelimiter='\t')
+                else:                    
+                    myOutput.writeIntoFile(mycomp+'/anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/SFH_Index_300_test_'+method+'_'+SFH_key+'.txt',
+                               myfiltered_data[['z', 'haloid','parentIndex', 'hostid', 'orphan', 'mhalo', 'mstar', 'SHMR', 'mcold', 'Mzgas', 'zcold', 'color', 'sfr', 'ssfr', 'x_pos', 'y_pos', 'z_pos','nsats']],
+                               myheader= 'z='+str(format(redshift, '0.2f'))+'\n(1) z (2) haloid  (3) parentIndex (4) hostid (5) orphan (6) Mvir [Msun] (7) Mstar [Msun] (8) SHMR [-] (9) mcold [Msun] (10) Mzgas [Msun] (11) zcold [-] (12) g-i [-] (13) sfr [Msun yr-1] (14) ssfr [yr-1] (15) x [comvMpc] (16) y [comvMpc] (17) z [comvMpc] (18) nsats',
+                               data_format="%0.2f\t%i\t%i\t%i\t%i\t%0.5e\t%0.5e\t%0.5f\t%0.8e\t%0.8e\t%0.5f\t%0.5f\t%0.8e\t%0.8e\t%0.6f\t%0.6f\t%0.6f\t%i",
+                               mydelimiter='\t',
+                               append_mytext=True)
+            else:
+                return error_count
+
+       
+        elif self.i==0 and SFH_key_count==0 and method!='M2':
             
-  
+            select_CMASS_z056()            
+
             if self.myconfig_array['catname'+str(self.a)].find('Gala')!=-1:
                               
                 write_progenitors(self.myData2Process,
                                   filename_indices)
- 
-        elif method=='subsamples':
-            print 'here 2757!'
+       
+        elif method=='M2':
             if self.i>0:
                 print 'i>0:'
-                z_test = str(format(redshift, '0.2f'))
-                if z_test=='1.48' and SFH_key.startswith('SFR'):
+
+                if z_test==ext_redshift and (SFH_key.find('st')!=-1 or SFH_key.find('gt')!=-1):
                     myfiltered_data=sample_selection(self.myData2Process, sample_key=SFH_key)
                         
                     write_progenitors(myfiltered_data,
@@ -2784,11 +3373,17 @@ class Pipeline:
                     if self.myconfig_array['catname'+str(self.a)].find('Gala')!=-1:
                         myfiltered_data=sample_selection(self.myData2Process, sample_key='main', filename_indices=filename_indices)
                     else:
-                        myfiltered_data=sample_selection(self.myData2Process, sample_key='valid', filename_indices=filename_indices)                    
+                        myfiltered_data=sample_selection(self.myData2Process, sample_key='valid', filename_indices=filename_indices)
+                        
+                myOutput.writeIntoFile(mycomp+'/anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/SFH_Index_'+str(format(redshift, '0.2f'))+'_'+SFH_key+'_props_'+method+'.txt',
+                       myfiltered_data[['haloid','parentIndex', 'hostid', 'nodeIndex', 'satelliteNodeIndex', 'orphan', 'mhalo', 'mstar', 'SHMR', 'mcold', 'Mzgas', 'zcold', 'color', 'sfr', 'ssfr']],
+                       myheader= 'z='+str(format(redshift, '0.2f'))+'\n(0) haloid  (2) parentIndex (1) hostid (3) nodeIndex (4) satelliteNodeIndex (5) orphan (6) Mvir [Msun] (7) Mstar [Msun] (8) SHMR [-] (9) mcold [Msun] (10) Mzgas [Msun] (11) zcold [-] (12) g-i [-] (13) sfr [Msun yr-1] (14) ssfr [yr-1]',
+                       data_format="%i\t%i\t%i\t%i\t%i\t%i\t%0.5e\t%0.5e\t%0.5f\t%0.8e\t%0.8e\t%0.5f\t%0.5f\t%0.8e\t%0.8e",
+                       mydelimiter='\t')
+                               
             else:
                 print 'i=0', self.i
                 myfiltered_data = select_CMASS_z056()
-                                 
                 write_progenitors(myfiltered_data,
                                   filename_indices)                
             
@@ -2797,132 +3392,267 @@ class Pipeline:
                 self.myData2Process=sample_selection(self.myData2Process, sample_key='main', filename_indices=filename_indices)
             else:
                 self.myData2Process=sample_selection(self.myData2Process, sample_key='valid', filename_indices=filename_indices)
-            
-            
-
-                    
+          
 
 ####### SAMPLE SELECTION     ##################################################################
         #print 'after selection:', myfiltered_data.shape,
-        if method!='subsamples':
+        if method=='M1':
+                     
             myfiltered_data=sample_selection(self.myData2Process, sample_key=SFH_key)                
-            print 'ngal after selection:', myfiltered_data.shape#, 'check original:', self.myData2Process.shape
-         
+            print 'ngal after selection:', myfiltered_data.shape,'\n'#, 'check original:', self.myData2Process.shape
+
+            myOutput.writeIntoFile(mycomp+'/anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/SFH_Index_'+str(format(redshift, '0.2f'))+'_'+SFH_key+'_props_'+method+'.txt',
+                       myfiltered_data[['haloid','parentIndex', 'hostid', 'nodeIndex', 'satelliteNodeIndex', 'orphan', 'mhalo', 'mstar', 'SHMR', 'mcold', 'Mzgas', 'zcold', 'color', 'sfr', 'ssfr']],
+                       myheader= 'z='+str(format(redshift, '0.2f'))+'\n(0) haloid  (2) parentIndex (1) hostid (3) nodeIndex (4) satelliteNodeIndex (5) orphan (6) Mvir [Msun] (7) Mstar [Msun] (8) SHMR [-] (9) mcold [Msun] (10) Mzgas [Msun] (11) zcold [-] (12) g-i [-] (13) sfr [Msun yr-1] (14) ssfr [yr-1]',
+                       data_format="%i\t%i\t%i\t%i\t%i\t%i\t%0.5e\t%0.5e\t%0.5f\t%0.8e\t%0.8e\t%0.5f\t%0.5f\t%0.8e\t%0.8e",
+                       mydelimiter='\t')          
         
-###############################################################################################          
-        self.histo_data_ZvsSFR = data
+###############################################################################################
 
-        percent_low = 31.7
-        percent_high = 68.3
-        #calculate properties        
-        self.histo_data_ZvsSFR[self.i, data_offset*(self.a)]    = redshift
-        self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +1] = np.nansum(myfiltered_data['sfr'])  
-    
-        #normalise sfr to sfr(z=0)
-        self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +2] =  self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +1] / self.histo_data_ZvsSFR[0, data_offset*(self.a) +1]
-        self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +3] =  np.nanmedian(myfiltered_data['sfr']) 
-        self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +4] =  np.nanpercentile(myfiltered_data['sfr'],percent_low)
-        self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +5] =  np.nanpercentile(myfiltered_data['sfr'],percent_high)
- 
-     
-        self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +6] =  np.nansum(myfiltered_data['ssfr'])
-        self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +7] =  self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +6]/self.histo_data_ZvsSFR[0, data_offset*(self.a) +6]
-        self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +8] =  np.nanmedian(myfiltered_data['ssfr']) 
-        self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +9] =  np.nanpercentile(myfiltered_data['ssfr'],percent_low)
-        self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +10] =  np.nanpercentile(myfiltered_data['ssfr'],percent_high)        
-        
-        try:
-            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +11]= np.nanmedian(myfiltered_data['mAB_dA_total_g']-myfiltered_data['mAB_dA_total_i']) #seconds to Gyrs
-            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +12]= np.nanpercentile((myfiltered_data['mAB_dA_total_g']-myfiltered_data['mAB_dA_total_i']),percent_low)
-            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +13]= np.nanpercentile((myfiltered_data['mAB_dA_total_g']-myfiltered_data['mAB_dA_total_i']),percent_high)
-        except:
-            print 'g-i color calculation faild!'
-
-        try:
-            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +29]= np.nanmedian(myfiltered_data['mAB_dA_total_r']-myfiltered_data['mAB_dA_total_i']) #seconds to Gyrs
-            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +30]= np.nanpercentile((myfiltered_data['mAB_dA_total_r']-myfiltered_data['mAB_dA_total_i']),percent_low)
-            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +31]= np.nanpercentile((myfiltered_data['mAB_dA_total_r']-myfiltered_data['mAB_dA_total_i']),percent_high)
-        except:
-            print 'r-i color calculation faild!' 
-
-           
-        self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +14]= np.nansum(myfiltered_data['mstar'])
-        self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +15]= self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +14]/self.histo_data_ZvsSFR[0, data_offset*(self.a) +14]
-        self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +16]= np.nanmedian(myfiltered_data['mstar'])
-        self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +17]= np.nanpercentile(myfiltered_data['mstar'],percent_low)
-        self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +18]= np.nanpercentile(myfiltered_data['mstar'],percent_high)
-
-        self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +19]= np.nansum(myfiltered_data['mhalo'])
-        self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +20]= self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +19]/self.histo_data_ZvsSFR[0, data_offset*(self.a) +19]
-        self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +21]= np.nanmedian(myfiltered_data['mhalo'])
-        self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +22]= np.nanpercentile(myfiltered_data['mhalo'],percent_low)
-        self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +23]= np.nanpercentile(myfiltered_data['mhalo'],percent_high)        
-
-        self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +24] = cd.lookback_time(self.histo_data_ZvsSFR[self.i, data_offset*(self.a)], z0=self.histo_data_ZvsSFR[0, data_offset*(self.a)], **fidcosmo)/3.1536e+16 #seconds to Gyrs
-
-        data_cents=myfiltered_data[np.where(myfiltered_data['orphan']==0)[0][:]]    
-        data_sats=myfiltered_data[np.where(myfiltered_data['orphan']==1)[0][:]]
-        data_os=myfiltered_data[np.where(myfiltered_data['orphan']==2)[0][:]]
-
-        self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +25] = format(data_cents.size/float(myfiltered_data.size), '0.3f')
-        self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +26] = format(data_sats.size/float(myfiltered_data.size), '0.3f')
-        self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +27] = format(data_os.size/float(myfiltered_data.size), '0.3f')
-
-        self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +28] = format(myfiltered_data.size/float(self.volume)/1e-4,'0.3f')
-
-        try:        
-            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +32]= np.nanmedian(myfiltered_data['spinParameter'])
-            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +33]= np.nanpercentile(myfiltered_data['spinParameter'],percent_low)
-            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +34]= np.nanpercentile(myfiltered_data['spinParameter'],percent_high)
+#        myfiltered_data['NFW_con'] = mL.calculate_NFW_con_with_fit(myfiltered_data['mhalo'], 
+#                                                                       redshift,
+#                                                                       cosmology='Planck', 
+#                                                                       overdens='vir')
             
-            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +35]= np.nanmedian(myfiltered_data['mstar']/myfiltered_data['mhalo'])
-            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +36]= np.nanpercentile(myfiltered_data['mstar']/myfiltered_data['mhalo'],percent_low)
-            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +37]= np.nanpercentile(myfiltered_data['mstar']/myfiltered_data['mhalo'],percent_high)        
-    
-            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +38]= np.nansum(myfiltered_data['mcold'])
-            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +39]= self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +38]/self.histo_data_ZvsSFR[0, data_offset*(self.a) +38]
-            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +40]= np.nanmedian(myfiltered_data['mcold'])
-            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +41]= np.nanpercentile(myfiltered_data['mcold'],percent_low)
-            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +42]= np.nanpercentile(myfiltered_data['mcold'],percent_high)        
-    
-            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +43]= np.nansum(myfiltered_data['Mzgas'])
-            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +44]= self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +43]/self.histo_data_ZvsSFR[0, data_offset*(self.a) +43]
-            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +45]= np.nanmedian(myfiltered_data['Mzgas'])
-            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +46]= np.nanpercentile(myfiltered_data['Mzgas'],percent_low)
-            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +47]= np.nanpercentile(myfiltered_data['Mzgas'],percent_high)
-    
-            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +48]= np.nanmedian(myfiltered_data['zcold'])
-            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +49]= np.nanpercentile(myfiltered_data['zcold'],percent_low)
-            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +50]= np.nanpercentile(myfiltered_data['zcold'],percent_high)
-        except:
-            pass
-        self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +51]= self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +1]/self.volume
+#        myfiltered_data['mhalo_200c']=mL.convert_halo_mass(myfiltered_data['mhalo'], 
+#                                                            myfiltered_data['NFW_con'],
+#                                                            myfiltered_data['orphan'])
 
 
+#
         try:
-            self.calcFastHisto(myfiltered_data['mstar'], filename[0:len(filename)-4]+'_mstar_histo.txt', 'mstar', 'Msun')
+            self.histo_data_ZvsSFR = data
+    
+            percent_low = 31.7
+            percent_high = 68.3
+            #calculate properties        
+            self.histo_data_ZvsSFR[self.i, data_offset*(self.a)]    = redshift
+            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +1] = np.nansum(myfiltered_data['sfr'])  
+        
+            #normalise sfr to sfr(z=0)
+            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +2] =  self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +1] / self.histo_data_ZvsSFR[0, data_offset*(self.a) +1]
+            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +3] =  np.nanmedian(myfiltered_data['sfr']) 
+            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +4] =  np.nanpercentile(myfiltered_data['sfr'],percent_low)
+            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +5] =  np.nanpercentile(myfiltered_data['sfr'],percent_high)
+     
+         
+            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +6] =  np.nansum(myfiltered_data['ssfr'])
+            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +7] =  self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +6]/self.histo_data_ZvsSFR[0, data_offset*(self.a) +6]
+            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +8] =  np.nanmedian(myfiltered_data['ssfr']) 
+            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +9] =  np.nanpercentile(myfiltered_data['ssfr'],percent_low)
+            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +10] =  np.nanpercentile(myfiltered_data['ssfr'],percent_high)        
+            
+            try:
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +11]= np.nanmedian(myfiltered_data[mag_prefix+'g']-myfiltered_data[mag_prefix+'i'])
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +12]= np.nanpercentile((myfiltered_data[mag_prefix+'g']-myfiltered_data[mag_prefix+'i']),percent_low)
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +13]= np.nanpercentile((myfiltered_data[mag_prefix+'g']-myfiltered_data[mag_prefix+'i']),percent_high)
+            except:
+                print 'g-i color calculation faild!'
+    
+            try:
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +29]= np.nanmedian(myfiltered_data[mag_prefix+'r']-myfiltered_data[mag_prefix+'i']) 
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +30]= np.nanpercentile((myfiltered_data[mag_prefix+'r']-myfiltered_data[mag_prefix+'i']),percent_low)
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +31]= np.nanpercentile((myfiltered_data[mag_prefix+'r']-myfiltered_data[mag_prefix+'i']),percent_high)
+            except:
+                print 'r-i color calculation faild!' 
+    
+               
+            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +14]= np.nansum(myfiltered_data['mstar'])
+            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +15]= self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +14]/self.histo_data_ZvsSFR[0, data_offset*(self.a) +14]
+            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +16]= np.nanmedian(myfiltered_data['mstar'])
+            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +17]= np.nanpercentile(myfiltered_data['mstar'],percent_low)
+            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +18]= np.nanpercentile(myfiltered_data['mstar'],percent_high)
+    
+            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +19]= np.nanmedian(myfiltered_data['rdisk'])
+            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +20]= np.nanpercentile(myfiltered_data['rdisk'],percent_low)
+            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +21]= np.nanmedian(myfiltered_data['rbulge']/myfiltered_data['rdisk'])
+            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +22]= np.nanpercentile((myfiltered_data['rbulge']/myfiltered_data['rdisk']),percent_low)
+            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +23]= np.nanpercentile((myfiltered_data['rbulge']/myfiltered_data['rdisk']),percent_high)        
+    
+            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +24] = cd.lookback_time(self.histo_data_ZvsSFR[self.i, data_offset*(self.a)], z0=self.histo_data_ZvsSFR[0, data_offset*(self.a)], **fidcosmo)/3.1536e+16 #seconds to Gyrs
+    
+            data_cents=myfiltered_data[np.where(myfiltered_data['orphan']==0)[0][:]]    
+            data_sats=myfiltered_data[np.where(myfiltered_data['orphan']==1)[0][:]]
+            data_os=myfiltered_data[np.where(myfiltered_data['orphan']==2)[0][:]]
+    
+            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +25] = format(data_cents.size/float(myfiltered_data.size), '0.3f')
+            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +26] = format(data_sats.size/float(myfiltered_data.size), '0.3f')
+            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +27] = format(data_os.size/float(myfiltered_data.size), '0.3f')
+    
+            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +28] = format(myfiltered_data.size/float(self.volume)/1e-4,'0.3f')
+    
+            try:        
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +32]= np.nanmedian(myfiltered_data['mbh'])
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +33]= np.nanpercentile(myfiltered_data['mbh'],percent_low)
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +34]= np.nanpercentile(myfiltered_data['mbh'],percent_high)
+            except:
+                pass
+            try:             
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +35]= np.nanmedian(myfiltered_data['rhalf_mass'])
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +36]= np.nanpercentile(myfiltered_data['rhalf_mass'],percent_low)
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +37]= np.nanpercentile(myfiltered_data['rhalf_mass'],percent_high)          
+            except:
+                pass
+            try: 
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +38]= np.nansum(myfiltered_data['mcold'])
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +39]= self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +38]/self.histo_data_ZvsSFR[0, data_offset*(self.a) +38]
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +40]= np.nanmedian(myfiltered_data['mcold'])
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +41]= np.nanpercentile(myfiltered_data['mcold'],percent_low)
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +42]= np.nanpercentile(myfiltered_data['mcold'],percent_high)        
+            except:
+                pass    
+            try: 
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +43]= np.nansum(myfiltered_data['Mzgas'])
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +44]= self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +43]/self.histo_data_ZvsSFR[0, data_offset*(self.a) +43]
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +45]= np.nanmedian(myfiltered_data['Mzgas'])
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +46]= np.nanpercentile(myfiltered_data['Mzgas'],percent_low)
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +47]= np.nanpercentile(myfiltered_data['Mzgas'],percent_high)
+            except:
+                pass    
+            try: 
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +48]= np.nanmedian(myfiltered_data['zcold'])
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +49]= np.nanpercentile(myfiltered_data['zcold'],percent_low)
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +50]= np.nanpercentile(myfiltered_data['zcold'],percent_high)
+            except:
+                pass
+            try: 
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +52]= np.nansum(myfiltered_data['mhalo'])
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +53]= self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +52]/self.histo_data_ZvsSFR[0, data_offset*(self.a) +52]
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +54]= np.nanmedian(myfiltered_data['mhalo'])
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +55]= np.nanpercentile(myfiltered_data['mhalo'],percent_low)
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +56]= np.nanpercentile(myfiltered_data['mhalo'],percent_high)
+            except:
+                pass
+            try: 
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +57]= np.nanmedian(myfiltered_data['mstar']/myfiltered_data['mhalo'])
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +58]= np.nanpercentile(myfiltered_data['mstar']/myfiltered_data['mhalo'],percent_low)
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +59]= np.nanpercentile(myfiltered_data['mstar']/myfiltered_data['mhalo'],percent_high)            
+            except:
+                pass
+    
+            try: 
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +60]= np.nanmedian(myfiltered_data['mean_age_stars_disk'])
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +61]= np.nanpercentile(myfiltered_data['mean_age_stars_disk'],percent_low)
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +62]= np.nanpercentile(myfiltered_data['mean_age_stars_disk'],percent_high)            
+            except:
+                pass
+            try: 
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +63]= np.nanmedian(myfiltered_data['mean_age_stars_spheroid'])
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +64]= np.nanpercentile(myfiltered_data['mean_age_stars_spheroid'],percent_low)
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +65]= np.nanpercentile(myfiltered_data['mean_age_stars_spheroid'],percent_high)            
+            except:
+                pass
+            try: 
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +66]= np.nanmedian(myfiltered_data['vmax'])
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +67]= np.nanpercentile(myfiltered_data['vmax'],percent_low)
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +68]= np.nanpercentile(myfiltered_data['vmax'],percent_high)            
+            except:
+                pass
+            try: 
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +69]= np.nanmedian(myfiltered_data['vdisp'])
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +70]= np.nanpercentile(myfiltered_data['vdisp'],percent_low)
+                self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +71]= np.nanpercentile(myfiltered_data['vdisp'],percent_high)            
+            except:
+                pass
+    
+    
+            self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +51]= self.histo_data_ZvsSFR[self.i, data_offset*(self.a) +1]/self.volume 
         except:
-            pass
-        try:
-            self.calcFastHisto(myfiltered_data['sfr'], filename[0:len(filename)-4]+'_sfr_histo.txt', 'sfr', 'Msun yr-1')
-        except:
-            pass
-        try:
-            self.calcFastHisto(myfiltered_data['ssfr'], filename[0:len(filename)-4]+'_ssfr_histo.txt', 'ssfr', 'yr-1')
-        except:
-            pass
-        try:
-            self.calcFastHisto(myfiltered_data['mhalo'], filename[0:len(filename)-4]+'_mhalo_histo.txt', 'mhalo', 'Msun')        
-        except:
-            pass
-        try:
-            self.calcFastHisto(myfiltered_data['mAB_dA_total_g']-myfiltered_data['mAB_dA_total_i'], filename[0:len(filename)-4]+'_g-i_histo.txt', 'g-i', '-', binning='lin')        
-        except:
-            pass
-        try:
-            self.calcFastHisto(myfiltered_data['zcold'], filename[0:len(filename)-4]+'_zcold_histo.txt', 'zcold', '-', binning='lin')        
-        except:
-            pass       
+            print 'no halos found at this redshift ...!'
+#        try:
+#            self.calcFastHisto(myfiltered_data['mstar'], filename[0:len(filename)-4]+'_mstar_histo.txt', 'mstar', 'Msun')
+#        except:
+#            pass
+#        try:
+#            self.calcFastHisto(myfiltered_data['sfr'], filename[0:len(filename)-4]+'_sfr_histo.txt', 'sfr', 'Msun yr-1')
+#        except:
+#            pass
+#        try:
+#            self.calcFastHisto(myfiltered_data['ssfr'], filename[0:len(filename)-4]+'_ssfr_histo.txt', 'ssfr', 'yr-1')
+#        except:
+#            pass
+#        try:
+#            self.calcFastHisto(myfiltered_data['rbulge']/myfiltered_data['rdisk'], filename[0:len(filename)-4]+'_rbulgevsrdisk_histo.txt', 'rbulgevsrdisk', '-')        
+#        except:
+#            pass
+#        try:
+#            self.calcFastHisto(myfiltered_data['rhalfmass'], filename[0:len(filename)-4]+'_rhalfmass_histo.txt', 'rhalfmass', '-')        
+#        except:
+#            pass        
+#        try:
+#            self.calcFastHisto(myfiltered_data['mhalo'], filename[0:len(filename)-4]+'_mhalo_histo.txt', 'mhalo', 'Msun')        
+#        except:
+#            pass        
+#        try:
+#            self.calcFastHisto(myfiltered_data[mag_prefix+'g']-myfiltered_data[mag_prefix+'i'], filename[0:len(filename)-4]+'_g-i_histo.txt', 'g-i', '-', binning='lin')        
+#        except:
+#            pass
+#        try:
+#            self.calcFastHisto(myfiltered_data['zcold'], filename[0:len(filename)-4]+'_zcold_histo.txt', 'zcold', '-', binning='lin')        
+#        except:
+#            pass       
+#
+#        try:     
+#            self.calcFastHisto(myfiltered_data[['mhalo','mstar','orphan']], filename[0:len(filename)-4]+'_SHMF_histo.txt', 'mhalo', '-', binup2D=True)        
+#        except:
+#            pass
+#        try:     
+#            self.calcFastHisto(myfiltered_data['mbh'], filename[0:len(filename)-4]+'_mbh_histo.txt', 'mbh', 'Msun')        
+#        except:
+#            pass        
+#
+#        try:     
+#            self.calcFastHisto(myfiltered_data['mean_age_stars_disk'], filename[0:len(filename)-4]+'_mean_age_stars_disk_histo.txt', 'mean_age_stars_disk', 'Gyr', binning='lin')        
+#        except:
+#            pass
+#        
+#        try:     
+#            self.calcFastHisto(myfiltered_data['mean_age_stars_spheroid'], filename[0:len(filename)-4]+'_mean_age_stars_spheroid_histo.txt', 'mean_age_stars_spheroid', 'Gyr', binning='lin')        
+#        except:
+#            pass
+#        try:     
+#            self.calcFastHisto(myfiltered_data['vmax'], filename[0:len(filename)-4]+'_vmax_histo.txt', 'vmax', 'kms-1')        
+#        except:
+#            pass
+#        try:     
+#            self.calcFastHisto(myfiltered_data['vdisp'], filename[0:len(filename)-4]+'_vdisp_histo.txt', 'vdisp', 'kms-1')        
+#        except:
+#            pass         
+#        try:     
+#            self.calcFastHisto(myfiltered_data['mcold']/myfiltered_data['mstar'], filename[0:len(filename)-4]+'_cgf_histo.txt', 'cgf', '-')        
+#        except:
+#            pass    
+##        
+##        try:
+##            self.HODFunction(myfiltered_data, filename, which_halomass='mhalo_200c')
+##        except:
+##            pass
+#       
+#        #try:
+#            #print 'mycond array:', mycond_array
+#        self.TwoPCF(myfiltered_data, filename, mycond_array)
+##        except:
+##            print 'CLUSTERING CALCULACTION NOT POSSIBLE!'
+
+#        if z_test=='0.56':
+#
+#            
+#            NFW_con = mL.calculate_NFW_con_with_fit(myfiltered_data['mhalo'], 
+#                                                                       redshift,
+#                                                                       cosmology='Planck', 
+#                                                                       overdens='vir')
+#            
+#            myfiltered_data['mhalo']=mL.convert_halo_mass(myfiltered_data['mhalo'], 
+#                                                                NFW_con,
+#                                                                myfiltered_data['orphan'])
+#             
+#            self.HODFunction(myfiltered_data, filename, which_halomass='mhalo')
+#
+#            myOutput.writeIntoFile(filename[0:len(filename)-4]+'_haloids.txt',
+#                       myfiltered_data[['haloid','hostid','orphan','mhalo','mstar']],
+#                       myheader= 'z='+str(format(redshift, '0.2f'))+'\n(1) haloid (2) hostid (3) orphan (4) mhalo_200c [Msun] (5) mstar [Msun]',
+#                       data_format="%i\t%i\t%i\t%0.8e\t%0.8e",
+#                       mydelimiter='\t')            
         
         return error_count
     
@@ -2950,8 +3680,298 @@ class Pipeline:
                     starforming_cut=1e-11,
                     volume_units='Mpc-3',
                     weight_function=False):
+
+        def caseSwitcher_plot_key(plot_key, myfiltered_data):
         
-        #if self.myconfig_array['catname'+str(self.a)].startswith('SAGE_'):  self.correctAndConvertUnits()            
+            choose = {
+                'SMF':          SMF,
+                'SFRF':         SFRF,
+                'sSFRF':        sSFRF,
+                'oh2mstar':     oh2mstar,
+                'mstar2mhalo':  mstar2mhalo,
+                'mstar2mhalo_no': mstar2mhalo,
+                'mstar2mhalovsSFR': mstar2mhalo,
+                'HMF':          HMF,
+                'HMF_no':       HMF,
+                'zgas2mstar':   zgas2mstar,
+                'Mzgas2mcold':  Mzgas2mcold
+                }
+                
+            func = choose.get(plot_key)
+            
+            return func(plot_key, myfiltered_data)
+
+        def SMF(plot_key, myfiltered_data):
+
+            if self.myconfig_array['catname'+str(self.a)]=='CMASS_SPALL':
+                if self.myconfig_array['catname'+str(self.a)].find('SPALL')!=-1:
+                    print 'correct IMF --> Kroupa to Chabrier'
+                    myfiltered_data['mstar']/=10**(0.03925)
+                    myfiltered_data['mstar']/=10**(0.2)
+    
+                    #print 'correct little-h for', self.myconfig_array['catname'+str(self.a)]
+                    #correction_factor=0.7**2            #Msun --> Msunh-2 WMAP9
+                    #correction_factor=(0.7/0.6777)**2    #Msunh-2 WMAP --> Msunh-2 Planck
+                    #correction_factor/=0.6777           #Msunh-2 Planck --> Msunh-1 WMAP9                     
+                    #self.myData2Process['mstar']*=(0.7/0.6777)
+    
+            try:
+                myfiltered_data['mstar']=myfiltered_data['mstar_spheroid']+myfiltered_data['mstar_disk']
+            except:
+                pass
+            
+     #        myfiltered_data = myfiltered_data[np.argsort(myfiltered_data['ssfr'])]
+    #        myfiltered_data=myfiltered_data[int(myfiltered_data['mstar'].size/100*40)::]                
+    #        print 'selection: --> highest', myfiltered_data.shape        
+            
+    #        Blue-Red separation
+            #myfiltered_data=myfiltered_data[np.where(myfiltered_data['mAB_total_g']-myfiltered_data['mAB_total_i']>2.35)[0][:]] 
+    #        Guo+13 cut
+    #        (r-i)>0.679 -0.082(Mi+20)
+#            cut=0.679-0.082*(myfiltered_data['MAB_dA_total_i']-5*np.log10(0.6777)+20.0)
+#            myfiltered_data=myfiltered_data[np.where(myfiltered_data['mAB_dA_total_r']-myfiltered_data['mAB_dA_total_i']>cut)[0][:]]         
+#            print name_x, 'selection: --> r-i > ', myfiltered_data.shape
+             
+            #myfiltered_data=myfiltered_data[np.where(myfiltered_data['sfr']/myfiltered_data['mstar']>1e-11)[0][:]]
+            #myfiltered_data=myfiltered_data[np.where(myfiltered_data['sfr']>1e-4)[0][:]]         
+    #        
+            #print name_x, 'selection: --> g-i ', myfiltered_data.shape
+            
+            return myfiltered_data
+    
+        def SFRF(plot_key, myfiltered_data):
+            return myfiltered_data
+                       
+            
+        def sSFRF(plot_key, myfiltered_data):
+            if np.all(myfiltered_data['ssfr']==-99.0):
+                myfiltered_data['ssfr']=myfiltered_data['sfr']/myfiltered_data['mstar']
+                
+            return myfiltered_data 
+ 
+
+        def ssfr2mstar(plot_key, myfiltered_data):
+            
+            myfiltered_data['sfr']/=myfiltered_data['mstar']           
+            print 'starforming cut:', starforming_cut
+            myfiltered_data = myData.selectData2Compute(myfiltered_data, 
+                                                        selected_col='sfr', 
+                                                        operator='>', 
+                                                        condition=starforming_cut)
+
+            return myfiltered_data
+ 
+        def HMF(plot_key, myfiltered_data):
+            print ' '
+            print 'HMF_no' 
+            print '+++++++++++++++++'
+            print 'shape before non-orphan selection!', myfiltered_data.shape,
+         
+            try:
+                print '--> select non-orphans',
+                myfiltered_data = myData.selectData2Compute(myfiltered_data, 
+                                                            selected_col='orphan', 
+                                                            operator='<', 
+                                                            condition=2)
+                                                                                                   
+                print 'shape after non-isolated selection!', myfiltered_data.shape                                            
+            except:
+                print 'no col "orphan" found! Could not do selection ...'
+                
+            return myfiltered_data
+                                                               
+        def mstar2mhalo(plot_key, myfiltered_data):
+            print 'mstar2mhalo\n++++++++++++++++++'
+            #approximated 200c overdensity converstion
+
+            if plot_key.find('vsSFR')!=-1:
+                myfiltered_data[name_y]=myfiltered_data['mstar']/myfiltered_data[name_y]
+ 
+            return myfiltered_data                                                              
+
+        def Mzgas2mcold(plot_key, myfiltered_data):
+            print 'Mzgas2mstar\n++++++++++++++++++'
+            
+            print 'Zgas=8.69+log10(Mzgas/(Mcold*0.0134)) ref: Allende-Pieto+01, Asplund+09'
+            if self.myconfig_array['catname'+str(self.a)].startswith('Galacticus') and self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_data_format']=='SAMHDF5':
+                #column Zgas_spheroid and Zgas_disk are wrongly named in the catalog it should be Mzgas_spheroid and Mzgas_disk
+                print 'Galaticus: zgas_disk+zgas_spheroid = Mzgas' 
+                myfiltered_data['zgas_spheroid']+=myfiltered_data['zgas_disk']
+
+            myfiltered_data=myfiltered_data[np.where(myfiltered_data[add_axis]>0.0)[0][:]]
+
+            myfiltered_data[name_y]=myfiltered_data[name_y]/(myfiltered_data[add_axis]*0.0134)                
+            
+            myfiltered_data=myfiltered_data[np.where(myfiltered_data[name_y]>0.0)[0][:]]
+                                            
+            myfiltered_data[name_y]=8.69+np.log10(myfiltered_data[name_y]) 
+
+            myfiltered_data = myData.selectData2Compute(myfiltered_data, 
+                                                        selected_col=name_y, 
+                                                        operator='!=', 
+                                                        condition='nan')
+
+            
+            print myfiltered_data[name_y][0:10]
+            
+            if name_x.find('mcold')!=-1:
+
+                myfiltered_data=myfiltered_data[np.where(myfiltered_data[name_x]>1e3)[0][:]]                    
+                
+                
+                myfiltered_data = mL.filter_data_before_analysis(myfiltered_data, 
+                                                                   5e10, 
+                                                                   1e11, 
+                                                                   'mstar')                
+                print 'mstar selection: -->', myfiltered_data.shape,
+                
+                myfiltered_data[name_x]/=myfiltered_data['mstar'] 
+
+                myfiltered_data = mL.filter_data_before_analysis(myfiltered_data, 
+                                                                   1e-4, 
+                                                                   1e4, 
+                                                                   name_x)
+                print 'Zcold selection: -->', myfiltered_data.shape,                                                    
+                myfiltered_data = mL.filter_data_before_analysis(myfiltered_data, 
+                                                                   6, 
+                                                                   11, 
+                                                                   name_y)                                                                   
+                print 'Mcold/Mstar selection: -->', myfiltered_data.shape 
+
+
+            return myfiltered_data                                                 
+
+
+
+        def zgas2mstar(plot_key, data):
+            print '\nzgas2mstar\n+++++++++++++++++'
+
+            try:
+                data['cgf']=data['mcold']/data['mstar']
+                
+                print 'CGF min/max', format(np.log10(min(data['cgf'])), '0.3f'), '/', format(np.log10(max(data['cgf'])), '0.3f')
+            except:
+                try:
+                    data['cgf']=data['mcold_disk']/data['mstar']
+                    
+                    print 'SAGE: CGF min/max', format(np.log10(min(data['cgf'])), '0.3f'), '/', format(np.log10(max(data['cgf'])), '0.3f')
+                except:
+                    pass
+            
+
+            try:
+                data['ssfr']=data['sfr']/data['mstar'] 
+                print 'starforming cut?', starforming_cut,
+                
+                data=data[np.where(data['ssfr']>starforming_cut)[:][0]]
+                                                            
+                print 'min', min(data['ssfr']), 'max:', max(data['ssfr']), '-->',data.shape
+            except:
+                print 'starforming cut FAILED!' 
+
+#            print 'min', min(data['Mzgas_disk']), 'max:', max(data['Mzgas_disk']), '-->',data.shape
+#            print 'min', min(data['Mzgas_spheroid']), 'max:', max(data['Mzgas_spheroid']), '-->',data.shape
+
+
+            try:
+                data['Mzgas']=data['Mzgas_disk']+data['Mzgas_spheroid']
+                print 'Mzgas=Mzgas_disk+Mzgas_spheroid', '-->',data.shape
+            except:
+                pass
+
+            data=data[np.where(data['mcold']>0.0)[:][0]]
+            print '-->',data.shape
+            try:
+                data=data[np.where(data[str(add_axis)]>0.1)[:][0]]
+            except:
+                pass                   
+
+            # Converstion value 0365507 comes from ...
+            # (O/H)_gal / (O/H)_sun = Z_gal / Z_sun
+            # (O/H)_gal = (O/H)_sun * Z_gal / Z_sun
+            # (O/H)_sun = 10**(8.38-12) --> from 12+log10(0/H)_sun = 8.69 (Allende-Prieto+01)
+            # Z_sun=0.0134 --> from (Asplund+09)
+            # (O/H)_gal = M_metals / M_baryons --> MZ_gas total / Mcold gas                                                      
+            # (O/H)_sun / Z_sun = 0.0365507
+            
+            # myfiltered_data[name_y]=12+np.log10(0.0365507*myfiltered_data[name_y]) == myfiltered_data[name_y]=8.69+np.log10(myfiltered_data[add_axis]/myfiltered_data[name_y]/0.0134)
+
+            try:
+                data[name_y]=8.69+np.log10(data['Mzgas']/data['mcold']/0.0134)
+            except:
+                print 'calculation failed! Try with disk properties only!',
+                data[name_y]=8.69+np.log10(data['Mzgas_disk']/data['mcold_disk']/0.0134)
+                print '--> DONE!'
+
+                
+            data=data[np.where(np.isfinite(data[name_y]))[:][0]]
+            print  'after isfinite -->', data.shape
+            try:
+                data=data[np.where(np.isfinite(data[add_axis]))[:][0]]
+            except:
+                pass
+            
+            #myfiltered_data[name_y]=12+np.log10(0.0365507*myfiltered_data['zcold'])
+            print 'Zcold min/max', min(data[name_y]), '/', max(data[name_y]), '-->', data.shape
+            return data                                               
+
+
+                    
+        def oh2mstar(plot_key, data):
+            print '\noh2mstar\n++++++++++++++++++'
+
+            try:
+                data['cgf']=data['mcold']/data['mstar']
+                
+                print 'CGF min/max', format(np.log10(min(data['cgf'])), '0.3f'), '/', format(np.log10(max(data['cgf'])), '0.3f')
+            except:
+                try:
+                    data['cgf']=data['mcold_disk']/data['mstar']
+                    
+                    print 'SAGE: CGF min/max', format(np.log10(min(data['cgf'])), '0.3f'), '/', format(np.log10(max(data['cgf'])), '0.3f')
+                except:
+                    pass
+
+            
+            try:
+                data['ssfr']=data['sfr']/data['mstar'] 
+                print 'starforming cut?', starforming_cut,
+                
+                data=myfiltered_data[np.where(data['ssfr']>starforming_cut)[:][0]]
+                                                            
+                print 'min', min(data['ssfr']), 'max:', max(data['ssfr']), '-->', data.shape
+            except:
+                pass
+            
+            try:
+                data=data[np.where(data['zgas_disk']>0.0)[:][0]] 
+                data=data[np.where(data['zgas_disk']<=1.0)[:][0]] 
+            except:
+                data=data[np.where(data['OH_gas_disk_bulge']>0.0)[:][0]] 
+                data=data[np.where(data['OH_gas_disk_bulge']<=1.0)[:][0]]
+                
+            print 'check 0.0 > zgas >= 1.0 (its a metal abundance!) -->',data.shape
+            data=data[np.where(data[str(add_axis)]>0.1)[:][0]]
+            if self.myconfig_array['catname'+str(self.a)].startswith('SAGE'):
+                print 'SAGE!',
+                                                             
+                data[name_y]=8.69+np.log10(data['zgas_disk']/0.0134)
+            else:
+                 
+                data[name_y]=12.0+np.log10(data['OH_gas_disk_bulge']/16.0)                
+
+
+            data=data[np.where(np.isfinite(data[name_y]))[:][0]]
+
+            
+            print 'oh min/max', min(data[name_y]), '/', max(data[name_y])
+            try:
+                print 'add axis min/max', add_axis, min(data[add_axis]), '/', max(data[add_axis])
+            except:
+                pass
+            return data
+
+          
         print ' '
         print ' '                 
         print 'binAndFrac2D()', 'self.i:', self.i, 'self.a:', self.a
@@ -2973,68 +3993,21 @@ class Pipeline:
         print ' '
         #self.correctAndConvertUnits()
         
-        
+#        try:
+#            self.myData2Process['mhalo']=self.myData2Process['mhalo']*0.884
+#            print 'doing 200c approx. convertion by multiply mhalo*0.884 ...' 
+#        except:
+#            pass
         
         print 'name_x:', name_x, 'col id:', self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_col_'+name_x], 'mycond x-axis: min/max', mycond_min_x, '/', mycond_max_x
 
-        #print len((np.where(self.myData2Process['orphan'] == 0))[0]), len((np.where(self.myData2Process['orphan'] == 1))[0]), len((np.where(self.myData2Process['orphan'] == 2))[0])
-        #exit()
-
-        if self.myconfig_array['catname'+str(self.a)]=='CMASS_SPALL':
-            if self.myconfig_array['catname'+str(self.a)].find('SPALL')!=-1:
-                print 'correct IMF --> Kroupa to Chabrier'
-                self.myData2Process['mstar']/=10**(0.03925)
-                self.myData2Process['mstar']/=10**(0.2)
-
-                #print 'correct little-h for', self.myconfig_array['catname'+str(self.a)]
-                #correction_factor=0.7**2            #Msun --> Msunh-2 WMAP9
-                #correction_factor=(0.7/0.6777)**2    #Msunh-2 WMAP --> Msunh-2 Planck
-                #correction_factor/=0.6777           #Msunh-2 Planck --> Msunh-1 WMAP9                     
-                #self.myData2Process['mstar']*=(0.7/0.6777)
-
-        try:
-            self.myData2Process['mstar']=self.myData2Process['mstar_spheroid']+self.myData2Process['mstar_disk']
-        except:
-            pass
-
-        if plot_key=='sSFRF':           
-            #if np.all(self.myData2Process['ssfr']==-99.0):
-            self.myData2Process['ssfr']=self.myData2Process['sfr']/self.myData2Process['mstar']
-        
+        #print np.info(self.myData2Process)
         myfiltered_data = mL.filter_data_before_analysis(self.myData2Process, 
                                                            mycond_min_x, 
                                                            mycond_max_x, 
                                                            name_x)
-        print name_x, 'selection: -->', myfiltered_data.shape
-#        myfiltered_data = myfiltered_data[np.argsort(myfiltered_data['ssfr'])]
-#        myfiltered_data=myfiltered_data[int(myfiltered_data['mstar'].size/100*40)::]                
-#        print 'selection: --> highest', myfiltered_data.shape        
-        
-#        Blue-Red separation
-        #myfiltered_data=myfiltered_data[np.where(myfiltered_data['mAB_dA_total_g']-myfiltered_data['mAB_dA_total_i']>2.35)[0][:]] 
-#        Guo+13 cut
-#        (r-i)>0.679 -0.082(Mi+20)
-        #cut=0.679-0.082*(myfiltered_data['MAB_dA_total_i']-5*np.log10(0.6777)+20.0)
-        #myfiltered_data=myfiltered_data[np.where(myfiltered_data['mAB_dA_total_r']-myfiltered_data['mAB_dA_total_i']>cut)[0][:]]         
-
-        #myfiltered_data=myfiltered_data[np.where(myfiltered_data['sfr']/myfiltered_data['mstar']>1e-11)[0][:]]
-        #myfiltered_data=myfiltered_data[np.where(myfiltered_data['sfr']>1e-4)[0][:]]         
-#        
-        #print name_x, 'selection: --> sfr ', myfiltered_data.shape
-
-#        if plot_key.find('_no')!=-1:                          
-#            print 'exclude orphan galaxies:',
-#            myfiltered_data = mL.filter_data_before_analysis(myfiltered_data, 
-#                                                               0, 
-#                                                               0.1, 
-#                                                               'orphan')
-#            print name_x, 'selection: -->', myfiltered_data.shape
-               
-        try: 
-            print 'add_axis:', add_axis, 'col id', self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_col_'+add_axis]
-        except:
-            print 'no axis to add ... '
-                                                                                                                                            
+        print '\t', name_x, 'selection: -->', myfiltered_data.shape
+                                                                                                                                           
 
         if name_y!=False:
             print 'name_y:', name_y, 'col id:', self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_col_'+name_y], 'mycond y-axis: min/max', mycond_min_y, '/', mycond_max_y
@@ -3042,218 +4015,37 @@ class Pipeline:
                                                                mycond_min_y, 
                                                                mycond_max_y, 
                                                                name_y)                                                       
-            print name_y, 'selection: -->', myfiltered_data.shape
-                                                
-        if plot_key=='ssfr2mstar':
-            
-            myfiltered_data['sfr']/=myfiltered_data['mstar']           
-            print 'starforming cut:', starforming_cut
-            myfiltered_data = myData.selectData2Compute(myfiltered_data, 
-                                                        selected_col='sfr', 
-                                                        operator='>', 
-                                                        condition=starforming_cut)
- 
-        elif plot_key.startswith('HMF_no'):
-            print ' '
-            print 'HMF_no' 
-            print '+++++++++++++++++'
-            print 'shape before non-orphan selection!', myfiltered_data.shape,
-         
-            try:
-                print '--> select non-orphans',
-                myfiltered_data = myData.selectData2Compute(myfiltered_data, 
-                                                            selected_col='orphan', 
-                                                            operator='<', 
-                                                            condition=2)
-                                                                                                   
-                print 'shape after non-isolated selection!', myfiltered_data.shape                                            
-            except:
-                print 'no col "orphan" found! Could not do selection ...'        
-                                                               
-        elif plot_key.startswith('mstar2mhalo'):
-            print ' '
-            print 'mstar2mhalo' 
-            print '+++++++++++++++++'
-            print 'shape before non-orphan selection!', myfiltered_data.shape,
-         
-            try:
-                print '--> select non-orphans',
-                myfiltered_data = myData.selectData2Compute(myfiltered_data, 
-                                                            selected_col='orphan', 
-                                                            operator='<', 
-                                                            condition=2)
-                                                                                                   
-                print 'shape after non-isolated selection!', myfiltered_data.shape                                            
-            except:
-                print 'no col "orphan" found! Could not do selection ...' 
-                
-            if plot_key.find('vsSFR')!=-1:
-                myfiltered_data[name_y]=myfiltered_data['mstar']/myfiltered_data['mhalo']
-                                                               
+            print '\t', name_y, 'selection: -->', myfiltered_data.shape
 
-        elif str(name_y).find('Mzgas')!=-1:
-            print ' '
-            print 'Zgas=8.69+log10(Mzgas/(Mcold*0.0134)) ref: Allende-Pieto+01, Asplund+09'
-            if self.myconfig_array['catname'+str(self.a)].startswith('Galacticus') and self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_data_format']=='SAMHDF5':
-                #column Zgas_spheroid and Zgas_disk are wrongly named in the catalog it should be Mzgas_spheroid and Mzgas_disk
-                print 'Galaticus: zgas_disk+zgas_spheroid = Mzgas' 
-                myfiltered_data['zgas_spheroid']+=myfiltered_data['zgas_disk']
+        try: 
+            print 'add_axis:', add_axis, 'col id', self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_col_'+add_axis]
+            myfiltered_data = mL.filter_data_before_analysis(myfiltered_data, 
+                                                               'min', 
+                                                               3.16e9, 
+                                                               'mstar')                                                       
+            print '\t', add_axis, 'selection: -->', myfiltered_data.shape
+        except:
+            print '\tno axis to add ... '
 
 
-            myfiltered_data = myData.selectData2Compute(myfiltered_data, 
-                                                        selected_col=add_axis, 
-                                                        operator='>', 
-                                                        condition=0.0)
+        if plot_key.find('_no')!=-1 or plot_key.find('vsSFR')!=-1:                          
+            print 'exclude orphan galaxies:',
+            myfiltered_data=myfiltered_data[np.where(myfiltered_data['orphan']==0)[0][:]] 
+            print '\tselection: -->', myfiltered_data.shape
+           
+        
+        data2bin = caseSwitcher_plot_key(plot_key, myfiltered_data)
 
-            myfiltered_data[name_y]=myfiltered_data[name_y]/(myfiltered_data[add_axis]*0.0134)                
-            
-            myfiltered_data = myData.selectData2Compute(myfiltered_data, 
-                                                        selected_col=name_y, 
-                                                        operator='>', 
-                                                        condition=0.0)
-                                            
-            myfiltered_data[name_y]=8.69+np.log10(myfiltered_data[name_y]) 
-
-            myfiltered_data = myData.selectData2Compute(myfiltered_data, 
-                                                        selected_col=name_y, 
-                                                        operator='!=', 
-                                                        condition='nan')
-
-            
-            print myfiltered_data[name_y][0:10]
-            
-            if name_x.find('mcold')!=-1:
-
-                try:
-                    myfiltered_data = myData.selectData2Compute(myfiltered_data, 
-                                                    selected_col='mcold', 
-                                                    operator='>', 
-                                                    condition=1e3)
-                except:
-                    myfiltered_data = myData.selectData2Compute(myfiltered_data, 
-                                                    selected_col='mcold_disk', 
-                                                    operator='>', 
-                                                    condition=1e3)                    
-                
-                
-                myfiltered_data = mL.filter_data_before_analysis(myfiltered_data, 
-                                                                   5e10, 
-                                                                   1e11, 
-                                                                   'mstar')                
-                print 'mstar selection: -->', myfiltered_data.shape,
-                
-                myfiltered_data[name_x]/=myfiltered_data['mstar'] 
-
-                myfiltered_data = mL.filter_data_before_analysis(myfiltered_data, 
-                                                                   1e-4, 
-                                                                   1e4, 
-                                                                   name_x)
-                print 'Zcold selection: -->', myfiltered_data.shape,                                                    
-                myfiltered_data = mL.filter_data_before_analysis(myfiltered_data, 
-                                                                   6, 
-                                                                   11, 
-                                                                   name_y)                                                                   
-                print 'Mcold/Mstar selection: -->', myfiltered_data.shape                                                  
-
-        elif plot_key=='oh2mstar':
-            print ' '
-            print 'OH2mstar'
-            print '+++++++++++++++++'
-            print ' '
-            #Converstion value 0365507 comes from ...
-            # (O/H)_gal / (O/H)_sun = Z_gal / Z_sun
-            # (O/H)_gal = (O/H)_sun * Z_gal / Z_sun
-            # (O/H)_sun = 10**(8.38-12) --> from 12+log10(0/H)_sun = 8.69 (Allende-Prieto+01)
-            # Z_sun=0.0134 --> from (Asplund+09)
-            # (O/H)_gal = M_metals / M_baryons --> MZ_gas total / Mcold gas                                                      
-            # (O/H)_sun / Z_sun = 0.0365507 
-
-#            if self.myconfig_array['catname'+str(self.a)]=='SAG_1Gpc_v2':
-#                print 'correct sfr*h for SAGv2!'
-#                myfiltered_data['sfr']*=0.6777
-            #select only starforming!
-            myfiltered_data['sfr']/=myfiltered_data['mstar']            
-            
-            
-            myfiltered_data = myData.selectData2Compute(myfiltered_data, 
-                                                        selected_col='sfr', 
-                                                        operator='>', 
-                                                        condition=starforming_cut)
-                                                        
-            print 'starforming? min', min(myfiltered_data['sfr']), 'max:', max(myfiltered_data['sfr'])
-
-
-            
-            #y-axis
-            if name_y.find('mcold')!=-1:
-                print ' '
-                print 'metallicity! x-axis --> Mzgas/Mcold, add axis name:', add_axis
-
-                try:
-                    myfiltered_data['Mzgas']=myfiltered_data['Mzgas_disk']+myfiltered_data['Mzgas_spheroid']
-                    print 'Mzgas=Mzgas_disk+Mzgas_spheroid'
-                except:
-                    pass
-                
-
-                myfiltered_data = myData.selectData2Compute(myfiltered_data, 
-                                                            selected_col=add_axis, 
-                                                            operator='>', 
-                                                            condition=10)
-
-                
-                print myfiltered_data.shape,                
-                if self.myconfig_array['catname'+str(self.a)].startswith('Galacticus') and self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_data_format']=='SAMHDF5':
-                    #column Zgas_spheroid and Zgas_disk are wrongly named in the catalog it should be Mzgas_spheroid and Mzgas_disk
-                    print 'Galaticus: zgas_disk+zgas_spheroid --> zgas/mcold' 
-                    myfiltered_data['zgas_disk']+=myfiltered_data[:,self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_col_zgas_spheroid']]      
-                else:
-                    print 'default!'
-                    
-                    
-                    myfiltered_data[name_y]=12+np.log10(0.0365507*myfiltered_data[add_axis]/myfiltered_data[name_y])  #+ 0.25      
-
-            elif name_y.find('OH')!=-1:
-                print ' '
-                print 'div 16!'
-                print ' '
-                print 'CHECK entries for SAG: 99.0 are numbers which should be avoided!'
-                print myfiltered_data.shape,
-                myfiltered_data = myData.selectData2Compute(myfiltered_data, 
-                                                            selected_col=name_y, 
-                                                            operator='!=', 
-                                                            condition=99.0)
-
-                print 'check no 99.0 -->', myfiltered_data.shape, 
-                
-                myfiltered_data = mL.filter_data_before_analysis(myfiltered_data, 
-                                                                       0.0, 
-                                                                       1, 
-                                                                       name_y)                
-
-                print 'check 0.0 > zgas >= 1.0 (its a metal abundance!) -->',myfiltered_data.shape
-                                                            
-                myfiltered_data[name_y]=12+np.log10(myfiltered_data[name_y]/16)
-            
-            elif self.myconfig_array['catname'+str(self.a)].startswith('SAGE'):
-                print 'SAGE: name_y=zgas_disk'
-                
-                myfiltered_data = mL.filter_data_before_analysis(myfiltered_data, 
-                                                                       0.0, 
-                                                                       1, 
-                                                                       add_axis)
-                
-                myfiltered_data[name_y]=12+np.log10(0.0365507*myfiltered_data[add_axis])    
                     
         print ' '        
         print 'check data:'
         print '+++++++++++++'
                                     
-        print 'name_x:', name_x ,'min/max:', min(myfiltered_data[name_x]), '/', max(myfiltered_data[name_x])
+        print 'name_x:', name_x ,'min/max:', min(data2bin[name_x]), '/', max(data2bin[name_x])
         if name_y!=False: 
-            print 'name_y:', name_y ,'min/max:', min(myfiltered_data[name_y]), '/', max(myfiltered_data[name_y])
+            print 'name_y:', name_y ,'min/max:', min(data2bin[name_y]), '/', max(data2bin[name_y])
         try:                
-            print 'add_axis:', add_axis,'min/max:', min(myfiltered_data[add_axis]), '/', max(myfiltered_data[add_axis])
+            print 'add_axis:', add_axis,'min/max:', min(data2bin[add_axis]), '/', max(data2bin[add_axis])
         except:
             pass
 
@@ -3270,22 +4062,28 @@ class Pipeline:
                                 add_axis=add_axis,
                                 cumulative=cumulative,
                                 weights=weight_function)
+
+
+
+
+
+            
         if float(self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_box_size'])==0.0:
             weight_function=True
             print 'weight function --> OBERVATIONAL DATA SET [name_x,weight] --> col name weights:', self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_name_weights']
-            histo, binsize = calcHisto(myfiltered_data[[name_x,self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_name_weights']]])          
+            histo, binsize = calcHisto(data2bin[[name_x,self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_name_weights']]])          
         else:   
                 
             try:
                 print '[name_x,name_y,add_axis] -->',
-                histo, binsize = calcHisto(myfiltered_data[[name_x,name_y,add_axis]])
+                histo, binsize = calcHisto(data2bin[[name_x,name_y,add_axis]])
             except:
                 try:
                     print '[name_x,name_y] -->',
-                    histo, binsize = calcHisto(myfiltered_data[[name_x,name_y]])
+                    histo, binsize = calcHisto(data2bin[[name_x,name_y]])
                 except:
                     print '[name_x] -->',
-                    histo, binsize = calcHisto(myfiltered_data[name_x])
+                    histo, binsize = calcHisto(data2bin[name_x])
 
         if float(self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_box_size'])==0.0:
             print '... calculate survey volume. skycoverage:', self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_skycoverage'], '[deg2]', 'zmax:', self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_zmax'], 'zmin:', self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_zmin'], '-->',
@@ -3462,6 +4260,7 @@ class Pipeline:
                                         use_random_cat=True)                                                                              
 
     def TwoPCF(self,
+               mydata,
                filename,
                myconds_array):
 
@@ -3596,7 +4395,7 @@ class Pipeline:
                                    results_CF,
                                    myheader=myheader,
                                    data_format=data_format)
-            print '---------------------\n\n'
+            
 
 
         print ' '
@@ -3604,7 +4403,7 @@ class Pipeline:
         print 'TwoPCF Corrfunc()', 'self.i:', self.i, 'self.a:', self.a
         print '++++++++++++++++++++++++++++++++++++++++++++++'
         print ' '
-        print 'catname', self.myconfig_array['catname'+str(self.a)], 'which:', self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_twoPCF_which'], 'z:', self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z']  
+        #print 'catname', self.myconfig_array['catname'+str(self.a)], 'which:', self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_twoPCF_which'], 'z:', self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z']  
         
 
         import Corrfunc as cf
@@ -3622,7 +4421,7 @@ class Pipeline:
         else:
             pos_unit='Mpc'            
       
-        gtype_list=['no', 'centrals', 'all']
+        gtype_list=['no', 'centrals']#, 'all']
 
         gtype_dict=          {'centrals': 0,    'no': 2, 'no-sats': 1, 'all': 10}       
         gtype_dict_operators={'centrals': '==', 'no': '<', 'no-sats': '==', 'all': '<'}
@@ -3630,14 +4429,19 @@ class Pipeline:
         #self.myData2Process= mL.choose_random_sample(self.myData2Process, 95683)
         
         #self.myData2Process['mstar']*=1.16 
-        print 'min/max mstar:', min(self.myData2Process['mstar']), '/', max(self.myData2Process['mstar'])
+        #print 'min/max mstar:', format(min(self.myData2Process['mstar']), '.3e'), '/', format(max(self.myData2Process['mstar']), '.3e')
  
+        if mydata==False:
+            mydata=self.myData2Process
 
+#        mydata = mL.choose_random_sample(self.myData2Process,int(self.myData2Process.size*0.1))
+#        print 'randomly chosen 10 %', mydata.size
+        #print 'here 3858', mydata   
        
         for gtype in gtype_list:
             
-            print 'first loop: \ngtype:', gtype, 'operator:',  gtype_dict_operators[gtype], 'condition:', gtype_dict[gtype]
-            cut_list=[10**10]
+            print 'gtype:', gtype, 'operator:',  gtype_dict_operators[gtype], 'condition:', gtype_dict[gtype]
+            cut_list=['']
             cut_list_max_dict={}
             #> or <
             #cut_list=[1e10]
@@ -3662,11 +4466,11 @@ class Pipeline:
           
            
             cut_list_operators=['>']
-            cut_list_operators_dict={'>':'_mstar_gt_'}
+            cut_list_operators_dict={'>':''}
             
             for cut in cut_list:
                 for operator in cut_list_operators:    
-                    print 'second loop:\ncut:', cut, 'operator:', operator, 'cut_list_operators_dict:', cut_list_operators_dict[operator]
+                    #print 'second loop:\ncut:', cut, 'operator:', operator, 'cut_list_operators_dict:', cut_list_operators_dict[operator]
                     try:
                         data      = self.myData2Process[np.where(self.myData2Process['Z']>0.05)]
                         #data['Z'] = cd.comoving_distance(data['Z'], **fidcosmo)*0.6777
@@ -3674,16 +4478,16 @@ class Pipeline:
                         #print data['Z'][0:20]
                     except:
  
-                                               
-                        data = myData.selectData2Compute(self.myData2Process, 
+                                             
+                        data = myData.selectData2Compute(mydata, 
                                                         selected_col='orphan', 
                                                         operator=gtype_dict_operators[gtype], 
                                                         condition=gtype_dict[gtype])
 
-                        print 'min/max mstar:', min(data['mstar']), '/', max(data['mstar']) 
+                        #print 'min/max mstar:', format(min(self.myData2Process['mstar']), '.3e'), '/', format(max(self.myData2Process['mstar']), '.3e')
 
                         
-                        print 'after selection galaxy type:', data.shape  
+                        #print 'after selection galaxy type:', data.shape  
 
                         if cut_list_operators_dict[operator].find('Mr')!=-1:
                             print 'here Mr > -21.5'
@@ -3741,7 +4545,7 @@ class Pipeline:
                         sats=len(np.where(data['orphan']==1)[0])
                         orphans=len(np.where(data['orphan']==2)[0])
                         
-                        print 'galaxy types in sample: cents:', centrals, 'no-sats:', sats, 'orphans:', orphans
+                        #print 'galaxy types in sample: cents:', centrals, 'no-sats:', sats, 'orphans:', orphans
                         
                         #data      = self.myData2Process[np.where(self.myData2Process['orphan']>0)]
                         #print 'sats+orphans!'
@@ -3756,7 +4560,7 @@ class Pipeline:
             #            data[f]/=0.6777
             #        print data['x_pos'][0:10]
             
-                    print 'units:', pos_unit, 'min/max: x,y,z', max(data['x_pos']), '/', max(data['x_pos']), max(data['y_pos']), '/', max(data['y_pos']), max(data['z_pos']), '/', max(data['z_pos'])
+                    #print 'units:', pos_unit, 'min/max: x,y,z', max(data['x_pos']), '/', max(data['x_pos']), max(data['y_pos']), '/', max(data['y_pos']), max(data['z_pos']), '/', max(data['z_pos'])
     
     
     
@@ -3800,7 +4604,7 @@ class Pipeline:
                     #            if self.myconfig_array['catname'+str(self.a)].startswith('SAGE'):
                     #                boxsize   = 350.0/0.6777+0.1
                                     
-                                print 'chosen BOXSIZE:', boxsize, 'rmin/rmax:', rmin, '/', rmax
+                                #print 'chosen BOXSIZE:', boxsize, 'rmin/rmax:', rmin, '/', rmax
                             else:
                                 boxsize   = '-'
                                 rand_RA, rand_DEC, rand_CZ = read_catalog(pjoin(dirname(abspath(cf.__file__)), "../mocks/tests/data", "Mr19_randoms_northonly.rdcz.ff"))
@@ -3829,10 +4633,11 @@ class Pipeline:
                     
                           
                             try:
-                                print 'calculate:', self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_twoPCF_calculate'],        
+                                #print 'calculate:', self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_twoPCF_calculate'],        
                                 results_CF, calc_time = caseSwitcher(self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_twoPCF_calculate'])           
-                                writeIntoFile(results_CF,  self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_twoPCF_calculate'])           
-                                print '... succsessful calculated! within:', calc_time, 'min /', calc_time, 'sec' 
+                                writeIntoFile(results_CF,  self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_twoPCF_calculate'])
+                                print '----------'
+                                #print '... succsessful calculated! within:', calc_time, 'min /', calc_time, 'sec' 
                                 
                             except:
                                 pass
@@ -3849,15 +4654,17 @@ class Pipeline:
 #                                    a+=1                    
 
     def HODFunction(self,
-                    filename):
+                    mydata,
+                    filename,
+                    which_halomass=''):
 
         print ' '
         print ' '                 
         print 'HODFunction()', 'self.i:', self.i, 'self.a:', self.a
         print '++++++++++++++++++++++++++++++++++++++++++++++'
         print ' '
-        print 'catname', self.myconfig_array['catname'+str(self.a)], 'z:', self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z'],  
-        print 'filename:', filename
+        #print 'catname', self.myconfig_array['catname'+str(self.a)], 'z:', self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z'],  
+        #print 'filename:', filename
 
         def GalaxyTypeStats(data):
     
@@ -3976,22 +4783,20 @@ class Pipeline:
         
         #data= mL.choose_random_sample(self.myData2Process, 500000)        
 
-#        data['mstar']=data['mstar_spheroid']+data['mstar_disk']
-#        
-#        data_centrals=data[np.where(data['haloid']==data['hostid'])]
-#        data_type0=data[np.where(data['orphan']==0)]
-#        data_sats=data[np.where(data['orphan']==1)]
-#        data_orphans=data[np.where(data['orphan']==2)]
-#      
-#        
+#        mL.give_galaxy_type_info(self.myData2Process['orphan'])       
 #        exit()        
     
         hod=True
-        halomass='mhalo'
-        central_id='fofID'        
-
+        if which_halomass=='':
+            halomass='mhalo_cents_200c'
+        else:
+            halomass=which_halomass
+            
+        #central_id='fofID' #LGALAXIES        
+        central_id='haloid' #MD
         #self.myData2Process=self.myData2Process[np.where(self.myData2Process['orphan']<2)[:][0]]
-
+#        mL.give_galaxy_type_info(self.myData2Process['orphan'])
+#        exit()
         #print self.myData2Process.shape, 'ngal sats:', self.myData2Process[np.where(self.myData2Process['orphan']>0)[:][0]].size
 
 
@@ -4000,13 +4805,38 @@ class Pipeline:
         #test      = np.in1d(self.myData2Process['hostid'], rand_sats['hostid'])             
         #self.myData2Process      = self.myData2Process[np.where(test==False)[0][:]]
 
-        sim='MSI'
+        redshift=float(self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z'])
+        print 'redshift', redshift
+        which_halocat=''
+        sim='MD'
         if sim=='MD':
-            data_halo = myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/OBS/hod_MD_0.56.txt', data_format='ASCII', data_shape='shaped', delim=' ', mydtype=np.float32, skiprow=1) 
-        elif sim=='MSI':
-            data_halo = myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/OBS/MSI_LGALAXIES_500Mpc_z_0.56_Nhalos.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float64, skiprow=2) 
-            
+            #path_to_halos=mycomp+'anaconda/pro/OBS/hod_MD_0.56.txt'
+            #path_to_halos=mycomp+'anaconda/pro/OBS/HMF_MPDL2_FOF_mass_Msun.txt'
+            path_to_halos=mycomp+'anaconda/pro/OBS/HMF_MDPL2_Rockstar_z_'+str(redshift)+'_M200c_Msun_Nhalos.txt'
+            #path_to_halos=mycomp+'anaconda/pro/OBS/HMF_MDPL2_FOF_z_'+str(redshift)+'_mass_Msun_Nhalos.txt'
+            data_halo = myData.readAnyFormat(config=False, mypath=path_to_halos, data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float32, skiprow=11) 
+            which_halocat='from MDPL2 Rockstar cosmosim.org'
             bins=data_halo[:,0]
+            Nhalos=data_halo[:,1]        
+        elif sim=='SMD':
+            #path_to_halos=mycomp+'anaconda/pro/OBS/HMF_SMPDL_FOF_mass_Msun.txt' 
+            path_to_halos=mycomp+'anaconda/pro/OBS/HMF_SMDPL_Rockstar_z_'+str(redshift)+'_M200c_Msun_Nhalos.txt'
+            #path_to_halos=mycomp+'anaconda/pro/OBS/HMF_SMDPL_FOF_z_'+str(redshift)+'_mass_Msun_Nhalos.txt'
+            data_halo = myData.readAnyFormat(config=False, mypath=path_to_halos, data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float32, skiprow=11) 
+            which_halocat='from SMDP2 M200c cosmosim.org'
+            bins=data_halo[:,0]
+            Nhalos=data_halo[:,1]
+        elif sim=='MSI':
+            data_halo = myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/OBS/MSI_LGALAXIES_500Mpc_z_0.56_Nhalos.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float64, skiprow=2)            
+            bins=data_halo[:,0]
+            
+        elif sim=='TNG':
+            path_to_halos=mycomp+'anaconda/pro/OBS/HMF_IllustrisTNG300_z_'+str(redshift)+'_tarsel_Nhalos.txt'
+            data_halo = myData.readAnyFormat(config=False, mypath=path_to_halos, data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float64, skiprow=2)             
+            which_halocat='from TNG300-1 cats from Celeste'
+            bins=np.log10(data_halo[:,0])
+            #print 'bins:', bins
+            Nhalos=data_halo[:,6]           
         else:
             binsize=0.103
             mhalo_min=12.1690
@@ -4015,35 +4845,40 @@ class Pipeline:
             binsize      = abs(mhalo_max-mhalo_min)
             bins         = np.arange(data_halo[0,0]-binsize/2.,data_halo[-1,0]-binsize/2., binsize)
   
+        print 'Halos from --> ', path_to_halos
         
         if hod==True:
-            print '<N> = sum hosthalos + 1 / nhalos per mhalo bin'
+            pass
+            #print '<N> = sum hosthalos + 1 / nhalos per mhalo bin'
 
+
+#        print len(np.where(self.myData2Process['orphan']==0)[:][0])
+#        exit()
+
+        
         data = mL.filter_data_before_analysis(self.myData2Process, 
-                                                           'min', 
-                                                           'max', 
-                                                           halomass)
+                                               'min', 
+                                               'max', 
+                                               halomass)
 
-
-
-        Nhalos       = data_halo[:,1]
         histo        = np.zeros((len(bins),7), dtype=np.float64)
         
         counts, edges= np.histogram(np.log10(data[halomass]), bins)
-        histo[:,0]   = 10**data_halo[:,0]
+        histo[:,0]   = 10**bins
 
         for gtype in ['all','centrals', 'sats']:
               
             i=1
             while i<len(histo[:,0])+1:
                 #try:
-                #print 'i:', i, edges[i-1], 
+                print 'i:', i, edges[i-1],
 
                 if i==len(histo[:,0]):
-                    print 'here! MAX', edges[i-1], np.log10(histo[i-1,0]),
+                    #print 'here! MAX', edges[i-1], np.log10(histo[i-1,0]),
                     data_bin   = data[np.where(np.log10(data[halomass])<=max(np.log10(data[halomass])))[:][0]]
                 else:               
-                    data_bin    = data[np.where(np.log10(data[halomass])<edges[i])[:][0]]              
+                    data_bin    = data[np.where(np.log10(data[halomass])<edges[i])[:][0]]
+                    
                 data_bin    = data_bin[np.where(np.log10(data_bin[halomass])>edges[i-1])[:][0]]
 
                 if gtype=='all':
@@ -4056,52 +4891,60 @@ class Pipeline:
 
                 
                 if hod==True:                                      
-                    #print 'check size:', data.size
-    
+                    #print 'data_bin', data_bin.size 
                     test = np.in1d(data_sel[central_id],data_bin[central_id])
                     data_to_check=data_sel[np.where(test==True)[:][0]]
                     
-                    #print 'N'+gtype+':', data_to_check.size,
+                    #print 'N'+gtype+':', data_to_check.size
                     unique_haloid, count_haloid = find_unique_objects(data_to_check[central_id]) 
                     #print data_to_check[['haloid','hostid','orphan']]
                     #print count_haloid[np.where(count_haloid!=1)[:][0]]
  
-                    #print 'Nhaloid:', sum(count_haloid), 'Nhalos:', Nhalos[i-1],
+                    print 'Nhaloid:', sum(count_haloid), 'Nunique:', len(unique_haloid), 'Nhalos:', float(Nhalos[i-1])
                         
                     try:
-                        histo[i-1,1]=(sum(count_haloid))/float(Nhalos[i-1])
-                        #print histo[i-1,1]
-                        #histo[i-1,1]=(data_sel.size*1.29)/float(MD_data[i-1,6])
+                        histo[i-1,1]=(sum(count_haloid))/float(Nhalos[i-1])                        
                     except:
-                        #histo[i-1,1]='NaN'
+                        histo[i-1,1]='NaN'
                         pass
+                    
                     histo[i-1,4]=len(unique_haloid)
                     histo[i-1,5]=sum(count_haloid)
-                   
+                    histo[i-1,6]=float(Nhalos[i-1])
+                    
                 else:
+                    
+                    if gtype=='all':
+                        data_sel=data_bin[np.where(data_bin['orphan']>-1)[:][0]] 
+                    elif gtype=='centrals':
+                        data_sel=data_bin[np.where(data_bin['orphan']==0)[:][0]]    
+                        
+                    else:
+                        data_sel=data_bin[np.where(data_bin['orphan']!=0)[:][0]] 
+                    
                     print 'calculate scatter: ', 
-                    mean_mstar=np.mean(np.log10(data_bin['mstar']))
+                    mean_mstar=np.mean(np.log10(data_sel['mstar']))
                     #scatter
-                    histo[i-1,1]=np.std(np.log10(data_bin['mstar']))
-                    histo[i-1,4]=histo[i-1,1]/(data_bin.size**0.5)
+                    histo[i-1,1]=np.std(np.log10(data_sel['mstar']))
+                    histo[i-1,4]=histo[i-1,1]/(data_sel.size**0.5)
                     histo[i-1,5]=histo[i-1,4]
                     print histo[i-1,1], np.log10(histo[i-1,0])
                     
-                histo[i-1,6]=float(Nhalos[i-1])               
+                    histo[i-1,6]=data_sel.size               
     
                 i+=1
 
 
             #print histo[:,[0,1]]
             if hod==True:
-                header='\n(1) mhalo [Msun] (2) <ngal> [-] (3) -dx \t(4) dx\t(5) N unique\t(6) N '+gtype+' (7) Nhalos'
+                header='\n(1) '+halomass+' [Msun] (2) <ngal> [-] (3) -dx \t(4) dx\t(5) N unique\t(6) N '+gtype+' (7) Nhalos '+which_halocat
                 myOutput.writeIntoFile(filename[0:len(filename)-4]+'_'+halomass+'_'+gtype+'.txt',
                                        histo,
                                        myheader='HODFunction '+self.myconfig_array['catname'+str(self.a)]+' z='+str(float("{0:.2f}".format(self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z'])))+' cumulative: no'+header,
                                        data_format="%0.8e",
                                        mydelimiter='\t')
             else:
-                header='\n(1) mhalo [Msun] (2) sigma(log10 Mstar) [-] (3) -dx\t(4) dx\t(5) -dy\t(6) dy\t(7) N halo/bin'
+                header='\n(1) '+halomass+' [Msun] (2) sigma(log10 Mstar [Msun]) [-] (3) -dx\t(4) dx\t(5) -dy\t(6) dy\t(7) Ngal/bin'
                 myOutput.writeIntoFile(filename[0:len(filename)-4]+'_'+halomass+'_sc_'+gtype+'.txt',
                                        histo,
                                        myheader='HOD scatter '+self.myconfig_array['catname'+str(self.a)]+' z='+str(float("{0:.2f}".format(self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z'])))+' cumulative: no'+header,
@@ -4113,47 +4956,114 @@ class Pipeline:
                       filename,
                       col_name,
                       col_unit,
-                      binning='log'):
-                
-        #print 'fast histogramm -->', col_name, '[', col_unit, ']',
-        if col_name=='sfr':
-            data = data[np.where(data>=1e-7)[:][0]]
+                      binning='log',
+                      binup2D=False):
 
-        elif col_name=='mstar':
-            data = data[np.where(data>1e5)[:][0]]
+        if binup2D==True:
 
-        elif col_name=='mhalo':
-            data = data[np.where(data>0)[:][0]]            
- 
-        if binning=='log':           
-            data = np.log10(data)
+            if col_name.find('mhalo')!=-1:
+                data = data[np.where(data['orphan']==0)[:][0]]
+                data = data[np.where(data[col_name]>=1e11)[:][0]]
+                data = data[np.where(data[col_name]<1e15)[:][0]]
+
+                histo, binsize = myFuncs.binUp(data[[col_name,'mstar']],
+                                                    25,
+                                                    histo_min=1e11,
+                                                    histo_max=1e15,
+                                                    log10bin=True,
+                                                    binup_2D=True,
+                                                    div_y2x=True,
+                                                    use_MAD=True,
+                                                    equal_bins=True) 
+                #print histo[:,[0,1]]
             
-        data = data[np.where(np.isfinite(data))[:][0]]        
-        data = data[np.where(data>=np.percentile(data,2))[:][0]]
-        data = data[np.where(data<np.percentile(data,98))[:][0]]
-        #print data.shape                
-        #print 'data min/max:', min(data), '/', max(data),
-        nbins=25
-        data_min = min(data)
-        data_max = max(data)
-
-        #print 'data_min:', data_min, 'data_max:', data_max
-        binsize = (data_max-data_min)/nbins
-       
-        counts, edges = np.histogram(data, nbins)
-
-        histo=np.zeros((nbins, 7), dtype=np.float32)
-        
-        if binning =='log':
-            histo[:,0]= (10**edges[1:]*10**edges[:-1])**0.5
         else:
-            histo[:,0]= (edges[1:]+edges[:-1])/2
+                
+            #print 'fast histogramm -->', col_name, '[', col_unit, ']',
+            if col_name=='sfr':
+                data_min = 1e-4
+                data_max = 1000
 
-        histo[:,1]=counts/binsize/self.volume
-        histo[:,2]=binsize
-        histo[:,4]=histo[:,1]/counts**0.5
-        histo[:,5]=histo[:,4]
-        histo[:,6]= counts
+            elif col_name=='zcold':
+                data_min = 8
+                data_max = 11.5
+
+            elif col_name=='g-i':
+                data_min = 0
+                data_max = 3.5
+
+            elif col_name=='ssfr':
+                data_min = 1e-13
+                data_max = 1e-8
+    
+            elif col_name=='mstar':
+                data_min = 1e9
+                data_max = 1e12                                          
+
+            elif col_name=='mbh':
+                data_min = 1e5
+                data_max = 1e9
+            elif col_name=='rbulgevsrdisk':
+                data_min = 0.001
+                data_max = 10000    
+            elif col_name.find('mhalo')!=-1:
+                data_min = 1e11
+                data_max = 1e15
+            elif col_name.find('age')!=-1:
+                data_min = 0.1
+                data_max = 10
+            elif col_name.find('rhalfmass')!=-1:
+                data_min = 1e-4
+                data_max = 1                
+            elif col_name=='vmax' or col_name=='vdisp':
+                data_min = 10
+                data_max = 10000
+            elif col_name=='cgf':
+                data_min = 1e-5
+                data_max = 10                   
+            else:
+                data_min=min(data)
+                data_max=max(data)
+                
+            data = data[np.where(data>=data_min)[:][0]]
+            data = data[np.where(data<data_max)[:][0]]
+
+            if binning=='log':           
+                data = np.log10(data)
+                data_min=np.log10(data_min)
+                data_max=np.log10(data_max)
+                  
+            data = data[np.where(np.isfinite(data))[:][0]]        
+    #        data = data[np.where(data>=np.percentile(data,0.01))[:][0]]
+    #        data = data[np.where(data<np.percentile(data,99.9))[:][0]]
+            #print data.shape                
+            #print 'data min/max:', min(data), '/', max(data),
+            nbins=25
+    
+            #print 'data_min:', data_min, 'data_max:', data_max
+            binsize = (data_max-data_min)/nbins
+            
+            bins = np.linspace(data_min, data_max, nbins+1)
+            #print bins
+           
+            counts, edges = np.histogram(data, bins)
+    
+            histo=np.zeros((nbins, 7), dtype=np.float32)
+           
+            if binning =='log':
+                histo[:,0]= (10**edges[1:]*10**edges[:-1])**0.5
+            else:
+                histo[:,0]= (edges[1:]+edges[:-1])/2
+    
+            if self.volume=='False' or self.volume==False:
+                self.volume=(self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_box_size']/0.6777)**3
+                print '--> set volume:', self.volume
+                
+            histo[:,1]=counts/binsize/self.volume
+            histo[:,2]=binsize
+            histo[:,4]=histo[:,1]/counts**0.5
+            histo[:,5]=histo[:,4]
+            histo[:,6]= counts
       
         header='\n(1) '+col_name+' ['+col_unit+'] (2) Phi [Mpc-3 dex-1] (3) dx \t(4) -dx (5) -dy\t(6) +dy\t(7) N count'    
 

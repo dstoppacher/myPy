@@ -156,7 +156,10 @@ def Galcticus_HDF5_filestruct(
     try:
         data = myData.readAnyFormat(config=False, mydtype=np.str_, mypath=path_to_directory+'file_names.txt', data_shape='shaped', comment='#')
     except:
-        data = myData.readAnyFormat(config=False, mydtype=np.str_, mypath=mycomp+'anaconda/pro/data/'+catname+'/'+catname+'_file_names.txt', data_shape='shaped', comment='#')
+        try:
+            data = myData.readAnyFormat(config=False, mydtype=np.str_, mypath=mycomp+'anaconda/pro/data/'+catname+'/file_names.txt', data_shape='shaped', comment='#')
+        except:          
+            data = myData.readAnyFormat(config=False, mydtype=np.str_, mypath=mycomp+'anaconda/pro/data/'+catname+'/'+catname+'_file_names.txt', data_shape='shaped', comment='#')
                                    
     i=0
     while i<data.size:
@@ -198,7 +201,15 @@ def Galcticus_HDF5_filestruct(
     
     SAM_hdf5_filestruct_map[catname+'_spinParameter']       = SAM_hdf5_filestruct_map[catname+'_path_to_data']+snapid+'/nodeData/spinSpin'
 
-    SAM_hdf5_filestruct_map[catname+'_mean_age_stars']     = ''
+    SAM_hdf5_filestruct_map[catname+'_mean_age_stars_disk']     = ''
+    SAM_hdf5_filestruct_map[catname+'_mean_age_stars_spheroid']     = ''
+    
+    SAM_hdf5_filestruct_map[catname+'_sfr_int_disk']     = SAM_hdf5_filestruct_map[catname+'_path_to_data']+snapid+'/nodeData/ageStatisticsDiskIntegratedSFR'
+    SAM_hdf5_filestruct_map[catname+'_sfr_int_spheroid']     = SAM_hdf5_filestruct_map[catname+'_path_to_data']+snapid+'/nodeData/ageStatisticsSpheroidIntegratedSFR'
+         
+    SAM_hdf5_filestruct_map[catname+'_age_sfr_int_disk']     = SAM_hdf5_filestruct_map[catname+'_path_to_data']+snapid+'/nodeData/ageStatisticsDiskTimeWeightedIntegratedSFR'
+    SAM_hdf5_filestruct_map[catname+'_age_sfr_int_spheroid']     = SAM_hdf5_filestruct_map[catname+'_path_to_data']+snapid+'/nodeData/ageStatisticsSpheroidTimeWeightedIntegratedSFR'
+    
     SAM_hdf5_filestruct_map[catname+'_mbh']                = SAM_hdf5_filestruct_map[catname+'_path_to_data']+snapid+'/nodeData/blackHoleMass'
     SAM_hdf5_filestruct_map[catname+'_bh_acc_rate']        = SAM_hdf5_filestruct_map[catname+'_path_to_data']+snapid+'/nodeData/blackHoleAccretionRate'    
     SAM_hdf5_filestruct_map[catname+'_bh_rad_eff']         = SAM_hdf5_filestruct_map[catname+'_path_to_data']+snapid+'/nodeData/blackHoleRadiativeEfficiency'
@@ -247,6 +258,9 @@ def Galcticus_HDF5_filestruct(
     SAM_hdf5_filestruct_map[catname+'_x_vel']               = SAM_hdf5_filestruct_map[catname+'_path_to_data']+snapid+'/nodeData/positionVelocityX'
     SAM_hdf5_filestruct_map[catname+'_y_vel']               = SAM_hdf5_filestruct_map[catname+'_path_to_data']+snapid+'/nodeData/positionVelocityY'
     SAM_hdf5_filestruct_map[catname+'_z_vel']               = SAM_hdf5_filestruct_map[catname+'_path_to_data']+snapid+'/nodeData/positionVelocityZ'
+    
+    SAM_hdf5_filestruct_map[catname+'_vbulge']           = SAM_hdf5_filestruct_map[catname+'_path_to_data']+snapid+'/nodeData/spheroidVelocity'
+    SAM_hdf5_filestruct_map[catname+'_vdisk']               = SAM_hdf5_filestruct_map[catname+'_path_to_data']+snapid+'/nodeData/diskVelocity'
 
     SAM_hdf5_filestruct_map[catname+'_L_RGO_dA_spheroid_B_part1'] = SAM_hdf5_filestruct_map[catname+'_path_to_data']+snapid+'/nodeData/spheroidLuminositiesStellar:RGO_B:rest:z'
     SAM_hdf5_filestruct_map[catname+'_L_RGO_dA_disk_B_part1']     = SAM_hdf5_filestruct_map[catname+'_path_to_data']+snapid+'/nodeData/diskLuminositiesStellar:RGO_B:rest:z'
@@ -290,13 +304,7 @@ def Galcticus_HDF5_filestruct(
     
     SAM_hdf5_filestruct_map[catname+'_vmax']               = SAM_hdf5_filestruct_map[catname+'_path_to_data']+snapid+'/nodeData/nBodyVelocityMaximum'   
     SAM_hdf5_filestruct_map[catname+'_vdisp']              = SAM_hdf5_filestruct_map[catname+'_path_to_data']+snapid+'/nodeData/nBodyVelocityDispersion'  
-    SAM_hdf5_filestruct_map[catname+'_sfr_disk_int']       = SAM_hdf5_filestruct_map[catname+'_path_to_data']+snapid+'/nodeData/ageStatisticsDiskIntegratedSFR' 
-    SAM_hdf5_filestruct_map[catname+'_sfr_spheroid_int']   = SAM_hdf5_filestruct_map[catname+'_path_to_data']+snapid+'/nodeData/ageStatisticsSpheroidIntegratedSFR'
  
-    SAM_hdf5_filestruct_map[catname+'_age_sfr_disk_int']       = SAM_hdf5_filestruct_map[catname+'_path_to_data']+snapid+'/nodeData/ageStatisticsDiskTimeWeightedIntegratedSFR' 
-    SAM_hdf5_filestruct_map[catname+'_age_sfr_spheroid_int']   = SAM_hdf5_filestruct_map[catname+'_path_to_data']+snapid+'/nodeData/ageStatisticsSpheroidTimeWeightedIntegratedSFR'
-
-  
     
     c=0
     while c<len(map_surveys):   
@@ -474,6 +482,11 @@ def SAG_HDF5_filestruct(catname,
         SAM_hdf5_filestruct_map[catname+'_MAB_total_i']   = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/Magnitudes/Mag_iS'
         SAM_hdf5_filestruct_map[catname+'_MAB_total_z']   = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/Magnitudes/Mag_zS'
 
+        SAM_hdf5_filestruct_map[catname+'_MAB_bulge_u']   = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/Magnitudes/Bulge/Mag_uSb'
+        SAM_hdf5_filestruct_map[catname+'_MAB_bulge_g']   = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/Magnitudes/Bulge/Mag_gSb'
+        SAM_hdf5_filestruct_map[catname+'_MAB_bulge_r']   = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/Magnitudes/Bulge/Mag_rSb'
+        SAM_hdf5_filestruct_map[catname+'_MAB_bulge_i']   = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/Magnitudes/Bulge/Mag_iSb'
+        SAM_hdf5_filestruct_map[catname+'_MAB_bulge_z']   = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/Magnitudes/Bulge/Mag_zSb'
 
     
     
@@ -492,7 +505,7 @@ def SAG_HDF5_filestruct(catname,
     SAM_hdf5_filestruct_map[catname+'_mbh']      = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/Mbh'       
     SAM_hdf5_filestruct_map[catname+'_bhspin']   = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/Lambda'
     
-    SAM_hdf5_filestruct_map[catname+'_mean_age_stars']      = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/T_stars' 
+    SAM_hdf5_filestruct_map[catname+'_mean_age_stars']      = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/T_stars'
 
     SAM_hdf5_filestruct_map[catname+'_rhalf_bulge']   = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/Rhalf_bulge'
     SAM_hdf5_filestruct_map[catname+'_rhalf_disk']   = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/Rhalf_disk'        
@@ -874,5 +887,40 @@ def LGALAXIES_HDF5_filestruct(catname,
     SAM_hdf5_filestruct_map[catname+'_MAB_dA_total_z']  = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/zDust'
       
     #print 'LGALAXIES filestructure:',  SAM_hdf5_filestruct_map     
+    
+
+
+def IllustrisTNG300_HDF5_Subhalo_filestruct(catname,
+                                            snapid,
+                                            subdirid=1,
+                                            path_to_directory=False): 
+
+  
+    SAM_hdf5_filestruct_map['catname']  = catname
+    
+    myData = aD.ArangeData()
+    data = myData.readAnyFormat(config=False, 
+                                mydtype=np.str_, 
+                                mypath=mycomp+'anaconda/pro/data/'+catname+'/'+catname+'_file_names.txt', 
+                                data_shape='shaped', 
+                                comment='#')
+                                    
+    SAM_hdf5_filestruct_map[catname+'_nr_files']            = 1
+    SAM_hdf5_filestruct_map[catname+'_path_to_data']        = ''
+    SAM_hdf5_filestruct_map[catname+'_filename0']           = path_to_directory+str(data)
+    SAM_hdf5_filestruct_map[catname+'_snapid']              = ''
+    SAM_hdf5_filestruct_map[catname+'_redshift_attribute']  = ''
+
+    print 'path to data:', SAM_hdf5_filestruct_map[catname+'_path_to_data']
+ 
+    SAM_hdf5_filestruct_map[catname+'_haloid']          = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/GrNr'    
+    SAM_hdf5_filestruct_map[catname+'_orphan']          = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/SatCen'
+    SAM_hdf5_filestruct_map[catname+'_mhalo_200c']      = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/Group_M_Crit200'
+    SAM_hdf5_filestruct_map[catname+'_mstar']          = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/SubGroupMs'
+    SAM_hdf5_filestruct_map[catname+'_sfr']             = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/SubGroupSFR'    
+    
+    SAM_hdf5_filestruct_map[catname+'_x_pos']           = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/GroupPos'
+    SAM_hdf5_filestruct_map[catname+'_y_pos']           = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/GroupPos'
+    SAM_hdf5_filestruct_map[catname+'_z_pos']           = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/GroupPos'
     
     return SAM_hdf5_filestruct_map 

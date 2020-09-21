@@ -6,10 +6,10 @@ Pieter van der Meer, 2011
 SRON - Netherlands Institute for Space Research
 """
 
-# colour table in HTML hex format
+# colour table in HTML hex format the last two one are grey
 hexcols = ['#332288', '#88CCEE', '#44AA99', '#117733', '#999933', '#DDCC77', 
            '#CC6677', '#882255', '#AA4499', '#661100', '#6699CC', '#225588',
-           '#4477AA']
+           '#4477AA', '#333333', '#4c4c4c','#191919', '#AA4466','#ffab00', '#d2691e']
 
 greysafecols = ['#809BC8', '#FF6666', '#FFCC66', '#64C204']
 
@@ -30,18 +30,27 @@ xarr = [[11],
 	#[3, 4, 5, 6, 8], 
         #[12, 6, 5, 2, 0],
         #[0, 1, 2, 5, 6, 8],
-        [0, 1, 2, 3, 5, 6],  
+        #[0, 1, 2, 3, 5, 6],
+		[0, 1, 2, 3, 17, 6], 
         [0, 1, 2, 3, 5, 6, 8], 
         [0, 1, 2, 3, 4, 5, 6, 8],
 	#for 9 subsamples in the assembly bias paper, customized by Doris 
-	  #[0, 1, 2, 3, 5, 6, 12, 8, 9], 
+	  	[0, 1, 2, 3, 5, 6, 12, 8, 9], 
         #[0, 1, 2, 3, 4, 5, 6, 7, 8],
-	  [6, 6, 11, 11, 5, 5, 12, 8, 9], 
+	  	#[6, 6, 11, 11, 5, 5, 12, 8, 9], 
 	#for SDSS bands double set (10 bands) u=blue, y=red 
-        #[0, 1, 3, 5, 6, 0, 1, 3, 5, 6], 
+        [0, 1, 3, 5, 6, 0, 1, 3, 5, 6], 
         #[0, 1, 2, 3, 4, 5, 9, 6, 7, 8], 
-        [0, 10, 1, 2, 3, 4, 5, 9, 6, 7, 8], 
-        [0, 10, 1, 2, 3, 4, 5, 9, 6, 11, 7, 8]]
+        [0, 10, 1, 2, 3, 4, 5, 9, 6, 7, 8],
+	#12 redshifts 
+        [0, 10, 1, 2, 3, 4, 5, 9, 6, 11, 7, 8],
+	#13 redshifts 
+        [0, 10, 1, 2, 3, 4, 5, 9, 6, 7, 13, 14, 15],
+	#14 redshifts/catalogs
+		[0, 0, 2, 17, 5, 6, 12, 8, 3, 13, 9, 18, 15, 4]]
+		#[0, 4, 2, 1, 5, 6, 12, 8, 3, 13, 9, 18, 15, 17]]
+		#[0, 1, 2, 4, 5, 6, 12, 8, 3, 13, 9, 18, 15, 17]]
+
 
 # get specified nr of distinct colours in HTML hex format.
 # in: nr - number of colours [1..12]
@@ -52,7 +61,7 @@ def get_distinct(nr):
     # check if nr is in correct range
     #
     
-    if nr < 1 or nr > 12:
+    if nr < 1 or nr > 14:
         print "wrong nr of distinct colours!"
         return
 

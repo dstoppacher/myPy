@@ -51,7 +51,7 @@ class MyFunctions:
         histo[:,5] = +dy  
         histo[:,6] = number count of binned objects y-axis
         """
-        print 'Normalisations y-Axis: NORM Y:', norm_y, 'error type:', y_error_type, 'NORM X:', norm_x
+        #print 'Normalisations y-Axis: NORM Y:', norm_y, 'error type:', y_error_type, 'NORM X:', norm_x
         #Choose x-axis, log or linear?
 
         #Normalisations x-Axis
@@ -110,7 +110,7 @@ class MyFunctions:
         norm_by_binsize=True,
         cumulative=False,
         weights=False,
-        equal_bins=False):
+        equal_bins=True):
 
         """
         Input:
@@ -175,9 +175,9 @@ class MyFunctions:
                     #print 'i:', i, 'bucket:', bucket, 'data[i]:', "{0:.10e}".format(10**data1[i]), "{0:.10e}".format(10**data_weight[i])
             
                     if data1[i]==data_max:
-                        print 'data_max:', data_max,#, data[i,0]
+                        #print 'data_max:', data_max,#, data[i,0]
                         bucket=nbins-1
-                        print bucket
+                        #print bucket
 #                    elif data1[i]==data_min:
 #                        print 'data_min:', data_min, data[i,0]
 #                        bucket=0 
@@ -223,12 +223,12 @@ class MyFunctions:
                             if len(data2bin['x_add_axis'+str(i)])>0:
                                 binned_array[i,7] = np.sum(data2bin['x_add_axis'+str(i)])
                                 binned_array[i,8] = np.percentile(data2bin['x_add_axis'+str(i)], 95)/binned_array[i,6]
-                                binned_array[i,9] = binned_array[i,8]                                
+                                binned_array[i,9] = np.percentile(data2bin['x_add_axis'+str(i)], 5)/binned_array[i,6]                              
                         except:
                             pass
                 else:
                     if use_MAD==True:
-                        #print 'USE MEDIAN AND MAD!'
+                        print 'USE MEDIAN AND MAD!'
                         if len(data2bin['x'+str(i)])>0: 
                             binned_array[i,0] = np.nanmedian(data2bin['x'+str(i)])
                             #MAD is 75% percentile!
@@ -241,7 +241,7 @@ class MyFunctions:
                             binned_array[i,5] = binned_array[i,4]                            
                         try:
                             if len(data2bin['x_add_axis'+str(i)])>0:
-                                binned_array[i,7] = np.median(data2bin['x_add_axis'+str(i)])
+                                binned_array[i,7] = np.nanmedian(data2bin['x_add_axis'+str(i)])
                                 #MAD is 75% percentile!
                                 binned_array[i,8] = robust.mad(data2bin['x_add_axis'+str(i)])
                                 binned_array[i,9] = binned_array[i,8]                                 
@@ -249,9 +249,9 @@ class MyFunctions:
                             pass
     
                     else:
-                        print 'USE MEDIAN AND PERCENTILES!'
-                        for col_data,col_bin,perc in zip(['x','y','x','x','y','y','x_add_axis','x_add_axis','x_add_axis'],[0,1,2,3,4,5,7,8,9],[50,50,16,84,32,68,50,16,84]):
-                            print 'col_bin:', col_bin, 'col_data:', col_data, 'perc:', perc
+                        #print 'USE MEDIAN AND PERCENTILES!'
+                        for col_data,col_bin,perc in zip(['x','y','x','x','y','y','x_add_axis','x_add_axis','x_add_axis'],[0,1,2,3,4,5,7,8,9],[50,50,32,68,32,68,50,32,68]):
+                            #print 'col_bin:', col_bin, 'col_data:', col_data, 'perc:', perc
                             try:
                                 binned_array[i,col_bin] =  np.percentile(data2bin[col_data+str(i)], perc)
                             except:
@@ -314,29 +314,37 @@ class MyFunctions:
         #rearange input data array --> has to have this shape data.shape = (n-rows,3)
 
         try: 
-            #try in case data is structured array!
-            #print 'try!'
+            print 'try in case data is structured array!'
+
 
             names=[]        
             for f in data.dtype.names:
                 names+=[f]
+                            
+            if div_y2x==False:
+                myexpand_col = names[0]
+            else:
+                myexpand_col = names[1]
                 
-            print names
+            #print 'col to expand', myexpand_col
             if len(names)<3:       
                 import numpy.lib.recfunctions as rcfuncs
-                data = rcfuncs.append_fields([data], ['add_axis'] ,[data[str(names[0])]], usemask=False)
+                data = rcfuncs.append_fields([data], ['add_axis'] ,[data[str(myexpand_col)]], usemask=False)
                 names+=['add_axis']
-
+            #print 'names', names
+            
             data_min = min(data[str(names[0])])
             data_max = max(data[str(names[0])])
       
             if div_y2x==True:
-                print 'div_y2x:', div_y2x
+                #print 'div_y2x:', div_y2x
                 data[str(names[1])]/=data[str(names[0])]    
     
             if log10bin==True:
                 for f in data.dtype.names:
                     data[f]=np.log10(data[f])
+                                     
+
         
         except:
             names=[99,99]          
@@ -366,16 +374,13 @@ class MyFunctions:
             if log10bin==True:
                 data = np.log10(data)
         
-
-        print 'use MAD for calculating errorbars?', use_MAD, 'use log10 bining?', log10bin
-
         linbin=False
         if log10bin==True:
-            print 'log quantity, linear binning!'
+            #print 'log quantity, linear binning!'
             
             if equal_bins==True:              
                                 
-                print 'equal bins!', histo_min
+                #print 'equal bins!', histo_min
                 data_min=float(histo_min)
                 data_max=float(histo_max)
                                 
@@ -393,6 +398,15 @@ class MyFunctions:
                 linbin=True
             else:                             
                 print 'linear quantity, log binning!'
+
+
+        #print 'data info:\n', np.info(data), '\n------------------\n'
+#        print 'use MAD?\t', use_MAD, '\nlog10 bining?\t', log10bin, '\nlin bining?\t', linbin, '\nweights?\t', weights, \
+#              '\nequal bins?\t', equal_bins, '\ndiv y/x?\t', div_y2x, '\nbinup 2D?\t', binup_2D, '\nnorm by binsz?\t', norm_by_binsize, '\ncumulative?\t', cumulative, \
+#              '\nadd axis?\t', add_axis
+
+
+
                 
         if add_axis!=False:
             size_binned_array=10
@@ -401,7 +415,7 @@ class MyFunctions:
             
         binned_array = np.zeros((nbins, size_binned_array), dtype=np.float64)
         
-        print 'data_min:', data_min, 'data_max:', data_max, 'histo min/max:', histo_min, '/', histo_max 
+        print 'data_min:', data_min, 'data_max:', data_max, 'histo min/max:', histo_min, '/', histo_max, 
                                                                                       
         print 'binsize:', binsize, 'shape of binned_array:', binned_array.shape 
 
@@ -414,12 +428,65 @@ class MyFunctions:
         if use_MAD==True and binup_2D==False:
             binData()
             
-        print 'Time 2 bin up with binUp:', (time()-start)/60.0, 'min/', (time()-start), 'sec'
+        #print 'Time 2 bin up with binUp:', (time()-start)/60.0, 'min/', (time()-start), 'sec'
 
 #        print 'check_shape:', binned_array.shape
-#        print binned_array
+        #print binned_array
 
         return binned_array, binsize
+
+#def calc_buckets_new(data,
+#                     col1,
+#                     col2,
+#                     col3):
+#    
+#    
+#    data=data[np.where(data[col1]>data_min)[:][0]]
+#    data=data[np.where(data[col1]<=data_max)[:][0]]
+#    
+#    if weights!=False: 
+#        data_weight=data[col2]
+#        
+#    else:
+#        data_weight=np.ones((data[col1].size,), dtype=np.int8)
+#
+#    data_sorted = data[np.argsort(data[name])]
+#                    
+#    for i in binned_array[:,0].size:
+#                        
+#        if log10bin==True:
+#            bucket = np.floor((data1[i]-data_min)/binsize)
+#        elif linbin==True:
+#            bucket = np.floor((data1[i]+data_min)/binsize)
+#        else:
+#            bucket = np.floor(np.log10(data1[i]/data_min)/binsize)
+#        
+#        bucket = np.int_(bucket)
+#        #print 'i:', i, 'bucket:', bucket, 'data[i]:', "{0:.10e}".format(10**data1[i]), "{0:.10e}".format(10**data_weight[i])
+#
+#        if data1[i]==data_max:
+#            #print 'data_max:', data_max,#, data[i,0]
+#            bucket=nbins-1
+#            #print bucket
+##                    elif data1[i]==data_min:
+##                        print 'data_min:', data_min, data[i,0]
+##                        bucket=0 
+##                        print bucket
+#            
+#
+#        if log10bin==True:
+#            data1[i]=10**data1[i]
+#            data2[i]=10**data2[i]
+#            data3[i]=10**data3[i]
+#                 
+#            data2bin['x'+str(bucket)].append(data1[i])
+#            data2bin['y'+str(bucket)].append(data2[i])
+#            data2bin['x_add_axis'+str(bucket)].append(data3[i])                              
+#        
+#        #bucket number count n
+#        binned_array[bucket,6]+=1*data_weight[i] 
+
+
 
     def fit_HOD(data):
 
