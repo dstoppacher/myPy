@@ -400,10 +400,12 @@ class DoAnalysis:
             
         def OH2Mstar(plot_key, data, filename):
             #mystarforming_cut default=1e-11, z=0.1 better to use the formular 0.3/t_hubble(z=0.1)=3.547e-11 (quisent cut)
+            starforming_cut=mL.starforming_cut_Henriques20_A1(redshift=float(self.snap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.myPipe.a)]+'_filename'+str(self.myPipe.i)]+'_snapid'+str(self.myPipe.i)]['z']))           
+            
             if self.myconfig_array['catname'+str(self.myPipe.a)].startswith('SAGE'): 
-                return self.initBinAndFrac2D(plot_key, data, filename, 'mstar', 'zcold', mybinUp2D=True, myadd_axis='cgf', mystarforming_cut=3.547e-11)                
+                return self.initBinAndFrac2D(plot_key, data, filename, 'mstar', 'zgas_disk', mybinUp2D=True, myadd_axis='mstar_disk', mystarforming_cut=starforming_cut)                
             else:                                
-                return self.initBinAndFrac2D(plot_key, data, filename, 'mstar', 'zcold', mybinUp2D=True, myadd_axis='cgf', mystarforming_cut=3.547e-11)
+                return self.initBinAndFrac2D(plot_key, data, filename, 'mstar', 'zcold', mybinUp2D=True, myadd_axis='mstar_disk', mystarforming_cut=starforming_cut)
  
         def Mstar2Rhalf(plot_key, data, filename):
             return self.initBinAndFrac2D(plot_key, data, filename, 'mstar', 'rhalf_mass', mybinUp2D=True, mydiv_y2x=False, myadd_axis='rbulge')
@@ -415,11 +417,12 @@ class DoAnalysis:
             return self.initBinAndFrac2D(plot_key, data, filename, 'ssfr', 'mhalo', mybinUp2D=True, mydiv_y2x=False, myadd_axis='mstar')
             
         def Zgas2Mstar(plot_key, data, filename):
-            starforming_cut=1e-11
+            starforming_cut=mL.starforming_cut_Henriques20_A1(redshift=float(self.snap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.myPipe.a)]+'_filename'+str(self.myPipe.i)]+'_snapid'+str(self.myPipe.i)]['z']))           
+            starforming_cut=1e-25       
             if self.myconfig_array['catname'+str(self.myPipe.a)].startswith('SAGE'): 
-                return self.initBinAndFrac2D(plot_key, data, filename, 'mstar', 'mcold_disk', mybinUp2D=True, myadd_axis=False, mystarforming_cut=starforming_cut)
+                return self.initBinAndFrac2D(plot_key, data, filename, 'mstar', 'mcold_disk', mybinUp2D=True, myadd_axis='mstar_disk', mystarforming_cut=starforming_cut)
             else:    
-                data = self.initBinAndFrac2D(plot_key, data, filename, 'mstar', 'zcold', mybinUp2D=True, myadd_axis='cgf', mystarforming_cut=starforming_cut)
+                data = self.initBinAndFrac2D(plot_key, data, filename, 'mstar', 'zcold', mybinUp2D=True, myadd_axis='ssfr', mystarforming_cut=starforming_cut)
 
         def Zgas2Mcold(plot_key, data, filename):
             if self.myconfig_array['catname'+str(self.myPipe.a)].startswith('SAGE'): 
@@ -676,7 +679,7 @@ class DoAnalysis:
                                  data_block_offset=int(self.plot_map_array['data_offset_'+plot_key]),
                                  data_block_subplot_offset=5,
                                  plot_key=plot_key,
-                                 print_redshift='z=0.0')#pop (ii), centrals')#, centrals')#\n$SFR<-1$')#CMASS DR12:')#$orphans$')# z='+str(float("{0:.2f}".format(myredshift))))#+' centrals')
+                                 print_redshift='z=0.56')#pop (ii), centrals')#, centrals')#\n$SFR<-1$')#CMASS DR12:')#$orphans$')# z='+str(float("{0:.2f}".format(myredshift))))#+' centrals')
 
         def LoadObs():
             #print ' '
@@ -1152,7 +1155,7 @@ class DoAnalysis:
                         part2_from_z_to_main='_tarsel_SFH_down3_'+method+'_main_cents'
                         orphan=method
                         self.plot_map_array['data_offset_'+plot_key] = 72                        
-                        catname='Gal-dens'                        
+                        catname='Gal-dens'                         
 
                     prop_col_map={'': '',\
                                   'sumSFR': 1,\
@@ -1163,6 +1166,7 @@ class DoAnalysis:
                                   '_mstar': 16,\
                                   '_rdisk': 19,\
                                   '_rbulgevsrdisk': 21,\
+                                  '_rbulge': 21,\
                                   '_r-i':   29,\
                                   '_mbh':   32,\
                                   '_rhalfmass': 35,\
@@ -1176,7 +1180,8 @@ class DoAnalysis:
                                   '_mean_age_stars_disk': 60,\
                                   '_mean_age_stars_spheroid': 63,\
                                   '_vmax':  66,\
-                                  '_vdisp': 69\
+                                  '_vdisp': 69,\
+                                  '_Tcons': 40\
                                   }
  
                     prop_unit_map={'': '',\
@@ -1187,6 +1192,7 @@ class DoAnalysis:
                                    '_rbulgevsrdisk': '$r_{bulge}/r_{rdisk}$',\
                                    '_mbh':      '$M_{BH}$',\
                                    '_rdisk':    '$r_{disk}$',\
+                                   '_rbulge':    '$r_{bulge}$',\
                                    '_rhalfmass':'$r_{1/2}$',\
                                    '_cgf':      '$M_{cold}/$M_{*}$',\
                                    '_mstar':    '$M_*$',\
@@ -1206,7 +1212,8 @@ class DoAnalysis:
                                    'sumMstar': '$\sum$ $M_{*}$ [$M_{\odot}$]',\
                                    'sumMhalo': '$\sum$ $M_{vir}$ [$M_{\odot}$]',\
                                    '_SHMF':     '$M_{*}$/$M_{vir}$',
-                                   '_SHMR':     '$M_{*}$/$M_{vir}$'}
+                                   '_SHMR':     '$M_{*}$/$M_{vir}$',
+                                   '_Tcons':    '$M_{cold}$/$SFR$ [$yr$]'}
 
                     if sample!='':
                         sample_code_space='_'
@@ -1258,8 +1265,10 @@ class DoAnalysis:
                             self.print_redshift=catname+'\n'+orphan+'\nall'                             
                         else:
                             self.print_redshift=catname+'\n'+orphan+'\n'+sample
+
                     else:
                         self.print_redshift=catname+'\n'+method+'\n'
+
                            
                     band={}
 
@@ -1315,6 +1324,16 @@ class DoAnalysis:
                                     norm_y=1450.0**3
                             elif prop=='_cgf':
                                 norm_y=self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+16]
+                            elif prop=='_Tcons':
+                                norm_y=self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+3]
+                            elif prop=='_rbulge':
+                                norm_y=(1.0/self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+19])/1000.0
+                                self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+22]=self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+22]*self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+20]*1000.0 
+                                self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+23]=self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+23]*self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+20]*1000.0 
+                            elif prop=='_rdisk':
+                                norm_y=1.0/1000.0
+                            elif prop=='_rhalfmass':
+                                norm_y=1.0/1000.0                                    
                             else:
                                 norm_y=1
                                                      
@@ -1349,7 +1368,7 @@ class DoAnalysis:
                                 if prop=='_logSHMF' or prop=='_logSHMF_200c':
                                     self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1]=np.log10(self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+col]/norm_y)
                                     self.my_analysed_data[:,int(self.plot_map_array['data_offset_'+plot_key])*i+4] = self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1]+self.my_analysed_data[:,int(self.plot_map_array['data_offset_'+plot_key])*i+col+1]/10**self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1]*0.434
-                                    self.my_analysed_data[:,int(self.plot_map_array['data_offset_'+plot_key])*i+5] = self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1]-self.my_analysed_data[:,int(self.plot_map_array['data_offset_'+plot_key])*i+col+2]/10**self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1]*0.434                                                                      
+                                    self.my_analysed_data[:,int(self.plot_map_array['data_offset_'+plot_key])*i+5] = self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+2]-self.my_analysed_data[:,int(self.plot_map_array['data_offset_'+plot_key])*i+col+1]/10**self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1]*0.434                                                                      
                                 else:
                                     self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1]=self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+col]/norm_y
                                     
@@ -1368,9 +1387,42 @@ class DoAnalysis:
                             #print self.my_analysed_data[:, [0,1]]
 #                            print norm_y
 
+                    elif key=='stats_violin':
+                        self.print_redshift='z='+sample
+                        self.plot_map_array['data_offset_'+plot_key] = 3
+                        i=0
+                        for item in mysamples:
+                            print 'z:', sample, 'sample:', item, 'prop:', prop,
+                            import pandas as pd
+                            data1 = pd.read_csv(mycomp+'anaconda/pro/data/Galacticus_1Gpc/SFH/SFH_Index_'+str(sample)+'_'+item+'_props_M1.txt', skiprows=2, names=['haloid', 'parentIndex', 'hostid', 'nodeIndex', 'satelliteNodeIndex', 'orphan', 'mhalo', 'mstar',  'SHMR', 'mcold',  'Mzgas',  'zcold', 'g-i', 'sfr', 'ssfr'], sep='\t')
+                            data_M1 = mL.df_to_sarray(data1)
+                            data2 = pd.read_csv(mycomp+'anaconda/pro/data/Galacticus_1Gpc/SFH/SFH_Index_'+str(sample)+'_'+item+'_props_M2.txt', skiprows=2, names=['haloid', 'parentIndex', 'hostid', 'nodeIndex', 'satelliteNodeIndex', 'orphan', 'mhalo', 'mstar',  'SHMR', 'mcold',  'Mzgas',  'zcold', 'g-i', 'sfr', 'ssfr'], sep='\t')
+                            data_M2 = mL.df_to_sarray(data2)
+                            print 'size M1:', data_M1.size, 'size M2:', data_M2.size
+                            if i==0:
+                                self.my_analysed_data = np.zeros((60000, int(self.plot_map_array['data_offset_'+plot_key])*len(mysamples)), dtype=np.float64)
+
+                            #self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i]=data_M1['z']
+                            if prop=='_g-i' or prop=='_zcold':
+                                self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1][0:data_M1.size]=data_M1[prop[1::]]
+                                self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+2][0:data_M2.size]=data_M2[prop[1::]]
+                                
+                            elif prop=='_SHMR':
+
+                                self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1][0:data_M1.size]=np.log10(1.0/data_M1[prop[1::]])
+                                self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+2][0:data_M2.size]=np.log10(1.0/data_M2[prop[1::]])
+                                
+                            else:
+                                self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1][0:data_M1.size]=np.log10(data_M1[prop[1::]])
+                                self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+2][0:data_M2.size]=np.log10(data_M2[prop[1::]])
+
+                            self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1][data_M1.size::]=-99.99                                                       
+                            self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+2][data_M2.size::]=-99.99                           
+                            i+=1
+
                     elif key.find('stats')!=-1:
                         print 'HERE! 1341 stats ...'
-                        self.plot_map_array['data_offset_'+plot_key] = 20                        
+                        self.plot_map_array['data_offset_'+plot_key] = 23                        
 
                         i=0
                         for sample in mysamples:
@@ -1380,7 +1432,7 @@ class DoAnalysis:
                                 #print np.info(self.my_analysed_data)
                             print 'i:', i, 'sample:', sample, 'prop:', prop, 'filenname:', filename+'/stats/Galacticus_1Gpc_SFH_z-evolution_stats'+band[str(i)]+prop+'.txt'                               
                             self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i : int(self.plot_map_array['data_offset_'+plot_key])*i + int(self.plot_map_array['data_offset_'+plot_key])] = myData.readAnyFormat(config=False, mypath=filename+'/stats/Galacticus_1Gpc_SFH_z-evolution_stats'+band[str(i)]+prop+'.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float64, skiprow=1)                                
-                            np.info(self.my_analysed_data)
+                            #np.info(self.my_analysed_data)
                             if key=='stats_xbar_M1found_M1':
                                 col=12
                             elif key=='stats_xbar_M1found_M2':
@@ -1388,12 +1440,14 @@ class DoAnalysis:
                             elif key=='stats_xbar_M1_M2':
                                 col=2
                             elif key=='stats_xbar_M1-M2_M2':
-                                col=19
+                                col=21
+                            elif key=='stats_xbar_MAD':
+                                col=22                                
                             else:
                                 col=1
                             print 'col:', col
                             self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1] = self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+col]                                
-
+                            #print self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1]
                             i+=1
                                                     
                     elif key.find('histo')!=-1:
@@ -1441,9 +1495,14 @@ class DoAnalysis:
                             i+=1                           
                     elif key=='gr_one': 
                         #growth history for one sample but many parameters
-                        #mstar, mhalo, mcold, Mzgas, mbh, rhalfmass, rbulgevsrdisk
+                        #mahlo, mhalo, mbh, rhalfmass, mbh, rhalfmass, rbulgevsrdisk
                         band={'0': 16, '1': 54, '2': 40, '3': 45, '4': 32, '5': 35, '6': 21}
-                        band={'0': 16, '1': 54, '2': 32, '3': 35, '4': 16, '5': 54, '6': 32, '7': 35}    
+                        #2x mstar, mhalo, mbh, rhalfmass, mbh,
+                        band={'0': 16, '1': 54, '2': 32, '3': 35, '4': 16, '5': 54, '6': 32, '7': 35}
+                        #mhalo, mstar, mcold, Mzgas, mbh, rhalfmass, zcold
+                        band={'0': 54, '1': 16, '2': 40, '3': 45, '4': 32, '5': 35, '6': 48}   
+    
+                        self.print_redshift='\nlow-$Z_{cold}$\n$true$'   
     
                         self.myconfig_array['nr_cats']=len(band)
                         i=0
@@ -1461,7 +1520,7 @@ class DoAnalysis:
                             i+=1                        
 
                     elif key=='wp_one': 
-                        
+                        self.print_redshift='z=0.56'#\n$high-Z_{cold}$'
                         self.plot_map_array['data_offset_'+plot_key] = 6
 
                         if folder.find('SDSS')!=-1:
@@ -1474,11 +1533,22 @@ class DoAnalysis:
                         while i<self.myconfig_array['nr_cats']:
                             if i==0:
                                 self.my_analysed_data = np.zeros((15, self.plot_map_array['data_offset_'+plot_key]*self.myconfig_array['nr_cats']), dtype=np.double)
-                            print 'z=', prop[i]
-                            print filename+'/wp/'+part2_to_z+prop[i]+part2_from_z_to_main+sample_code_space+sample+endfix+'_wp.txt'
+                            if i==12:
+                                sample='low-zcold'
+                            elif i==1 or i==3:
+                                sample='high-zcold'
+                                
+                            if prop[i].find('Pop')!=-1 or prop[i].find('fila')!=-1 or prop[i].find('knot')!=-1 :
+                                print 'more wp props ...'
+                                endfix='_0.5_150_150'
+                                myfilename=filename+'/wp/twoPCF_Galacticus_1Gpc_z_0.56_tarsel_new_mags_CMASS_down_sample3_more_props_test_'+sample+'_centrals_'+prop[i]+endfix+'_wp.txt'
+                                #twoPCF_Galacticus_1Gpc_z_0.56_tarsel_new_mags_CMASS_down_sample3_more_props_test_low-zcold_centrals_PopB+k_0.5_150_150_wp.txt
+                            else:                                
+                                print 'z=', prop[i]
+                                myfilename=filename+'/wp/'+part2_to_z+prop[i]+part2_from_z_to_main+sample_code_space+sample+endfix+'_wp.txt'
                             
-                            
-                            data = myData.readAnyFormat(config=False, mypath=filename+'/wp/'+part2_to_z+prop[i]+part2_from_z_to_main+sample_code_space+sample+endfix+'_wp.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float64, skiprow=2)
+                            print myfilename
+                            data = myData.readAnyFormat(config=False, mypath=myfilename, data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float64, skiprow=2)
                           
                             self.my_analysed_data[:, [int(self.plot_map_array['data_offset_'+plot_key])*i, int(self.plot_map_array['data_offset_'+plot_key])*i+1, int(self.plot_map_array['data_offset_'+plot_key])*i+4, int(self.plot_map_array['data_offset_'+plot_key])*i+5]]=data[:,[2,3,5,5]]
 
@@ -1517,7 +1587,10 @@ class DoAnalysis:
                             
                             #print self.my_analysed_data[:, [int(self.plot_map_array['data_offset_'+plot_key])*i, int(self.plot_map_array['data_offset_'+plot_key])*i+1]]
                             i+=1
-                       
+                    elif key=='envr_props':
+                        print 'key:', key
+                        self.my_analysed_data = np.zeros((15, self.plot_map_array['data_offset_'+plot_key]*self.myconfig_array['nr_cats']), dtype=np.double)
+                        self.print_redshift='low-$Z_{cold}$'
 
 
 
@@ -1578,128 +1651,135 @@ class DoAnalysis:
                     #oh2mstar
                     #legend={'0':'Galacticus', '1':'SAGv2 OH disk', '2':'SAGv2 mcold','3':'SAGv2 mcold disk','4': 'SAGv3 OH', '5':'SAGv3 mcold', '6':'SAGv3 mcold disk', '7':'SAGE zgas disk','8':'SAGE mcold disk'}
                     #band={'0':'Galacticus_1Gpc_z_0.09', '1': 'SAG_1Gpc_v2_z_0.07_OII_disk_sfr+h', '2':'SAG_1Gpc_v2_z_0.07_mcold_sfr+h', '3':'SAG_1Gpc_v2_z_0.07_mcold_disk_sfr+h','4':'SAG_1Gpc_z_0.09_OII', '5':'SAG_1Gpc_z_0.09_mcold', '6':'SAG_1Gpc_z_0.09_mcold_disk', '7':'SAGE_1Gpc_z_0.09_OII', '8':'SAGE_1Gpc_z_0.09_mcold_disk' }
+                    band={'0':'0.0', '1': '0.49', '2':'0.99', '3':'2.03','4':'3.04', '5':'4.04', '6':'5.02' }
+                    #band={'0':'0.0', '1': '0.49', '2':'1.0', '3':'2.02','4':'3.03', '5':'3.95', '6':'5.7' }
 
+                    self.myconfig_array['nr_cats']=7
+                    self.plot_map_array['data_offset_'+plot_key]=10
+                    i=0
+                    while i<self.myconfig_array['nr_cats']:
+                        if i==0:
+                            self.my_analysed_data = np.zeros((25, self.plot_map_array['data_offset_'+plot_key]*self.myconfig_array['nr_cats']), dtype=np.double)
+                        self.myconfig_array.update({'catname'+str(i):'Galacticus_1Gpc'})
+                        #filename = mycomp+'anaconda/pro/myRun/histos/oh2mstar/oh2mstar_'+band[str(i)]+'.txt'
+                        filename = mycomp+'anaconda/pro/myRun/histos/oh2mstar/oh2mstar_SAGE_1Gpc_z_'+band[str(i)]+'_tarsel_ssfr_Hen+20.txt' 
+                        #filename = mycomp+'anaconda/pro/myRun/histos/zgas2mstar/zgas2mstar_Galacticus_1Gpc_z_'+band[str(i)]+'_tarsel.txt'
+                        #filename = mycomp+'anaconda/pro/myRun/histos/zgas2mstar/zgas2mstar_Galacticus_400Mpc_z_'+band[str(i)]+'_tarsel_ssfr_Hen+20.txt'                        
+                        print 'i:', i, 'filenname:', filename, band[str(i)]
+                        
+                        self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i : int(self.plot_map_array['data_offset_'+plot_key])*i + int(self.plot_map_array['data_offset_'+plot_key])] = myData.readAnyFormat(config=False, mypath=filename, data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float64, skiprow=2)
+                        self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i]=np.log10(self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i])
+                        self.my_analysed_data[:,int(self.plot_map_array['data_offset_'+plot_key])*i+4] = self.my_analysed_data[:,int(self.plot_map_array['data_offset_'+plot_key])*i+1] - self.my_analysed_data[:,int(self.plot_map_array['data_offset_'+plot_key])*i+4]
+                        self.my_analysed_data[:,int(self.plot_map_array['data_offset_'+plot_key])*i+5] = self.my_analysed_data[:,int(self.plot_map_array['data_offset_'+plot_key])*i+1] + self.my_analysed_data[:,int(self.plot_map_array['data_offset_'+plot_key])*i+5]
 
-#                    self.myconfig_array['nr_cats']=9
-#                    i=0
-#                    while i<self.myconfig_array['nr_cats']:
-#                        if i==0:
-#                            self.my_analysed_data = np.zeros((60, self.plot_map_array['data_offset_'+plot_key]*self.myconfig_array['nr_cats']), dtype=np.double)
-#                        self.myconfig_array.update({'catname'+str(i):'Galacticus_1Gpc'})
-#                        filename = mycomp+'anaconda/pro/myRun/histos/oh2mstar/oh2mstar_'+band[str(i)]+'.txt'   
-#
-#                        print 'i:', i, 'filenname:', filename, band[str(i)]
-#                        
-#                        self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i : int(self.plot_map_array['data_offset_'+plot_key])*i + int(self.plot_map_array['data_offset_'+plot_key])] = myData.readAnyFormat(config=False, mypath=filename, data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float64, skiprow=2)
-#                        self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i]=np.log10(self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i])
-##                        if band[str(i)].find('OII')!=-1:
-##                            self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1]+=0.25
-#                        i+=1
+#                        if band[str(i)].find('OII')!=-1:
+#                            self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1]+=0.25
+                        i+=1
 
                         
                     #++++++++++++++++++++++++++++++++++++++++++++
                     #SMF CMASS and HOD
-                    key='HOD'
-                    key2='scd'
- 
-                    #sample='Gal400-dens'# f$^{rand}_{sats}$'                        
-                    #sample='Gal2-dens haloid from Gal-dens'# f$^{rand}_{sats}$'
-                    #sample='dens $V_{max}$'
-                    #prefix=key+'_LGALAXIES_500Mpc_z_0.56_tarsel_CMASS_density_mstar_no_mhalo'
-                    #prefix=key+'_SAG_1Gpc_z_0.56_new_CMASS_down_sample_mhalo_cents'
-                    
-                    if key=='SMF'or key=='HMF' or key.find('SFR')!=-1:
-                        prefix='SMF_Galacticus_1Gpc_z_0.56_new_mags'
-                        #prefix='SMF_SAG_1Gpc_z_0.56_new'
-                        
-                        #prefix='SMF_SAGE_1Gpc_z_0.56_tarsel_v3_mags_run_1238'
-                        prefix=key+'_LGALAXIES_500Mpc_z_0.56_tarsel'                        
-                        prefix=key+'_Galacticus_1Gpc_z_'
-                        prefix='SMF_SAG_1Gpc_v2_z_0.07'
-                        #prefix=key+'_Galacticus_1Gpc_z_0.56_tarsel_new_mags'
-                        
-                        
-                        #band={'0':'Galacticus_1Gpc_z_0.56_mstar'}#, '1': 'SAG_1Gpc_z_0.56_mstar', '2':'SAGE_1Gpc_z_0.56_1238_mstar'}#, '3':'SAG_1Gpc_v2_z_0.07_mcold_disk_sfr+h','4':'SAG_1Gpc_z_0.09_OII', '5':'SAG_1Gpc_z_0.09_mcold', '6':'SAG_1Gpc_z_0.09_mcold_disk', '7':'SAGE_1Gpc_z_0.09_OII', '8':'SAGE_1Gpc_z_0.09_mcold_disk' }
-                        #band={'0': prefix+'_CMASS', '2': prefix+'_CMASS_density_sample', '3': prefix+'_CMASS_mass_sample', '1': prefix}#, '3':'SAG_1Gpc_v2_z_0.07_mcold_disk_sfr+h','4':'SAG_1Gpc_z_0.09_OII', '5':'SAG_1Gpc_z_0.09_mcold', '6':'SAG_1Gpc_z_0.09_mcold_disk', '7':'SAGE_1Gpc_z_0.09_OII', '8':'SAGE_1Gpc_z_0.09_mcold_disk' }
-                        #band={'0':'SMF_SAGE_1Gpc_z_0.56_CMASS_sample', '1': 'SAGE_1Gpc_z_0.56_mstar', '2':'SMF_SAGE_1Gpc_z_0.56_densCut_CMASS_mstar'}
-                        #band={'0': prefix+'_CMASS', '2': prefix+'_test_no5h_CMASS', '3': prefix+'_test_nozboost_no5h_CMASS', '1': prefix+'_test_nozboost_no5h_noiltdmesa_CMASS'}#, '3':'SAG_1Gpc_v2_z_0.07_mcold_disk_sfr+h','4':'SAG_1Gpc_z_0.09_OII', '5':'SAG_1Gpc_z_0.09_mcold', '6':'SAG_1Gpc_z_0.09_mcold_disk', '7':'SAGE_1Gpc_z_0.09_OII', '8':'SAGE_1Gpc_z_0.09_mcold_disk' }
-
-                        #band={'0': prefix+'_centrals', '1': prefix+'_sats', '2': prefix+'_CMASS_centrals', '3': prefix+'_CMASS_sats', '4': prefix+'_CMASS_density_sample_no', '5': prefix+'_CMASS_density_sample_sats'}#, '4': prefix+'_mass_sample_centrals', '5': prefix+'_mass_sample_sats'}
-                        band={'0': prefix+'_CMASS', '2': prefix+'_CMASS_down_sample3', '3': prefix+'_CMASS_mass_sample', '1': prefix}
-                        band={'0': prefix+'_CMASS_down_sample3', '1': prefix+'_CMASS_density_sample_mhalo', '2': prefix+'_CMASS_density_sample_mstar', '3': prefix}                        
-                        #band={'0': prefix+'', '1': prefix+'_g-i_gt_2.35', '2': prefix+'_g-i_gt_2.15', '3': prefix+'_g-i_gt_2.0'}
-                        
-                        #band={'0': prefix+'_CMASS_down_sample', '1': prefix+'_35bins_2e10', '2': prefix+'_CMASS_down_sample_no', '3': prefix+'_35bins_2e10_no'}
-                        
-                        band={'0': prefix+'_CMASS_down_sample_test', \
-                              '1': prefix+'_35bins_2e10', \
-                              '2': prefix+'_CMASS_density_mstar', \
-                              '3': prefix+'_CMASS_density_vmax'}#, \
-                              #'4': prefix+'_density_vmax', \
-                              #'5': prefix+'_density_vmax_sat'}
-                              
-                        band={'0': prefix+'_OII', \
-                              '1': prefix+'_test_OII'}#, \
-                              #'2': prefix+'_test_OII'}#, \
-#                              '4': prefix+'_density_vmax', \
-#                              '5': prefix+'_density_vmax_sat'
-
-#                        band={'0': prefix+'_CMASS_down_sample_test', \
-#                              '1': prefix+'_CMASS_density_vmax', \
-#                              '2': prefix+'_CMASS_density_mstar'}#, \
-#                              '4': prefix+'_density_vmax', \
-#                              '5': prefix+'_density_vmax_sat'
-                        redshift_MD = '0.0'
-                        redshift_SMD = '0.0'
-                        redshift_TNG = '0.0'
-                        rand_sample='0.008'
-                        band={'0': 'MDPL2_Rockstar_z_'+redshift_MD, '1': 'SMDPL_Rockstar_z_'+redshift_SMD, '2': 'IllustrisTNG300_z_'+redshift_TNG,\
-                              '3': 'Galacticus_1Gpc_z_'+redshift_MD+'_tarsel', '4': 'Galacticus_400Mpc_z_'+redshift_SMD+'_tarsel', '5': 'IllustrisTNG300_z_'+redshift_TNG+'_tarsel_n_0.008'}
-                        
-                    elif key2=='sc':
-                        prefix='HOD_Galacticus_1Gpc_z_0.56_tarsel_new_mags'
-                        #prefix='HOD_SAG_1Gpc_z_0.56_tarsel_new'
-                        
-                        prefix1=key+'_IllustrisTNG300_z_0.0_tarsel_mhalo_200c' 
-                        prefix2=key+'_Galacticus_400Mpc_z_0.0_tarsel_mhalo' 
-                        prefix3=key+'_Galacticus_1Gpc_z_0.0_tarsel_mhalo'
-                    
-                        band={'0': prefix3, '1': prefix2, '2': prefix1}
-                                             
-                        #band={'0': prefix+'_CMASS', '1': prefix+'_CMASS_down_sample3', '2': prefix+'_CMASS_mass_sample'}#, '2':prefix+'_CMASS_down_sample', '1':prefix+'_CMASS_density_sample'}
-                        #band={'0': prefix+'_CMASS_down_sample', '1': prefix+'_CMASS_mass_sample'}
-
-                    else:
-                        # HOD for each sample seperatly
-                        #prefix=key+'_Galacticus_1Gpc_z_0.56_tarsel_new_mags_CMASS_down_sample3_HOD_mhalo_cents_200c'
-                        #prefix=key+'_Galacticus_1Gpc_z_0.56_tarsel_new_mags_CMASS_down_sample3_HOD_FOF_halos_mhalo_cents_200c'
-                        #prefix=key+'_Galacticus_1Gpc_run2_z_0.56_tarsel_CMASS_down_sample3_haloid_from_Gal-dens_Rockstar_halos_mhalo_cents_200c'
-                        prefix=key+'_Galacticus_1Gpc_run2_z_0.56_tarsel_CMASS_density_sample_mstar_Rockstar_halos_mhalo_cents_200c'                        
-                        #prefix=key+'_Galacticus_400Mpc_z_0.55_tarsel_CMASS_down_sample3_Rockstar_halos_mhalo_cents_200c' 
-                        #prefix=key+'_Galacticus_1Gpc_run2_z_0.56_tarsel_CMASS_down_sample3_haloid_from_Gal-dens_mhalo_cents_200c'
-                        print 'HERE test 1522', self.redshift
-
-                        #for HOD-SFgalaxies
-                        cut='CUT3'
-                        prop='_ssfr'
-                        prefix1='HOD-SF/'+key+'_IllustrisTNG300_z_0.0_tarsel_HOD-SF_'+cut+prop+'_mhalo_200c' 
-                        prefix2='HOD-SF/'+key+'_Galacticus_400Mpc_z_0.0_tarsel_HOD-SF_'+cut+prop+'_mhalo_cents_200c' 
-                        prefix3='HOD-SF/'+key+'_Galacticus_1Gpc_z_0.0_tarsel_HOD-SF_'+cut+prop+'_mhalo_cents_200c'
-
-                        band={'0': prefix3+'_all', '1': prefix3+'_centrals', '2': prefix3+'_sats',\
-                              '3': prefix2+'_all', '4': prefix2+'_centrals', '5': prefix2+'_sats',\
-                              '6': prefix1+'_all', '7': prefix1+'_centrals', '8': prefix1+'_sats'} 
- 
-
-
-                       
-                        #for CMASS SFH paper
-                        prefix2=key+'_Galacticus_400Mpc_z_0.55_tarsel_CMASS_down_sample3_Rockstar_halos_mhalo_cents_200c' 
-                        prefix1=key+'_Galacticus_1Gpc_z_0.56_tarsel_new_mags_CMASS_down_sample3_HOD_Rockstar_halos_mhalo_cents_200c'
+#                    key='HOD'
+#                    key2='scd'
+# 
+#                    #sample='Gal400-dens'# f$^{rand}_{sats}$'                        
+#                    #sample='Gal2-dens haloid from Gal-dens'# f$^{rand}_{sats}$'
+#                    #sample='dens $V_{max}$'
+#                    #prefix=key+'_LGALAXIES_500Mpc_z_0.56_tarsel_CMASS_density_mstar_no_mhalo'
+#                    #prefix=key+'_SAG_1Gpc_z_0.56_new_CMASS_down_sample_mhalo_cents'
+#                    
+#                    if key=='SMF'or key=='HMF' or key.find('SFR')!=-1:
+#                        prefix='SMF_Galacticus_1Gpc_z_0.56_new_mags'
+#                        #prefix='SMF_SAG_1Gpc_z_0.56_new'
+#                        
+#                        #prefix='SMF_SAGE_1Gpc_z_0.56_tarsel_v3_mags_run_1238'
+#                        prefix=key+'_LGALAXIES_500Mpc_z_0.56_tarsel'                        
+#                        prefix=key+'_Galacticus_1Gpc_z_'
+#                        prefix='SMF_SAG_1Gpc_v2_z_0.07'
+#                        #prefix=key+'_Galacticus_1Gpc_z_0.56_tarsel_new_mags'
+#                        
+#                        
+#                        #band={'0':'Galacticus_1Gpc_z_0.56_mstar'}#, '1': 'SAG_1Gpc_z_0.56_mstar', '2':'SAGE_1Gpc_z_0.56_1238_mstar'}#, '3':'SAG_1Gpc_v2_z_0.07_mcold_disk_sfr+h','4':'SAG_1Gpc_z_0.09_OII', '5':'SAG_1Gpc_z_0.09_mcold', '6':'SAG_1Gpc_z_0.09_mcold_disk', '7':'SAGE_1Gpc_z_0.09_OII', '8':'SAGE_1Gpc_z_0.09_mcold_disk' }
+#                        #band={'0': prefix+'_CMASS', '2': prefix+'_CMASS_density_sample', '3': prefix+'_CMASS_mass_sample', '1': prefix}#, '3':'SAG_1Gpc_v2_z_0.07_mcold_disk_sfr+h','4':'SAG_1Gpc_z_0.09_OII', '5':'SAG_1Gpc_z_0.09_mcold', '6':'SAG_1Gpc_z_0.09_mcold_disk', '7':'SAGE_1Gpc_z_0.09_OII', '8':'SAGE_1Gpc_z_0.09_mcold_disk' }
+#                        #band={'0':'SMF_SAGE_1Gpc_z_0.56_CMASS_sample', '1': 'SAGE_1Gpc_z_0.56_mstar', '2':'SMF_SAGE_1Gpc_z_0.56_densCut_CMASS_mstar'}
+#                        #band={'0': prefix+'_CMASS', '2': prefix+'_test_no5h_CMASS', '3': prefix+'_test_nozboost_no5h_CMASS', '1': prefix+'_test_nozboost_no5h_noiltdmesa_CMASS'}#, '3':'SAG_1Gpc_v2_z_0.07_mcold_disk_sfr+h','4':'SAG_1Gpc_z_0.09_OII', '5':'SAG_1Gpc_z_0.09_mcold', '6':'SAG_1Gpc_z_0.09_mcold_disk', '7':'SAGE_1Gpc_z_0.09_OII', '8':'SAGE_1Gpc_z_0.09_mcold_disk' }
 #
-                        band={'0': prefix1+'_all', '1': prefix1+'_centrals', '2': prefix1+'_sats',\
-                              '3': prefix2+'_all', '4': prefix2+'_centrals', '5': prefix2+'_sats'}   
-                       
+#                        #band={'0': prefix+'_centrals', '1': prefix+'_sats', '2': prefix+'_CMASS_centrals', '3': prefix+'_CMASS_sats', '4': prefix+'_CMASS_density_sample_no', '5': prefix+'_CMASS_density_sample_sats'}#, '4': prefix+'_mass_sample_centrals', '5': prefix+'_mass_sample_sats'}
+#                        band={'0': prefix+'_CMASS', '2': prefix+'_CMASS_down_sample3', '3': prefix+'_CMASS_mass_sample', '1': prefix}
+#                        band={'0': prefix+'_CMASS_down_sample3', '1': prefix+'_CMASS_density_sample_mhalo', '2': prefix+'_CMASS_density_sample_mstar', '3': prefix}                        
+#                        #band={'0': prefix+'', '1': prefix+'_g-i_gt_2.35', '2': prefix+'_g-i_gt_2.15', '3': prefix+'_g-i_gt_2.0'}
+#                        
+#                        #band={'0': prefix+'_CMASS_down_sample', '1': prefix+'_35bins_2e10', '2': prefix+'_CMASS_down_sample_no', '3': prefix+'_35bins_2e10_no'}
+#                        
+#                        band={'0': prefix+'_CMASS_down_sample_test', \
+#                              '1': prefix+'_35bins_2e10', \
+#                              '2': prefix+'_CMASS_density_mstar', \
+#                              '3': prefix+'_CMASS_density_vmax'}#, \
+#                              #'4': prefix+'_density_vmax', \
+#                              #'5': prefix+'_density_vmax_sat'}
+#                              
+#                        band={'0': prefix+'_OII', \
+#                              '1': prefix+'_test_OII'}#, \
+#                              #'2': prefix+'_test_OII'}#, \
+##                              '4': prefix+'_density_vmax', \
+##                              '5': prefix+'_density_vmax_sat'
+#
+##                        band={'0': prefix+'_CMASS_down_sample_test', \
+##                              '1': prefix+'_CMASS_density_vmax', \
+##                              '2': prefix+'_CMASS_density_mstar'}#, \
+##                              '4': prefix+'_density_vmax', \
+##                              '5': prefix+'_density_vmax_sat'
+#                        redshift_MD = '0.0'
+#                        redshift_SMD = '0.0'
+#                        redshift_TNG = '0.0'
+#                        rand_sample='0.008'
+#                        band={'0': 'MDPL2_Rockstar_z_'+redshift_MD, '1': 'SMDPL_Rockstar_z_'+redshift_SMD, '2': 'IllustrisTNG300_z_'+redshift_TNG,\
+#                              '3': 'Galacticus_1Gpc_z_'+redshift_MD+'_tarsel', '4': 'Galacticus_400Mpc_z_'+redshift_SMD+'_tarsel', '5': 'IllustrisTNG300_z_'+redshift_TNG+'_tarsel_n_0.008'}
+#                        
+#                    elif key2=='sc':
+#                        prefix='HOD_Galacticus_1Gpc_z_0.56_tarsel_new_mags'
+#                        #prefix='HOD_SAG_1Gpc_z_0.56_tarsel_new'
+#                        
+#                        prefix1=key+'_IllustrisTNG300_z_0.0_tarsel_mhalo_200c' 
+#                        prefix2=key+'_Galacticus_400Mpc_z_0.0_tarsel_mhalo' 
+#                        prefix3=key+'_Galacticus_1Gpc_z_0.0_tarsel_mhalo'
+#                    
+#                        band={'0': prefix3, '1': prefix2, '2': prefix1}
+#                                             
+#                        #band={'0': prefix+'_CMASS', '1': prefix+'_CMASS_down_sample3', '2': prefix+'_CMASS_mass_sample'}#, '2':prefix+'_CMASS_down_sample', '1':prefix+'_CMASS_density_sample'}
+#                        #band={'0': prefix+'_CMASS_down_sample', '1': prefix+'_CMASS_mass_sample'}
+#
+#                    else:
+#                        # HOD for each sample seperatly
+#                        #prefix=key+'_Galacticus_1Gpc_z_0.56_tarsel_new_mags_CMASS_down_sample3_HOD_mhalo_cents_200c'
+#                        #prefix=key+'_Galacticus_1Gpc_z_0.56_tarsel_new_mags_CMASS_down_sample3_HOD_FOF_halos_mhalo_cents_200c'
+#                        #prefix=key+'_Galacticus_1Gpc_run2_z_0.56_tarsel_CMASS_down_sample3_haloid_from_Gal-dens_Rockstar_halos_mhalo_cents_200c'
+#                        prefix=key+'_Galacticus_1Gpc_run2_z_0.56_tarsel_CMASS_density_sample_mstar_Rockstar_halos_mhalo_cents_200c'                        
+#                        #prefix=key+'_Galacticus_400Mpc_z_0.55_tarsel_CMASS_down_sample3_Rockstar_halos_mhalo_cents_200c' 
+#                        #prefix=key+'_Galacticus_1Gpc_run2_z_0.56_tarsel_CMASS_down_sample3_haloid_from_Gal-dens_mhalo_cents_200c'
+#                        print 'HERE test 1522', self.redshift
+#
+#                        #for HOD-SFgalaxies
+#                        cut='CUT3'
+#                        prop='_ssfr'
+#                        prefix1='HOD-SF/'+key+'_IllustrisTNG300_z_0.0_tarsel_HOD-SF_'+cut+prop+'_mhalo_200c' 
+#                        prefix2='HOD-SF/'+key+'_Galacticus_400Mpc_z_0.0_tarsel_HOD-SF_'+cut+prop+'_mhalo_cents_200c' 
+#                        prefix3='HOD-SF/'+key+'_Galacticus_1Gpc_z_0.0_tarsel_HOD-SF_'+cut+prop+'_mhalo_cents_200c'
+#
+#                        band={'0': prefix3+'_all', '1': prefix3+'_centrals', '2': prefix3+'_sats',\
+#                              '3': prefix2+'_all', '4': prefix2+'_centrals', '5': prefix2+'_sats',\
+#                              '6': prefix1+'_all', '7': prefix1+'_centrals', '8': prefix1+'_sats'} 
+# 
+#
+#
+#                       
+#                        #for CMASS SFH paper
+#                        prefix2=key+'_Galacticus_400Mpc_z_0.55_tarsel_CMASS_down_sample3_Rockstar_halos_mhalo_cents_200c' 
+#                        prefix1=key+'_Galacticus_1Gpc_z_0.56_tarsel_new_mags_CMASS_down_sample3_HOD_Rockstar_halos_mhalo_cents_200c'
+##
+#                        band={'0': prefix1+'_all', '1': prefix1+'_centrals', '2': prefix1+'_sats',\
+#                              '3': prefix2+'_all', '4': prefix2+'_centrals', '5': prefix2+'_sats'}   
+#                       
 
                     #endfix='_mstar'
                     #green butterfly test
@@ -1711,53 +1791,53 @@ class DoAnalysis:
 #                        band={'0':'SMF_'+self.myconfig_array['catname'+str(self.myPipe.a)]+'_z_0.56_CMASS', '1': 'SMF_'+self.myconfig_array['catname'+str(self.myPipe.a)]+'_z_0.56', '2':'SMF_'+self.myconfig_array['catname'+str(self.myPipe.a)]+'_z_0.56_densCut_CMASS_mstar'}#, '3':'SMF_'+self.myconfig_array['catname'+str(self.myPipe.a)]+'_z_0.56_densCut_CMASS_mstar'}
 
                     #self.print_redshift='Gal2-dens mstar'
-                    self.print_redshift='z$\sim0.55$'                   
-                    #self.print_redshift='z$\sim$0.1'
-                    self.plot_map_array['data_offset_'+plot_key] = 7                    
-
-                    i=0
-                    while i<len(band):
-
-                        self.myconfig_array.update({'catname'+str(i):self.myconfig_array['catname'+str(self.myPipe.a)]})
-                        if key2=='sc':
-                            filename = mycomp+'anaconda/pro/myRun/histos/'+key+'/'+band[str(i)]+'_sc_centrals.txt'
-                            
-                        elif key=='HMF':
-                            if i<3:
-                                filename = mycomp+'anaconda/pro/myRun/histos/'+key+'/'+key+'_'+band[str(i)]+'_Nhalos.txt'
-                            else:
-                                filename = mycomp+'anaconda/pro/myRun/histos/'+key+'/'+key+'_'+band[str(i)]+'.txt'
-                        else:
-                            filename = mycomp+'anaconda/pro/myRun/histos/'+key+'/'+band[str(i)]+'.txt'  
-
-                        print 'i:', i, 'filenname:', filename#, band[str(i)]
-                        data=myData.readAnyFormat(config=False, mypath=filename, data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float64, skiprow=2)
-                        if i==0:
-                            self.my_analysed_data = np.zeros((data[:,0].size, self.plot_map_array['data_offset_'+plot_key]*len(band)), dtype=np.float32)
-                            
-                        self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i] = np.log10(data[:,0])#+0.03925
-                        self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1] = np.log10(data[:,1])
-                        
-                        if key=='HOD' and key2!='sc':
-                            #self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1] = np.log10((data[:,5])/data[:,6])
-                            
-                            self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+4] = self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1] + (1.0/np.sqrt(data[:,6]))/data[:,1]*0.434
-                            self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+5] = self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1] - (1.0/np.sqrt(data[:,6]))/data[:,1]*0.434                                     
-                        else:
-                            if key2=='sc':
-                                self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1] = data[:,1]
-                                
-                                self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+4] = self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1] + data[:,4]
-                                self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+5] = self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1] - data[:,5]              
-                            else:
-                                try:
-                                    self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+4] = self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1] + data[:,4]/data[:,1]*0.434
-                                    self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+5] = self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1] - data[:,5]/data[:,1]*0.434                  
-                                except:
-                                    pass
-                                
-                        #print self.my_analysed_data[:, [int(self.plot_map_array['data_offset_'+plot_key])*i+0, int(self.plot_map_array['data_offset_'+plot_key])*i+1]]
-                        i+=1  
+#                    self.print_redshift='z$\sim0.55$'                   
+#                    #self.print_redshift='z$\sim$0.1'
+#                    self.plot_map_array['data_offset_'+plot_key] = 7                    
+#
+#                    i=0
+#                    while i<len(band):
+#
+#                        self.myconfig_array.update({'catname'+str(i):self.myconfig_array['catname'+str(self.myPipe.a)]})
+#                        if key2=='sc':
+#                            filename = mycomp+'anaconda/pro/myRun/histos/'+key+'/'+band[str(i)]+'_sc_centrals.txt'
+#                            
+#                        elif key=='HMF':
+#                            if i<3:
+#                                filename = mycomp+'anaconda/pro/myRun/histos/'+key+'/'+key+'_'+band[str(i)]+'_Nhalos.txt'
+#                            else:
+#                                filename = mycomp+'anaconda/pro/myRun/histos/'+key+'/'+key+'_'+band[str(i)]+'.txt'
+#                        else:
+#                            filename = mycomp+'anaconda/pro/myRun/histos/'+key+'/'+band[str(i)]+'.txt'  
+#
+#                        print 'i:', i, 'filenname:', filename#, band[str(i)]
+#                        data=myData.readAnyFormat(config=False, mypath=filename, data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float64, skiprow=2)
+#                        if i==0:
+#                            self.my_analysed_data = np.zeros((data[:,0].size, self.plot_map_array['data_offset_'+plot_key]*len(band)), dtype=np.float32)
+#                            
+#                        self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i] = np.log10(data[:,0])#+0.03925
+#                        self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1] = np.log10(data[:,1])
+#                        
+#                        if key=='HOD' and key2!='sc':
+#                            #self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1] = np.log10((data[:,5])/data[:,6])
+#                            
+#                            self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+4] = self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1] + (1.0/np.sqrt(data[:,6]))/data[:,1]*0.434
+#                            self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+5] = self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1] - (1.0/np.sqrt(data[:,6]))/data[:,1]*0.434                                     
+#                        else:
+#                            if key2=='sc':
+#                                self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1] = data[:,1]
+#                                
+#                                self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+4] = self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1] + data[:,4]
+#                                self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+5] = self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1] - data[:,5]              
+#                            else:
+#                                try:
+#                                    self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+4] = self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1] + data[:,4]/data[:,1]*0.434
+#                                    self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+5] = self.my_analysed_data[:, int(self.plot_map_array['data_offset_'+plot_key])*i+1] - data[:,5]/data[:,1]*0.434                  
+#                                except:
+#                                    pass
+#                                
+#                        #print self.my_analysed_data[:, [int(self.plot_map_array['data_offset_'+plot_key])*i+0, int(self.plot_map_array['data_offset_'+plot_key])*i+1]]
+#                        i+=1  
 
 #                    self.print_redshift='z=0.56'#(>)\nnon-orphan sats'
 #                    #self.print_redshift='LG-'+sample
@@ -2421,7 +2501,10 @@ class DoAnalysis:
                                 # selected at every snapshot)
                                 #-------------------------------------------
                                 mymethod='M1' 
-
+                                for reds in [0.0,0.1,0.56,0.7,3.0,4.15]:
+                                    mL.starforming_cut_Henriques20_A1(redshift=reds)
+                                    
+                                exit()
                                 #M1: default only [1] for M2: [1,2] because there are much more subsample and the are divided into two plots
                                 #myplot_num ['_1','_2','_3,'demo']  1: standard sample 1 (all, low, high, active, passive, red, blue, redmstar11, 'redmhalo13)
                                 #                           2: standard sample 2 (all, mhalo12st, mhalo12gt, mstar10st, mstar11gt, zcold9st, zcold9gt, lowmstar11, lowmhalo13)
@@ -2437,10 +2520,10 @@ class DoAnalysis:
                                               '_mean_age_stars_disk', '_mean_age_stars_spheroid']
                                 else:
                                     myprop = ['_mhalo', '_mstar', '_SHMF', '_sfr', '_ssfr', '_mcold', '_Mzgas', '_zcold',\
-                                              '_g-i', '_r-i', '_cgf', '_mbh', '_rhalfmass', '_rbulgevsrdisk', 'SFHd', 'sumSFR']                                
-                                myprop = ['_mhalo', '_mstar', '_cgf', '_mcold', '_Mzgas', '_mbh', '_rbulgevsrdisk', '_rhalfmass']
-                                myprop = ['_zcold']#, '_r-i', '_sfr', '_ssfr']
-                                #myprop = ['SFHd']                                 
+                                              '_g-i', '_r-i', '_cgf', '_mbh', '_rhalfmass', '_rbulgevsrdisk', 'SFHd', 'sumSFR', '_Tcons', '_rbulge', '_rdisk']                                
+                                #myprop = ['_SHMF', '_rhalfmass']#, '_mstar']#, '_cgf', '_mcold', '_Mzgas', '_mbh', '_rbulgevsrdisk', '_rhalfmass']
+                                #myprop = ['_sfr', '_r-i', '_zcold', 'SFHd']
+                                myprop = ['_mhalo']                                 
                                 # selected which plot should be created
                                 #   default: SFH for each selected property in 'myprop'
                                 #   gr:      growth histories of all properties 'in myprop'
@@ -2450,8 +2533,8 @@ class DoAnalysis:
                                 #   wp_one:  2pCF of all subsamples in 'mysamples' together in one plot at each redshift defind in 'band'
                                 #   print_stats:  print stats of galaxy properts of all subsamples in 'mysamples' at each redshift defind in 'band' usind the function mL.test_methods()                               
                                 #------------------------------------------                                
-                                workflow = ['default', 'gr', 'gr_one', 'histo','wp','wp_one', 'stats_N', 'stats_xbar_M1-M2_M2', 'stats_xbar_M1found_M1', 'stats_xbar_M1found_M2']
-                                workflow='stats_calc'
+                                workflow = ['default', 'gr', 'gr_one', 'histo','wp','wp_one', 'stats_N', 'stats_xbar_M1-M2_M2', 'stats_xbar_M1found_M1', 'stats_xbar_M1found_M2', 'stats_xbar_MAD']
+                                workflow='stats_xbar_MAD'
                                 
                                 if workflow.find('histo')!=-1:
                                     if self.myconfig_array['catname0'].find('run2')!=-1:                                    
@@ -2460,7 +2543,7 @@ class DoAnalysis:
                                                   '_mean_age_stars_disk', '_mean_age_stars_spheroid']
                                     else:
                                         myprop = ['_mhalo', '_mstar', '_sfr', '_ssfr', '_zcold', '_g-i',\
-                                                  '_mbh', '_rbulgevsrdisk']                                        
+                                                  '_mbh', '_rbulgevsrdisk', '_cgf']                                        
 
                                 myprop = myprop[::-1]
                                 errors=''
@@ -2509,11 +2592,19 @@ class DoAnalysis:
                                                  '2.03','2.10','2.16','2.24','2.31','2.38','2.46','2.53','2.61','2.70','2.78','2.86','2.95',\
                                                  '3.04','3.13','3.22','3.31','3.41','3.51','3.61','3.71','3.82','3.93',\
                                                  '4.04','4.15']
-                                    
+
+                                #band = ['1.37', '1.54', '2.7', '3.04']
+                                #band = ['0.7']
+                                #band = ['1.37', '2.1', '3.51']   
                                 #choose a custom filename prefix
                                 #custom_plot_filename_prefix='_SFH_300-r0001'
+                                band = ['PopB+k', 'PopB+f', 'PopA+k', 'PopA+f']
+                                band = ['knots', 'filaments', 'knots', 'filaments']#, 'knots', 'filaments']
+                                #band = ['knots', 'knots', 'knots']
+                                #band = ['filaments', 'filaments','filaments']
+                                band = ['0.56', '0.56']                                  
                                 custom_plot_filename_prefix='_CMASS_SFH_down3_'
-                                for_paper='_FP_reduced2'
+                                for_paper=''
                                 
                                 ######################################################################################################
 
@@ -2524,8 +2615,8 @@ class DoAnalysis:
                                     #Galacticus
                                     #mysample=['', 'low', 'high', 'passive', 'active', 'red', 'blue']                                    
                                     mysample=['low', 'low', 'low', 'passive', 'low', 'red', 'low', 'low-zcold', 'high-zcold']
-                                    #mysample=['low', 'passive', 'red', 'low-zcold', 'high-zcold', 'blue']
-                                    #mysample=['high']
+                                    #mysample=['low', 'passive', 'red', 'low-zcold', 'high-zcold']
+                                    #mysample=['low','low']
                                 elif mymethod=='M2' and myplot_num=='':       
                                     #Galacticus
                                     #standard plot1 M2 & M2
@@ -2545,9 +2636,10 @@ class DoAnalysis:
                                     mysample=['highZcold-highMstar','lowZcold-highMstar']
                                                                         
                                 else:
-                                    mysample=['']#,'low', 'high', 'passive', 'active', 'red', 'blue']
+                                    mysample=['','low', 'high', 'passive', 'active', 'red', 'blue']
 
-                                #mysample=['low-zcold', 'high-zcold']
+                                #mysample=['low-zcold']#, 'low-zcold', 'low-zcold', 'low-zcold']
+
                                 if workflow=='zevol':
                                     for sample in ['mstar']:#, 'sfr', 'ssfr']:
                                         for prop in ['_mstar']:
@@ -2558,14 +2650,14 @@ class DoAnalysis:
 
                                 elif workflow=='gr' or workflow=='gr_res':
                                     #plot property for all samples in one plot
-                                    for prop in ['_mhalo', '_mstar', '_mcold', '_Mzgas' , '_cgf', '_mbh', '_rbulgevsrdisk', '_rhalfmass'][::-1]:
+                                    for prop in ['_mhalo', '_mstar', '_SHMF', '_mcold', '_Mzgas' , '_cgf', '_mbh', '_rbulgevsrdisk', '_rhalfmass'][::-1]:
                                         self.myPlot=caseSwitcherPlotKey('loadFromFile', '', workflow, prop, mysample, mymethod, myplot_num)
                                         mycustom_plot_filename=custom_plot_filename_prefix+mymethod+prop+'_'+workflow+myplot_num+for_paper
                                         plotOutput('_'+workflow, mycustom_plot_filename)                                       
 
                                 elif workflow=='gr_one':
                                     #3 plot growth of one sample
-                                    for sample in mysample:
+                                    for sample in ['low-zcold']:#mysample:
                                         self.myPlot=caseSwitcherPlotKey('loadFromFile', sample, workflow, '', mysample, mymethod, myplot_num)
                                         mycustom_plot_filename=custom_plot_filename_prefix+sample+'_'+mymethod+'_'+workflow+for_paper
                                         plotOutput('_'+workflow, mycustom_plot_filename)
@@ -2580,13 +2672,13 @@ class DoAnalysis:
 
                                 elif workflow=='stats_calc':
                                     #5 print statistics of properties in a text-file
-                                    myprops=['mstar', 'SHMR', 'sfr', 'ssfr', 'mcold', 'Mzgas', 'zcold', 'g-i']
+                                    myprops=['mhalo', 'SHMR', 'sfr', 'ssfr', 'mcold', 'Mzgas', 'zcold', 'g-i']
                                     for prop in myprops:                                                            
                                         for sample in mysample:
                                             for count, redshift in enumerate(band):                     
                                                 print 'count:', count, 'redshift:', redshift, 'sample:', sample, 'prop:', prop
                                                 if count==0:
-                                                    stats_data = np.zeros((55, 20), dtype=np.float64)  
+                                                    stats_data = np.zeros((55, 23), dtype=np.float64)  
                                                 myfilename=mycomp+'anaconda/pro/myRun/histos/sfr2z/Gal-dens_main_cents_'+mymethod+'/stats/'+self.myconfig_array['catname'+str(self.myPipe.a)]+'_SFH_z-evolution_stats_'+sample+'_'+prop+'.txt'
 
                                                 stats_data, myheader=mL.calc_residuals(stats_data, count, redshift, sample, prop)
@@ -2594,7 +2686,7 @@ class DoAnalysis:
                                                 myOutput.writeIntoFile(myfilename,
                                                                        stats_data,
                                                                        myheader='SF- project statistics of galaxy properties with redshift; cat: '+self.myconfig_array['catname'+str(self.myPipe.a)]+' CMASS-sample: '+sample+myheader,
-                                                                       data_format='%0.3f\t%0.5f\t%0.5f\t%0.5f\t%0.8e\t%0.8e\t%0.8e\t%i\t%0.8e\t%0.8e\t%0.8e\t%i\t%0.8e\t%0.8e\t%0.8e\t%i\t%0.5f\t%0.5f\t%0.5f\t%0.5f')
+                                                                       data_format='%0.3f\t%0.5f\t%0.5f\t%0.5f\t%0.8e\t%0.8e\t%0.8e\t%0.8e\t%i\t%0.8e\t%0.8e\t%0.8e\t%0.8e\t%i\t%0.8e\t%0.8e\t%0.8e\t%0.8e\t%i\t%0.5f\t%0.5f\t%0.5f\t%0.5f')
 
                                 elif workflow=='print_stats':
                                     #5 print statistics of properties in a text-file
@@ -2663,12 +2755,20 @@ class DoAnalysis:
                                                        data_is_string=True,
                                                        data_format='%s')                                           
 
+                                elif workflow.find('stats_violin')!=-1:
+                                    #1 plot property for all samples in one plot
+                                    for z in band: 
+                                        for prop in ['_mhalo', '_mstar', '_SHMR']:# '_zcold', '_SHMR', '_mstar', '_mcold', '_Mzgas', '_sfr', '_ssfr', '_g-i'][::-1]:
+                                                self.myPlot=caseSwitcherPlotKey('loadFromFile', z , workflow, prop, mysample, mymethod, myplot_num)
+                                                mycustom_plot_filename=custom_plot_filename_prefix+mymethod+prop+'_z_'+z[0]+'_'+workflow+myplot_num+for_paper
+                                                plotOutput('_'+workflow+prop, mycustom_plot_filename)
+
                                 elif workflow.find('stats')!=-1:
                                     #1 plot property for all samples in one plot
-                                    for prop in ['_mhalo']:#, '_zcold', '_SHMR', '_mstar', '_mcold', '_Mzgas', '_sfr', '_ssfr', '_g-i'][::-1]:
+                                    for prop in ['_mhalo']:#, '_mstar', '_SHMR']:# '_zcold', '_SHMR', '_mstar', '_mcold', '_Mzgas', '_sfr', '_ssfr', '_g-i'][::-1]:
                                             self.myPlot=caseSwitcherPlotKey('loadFromFile', '' , workflow, prop, mysample, mymethod, myplot_num)
                                             mycustom_plot_filename=custom_plot_filename_prefix+mymethod+prop+'_'+workflow+myplot_num+for_paper
-                                            plotOutput('_'+workflow, mycustom_plot_filename)
+                                            plotOutput('_'+workflow, mycustom_plot_filename)                                                
                                                 
                                 elif workflow=='wp':
                                 #4 plot wp of all samples of certain redshift as prop
@@ -2683,7 +2783,11 @@ class DoAnalysis:
                                         self.myPlot=caseSwitcherPlotKey('loadFromFile', sample, 'wp_one', band, mysample, mymethod, myplot_num)
                                         mycustom_plot_filename=custom_plot_filename_prefix+mymethod+sample+'_wp_one'
                                         plotOutput('_wp_one', mycustom_plot_filename)
-                                        
+                                elif workflow=='envr_props':
+                                    #4 plot 2pCF of all samples
+                                    self.myPlot=caseSwitcherPlotKey('loadFromFile', '', 'envr_props', '', mysample, mymethod, myplot_num)
+                                    mycustom_plot_filename=custom_plot_filename_prefix+mymethod+'_envr_props'
+                                    plotOutput('_envr_props', mycustom_plot_filename)                                        
                                 else:
                                     #1 plot property for all samples in one plot
                                     for prop in myprop:

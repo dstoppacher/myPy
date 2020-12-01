@@ -641,7 +641,21 @@ def adjust_data_for_plot(data,
             mask=np.where(np.isfinite(data['MAB_dA_total_i']))
 
         return data[mask[:][0]]            
-        
+
+    def g_i_mhalo(data):
+
+        try:
+            data['mAB_dA_total_g']-=data['mAB_dA_total_i']        
+            data['mhalo']=np.log10(data['mhalo'])
+            
+            mask=np.where(np.isfinite(data['mAB_dA_total_i']))            
+        except:
+            data['MAB_dA_total_g']-=data['MAB_dA_total_i']        
+            data['MAB_dA_total_i']=np.log10(data['mhalo'])
+            
+            mask=np.where(np.isfinite(data['MAB_dA_total_i']))
+
+        return data[mask[:][0]]           
 
     def u_r_mstar():
 
@@ -944,7 +958,8 @@ def adjust_data_for_plot(data,
                 'u-r_r': u_r_r,
                 'u-r_mstar': u_r_mstar,
                 'g-i_i': g_i_i,
-                'g-i_mstar': g_i_mstar,                
+                'g-i_mstar': g_i_mstar,
+                'g-i_mhalo': g_i_mhalo,                   
                 'dmesa_i': dmesa_i,
                 'dmesa_mstar': dmesa_mstar,
                 'r-i_g-r': r_i_g_r,
@@ -996,15 +1011,15 @@ def adjust_data_for_plot(data,
 #    prop=(y+11.16)/1.12-x
 #    data = data[np.where(prop<=0.0)[:][0]] 
       
-    
+
     print '--> after selection: ngal:', data.shape, '\n'
        
     return data 
     
 
-plot_type = 'ssfr_mstar'
+plot_type = 'g-i_mhalo'
 
-#mycomp='/home/doris/anaconda/pro/data/'
+mycomp='/home/doris/anaconda/pro/data/'
 
 
 def myCatalog(load_from_file=False): 
@@ -1058,6 +1073,13 @@ def CMASS_Galacticus_down_catalog(load_from_file=False): return load_SAM_catalog
 def CMASS_Galacticus_down3_catalog(load_from_file=False): return load_SAM_catalog(mycomp+'Galacticus_1Gpc/Galacticus_1Gpc_z_0.56_tarsel_new_mags_CMASS_down_sample3.hdf5', 'Gal-dens')
 def CMASS_Galacticus_down3_crossed_catalog(load_from_file=False): return load_SAM_catalog(mycomp+'Galacticus_1Gpc/Galacticus_1Gpc_z_0.56_tarsel_new_mags_CMASS_down_sample3_crossed.hdf5', 'crossed')
 
+def CMASS_Galacticus_down3_low_catalog(load_from_file=False): return load_SAM_catalog(mycomp+'Galacticus_1Gpc/Galacticus_1Gpc_z_0.56_tarsel_new_mags_CMASS_down_sample3_more_props_test_low.hdf5', '$low$-SFR')
+def CMASS_Galacticus_down3_passive_catalog(load_from_file=False): return load_SAM_catalog(mycomp+'Galacticus_1Gpc/Galacticus_1Gpc_z_0.56_tarsel_new_mags_CMASS_down_sample3_more_props_test_passive.hdf5', 'passive')
+def CMASS_Galacticus_down3_red_catalog(load_from_file=False): return load_SAM_catalog(mycomp+'Galacticus_1Gpc/Galacticus_1Gpc_z_0.56_tarsel_new_mags_CMASS_down_sample3_more_props_test_red.hdf5', 'red')
+def CMASS_Galacticus_down3_blue_catalog(load_from_file=False): return load_SAM_catalog(mycomp+'Galacticus_1Gpc/Galacticus_1Gpc_z_0.56_tarsel_new_mags_CMASS_down_sample3_more_props_test_blue.hdf5', 'blue')
+def CMASS_Galacticus_down3_lowZ_catalog(load_from_file=False): return load_SAM_catalog(mycomp+'Galacticus_1Gpc/Galacticus_1Gpc_z_0.56_tarsel_new_mags_CMASS_down_sample3_more_props_test_low-zcold.hdf5', '$low$-$Z_{cold}$')
+def CMASS_Galacticus_down3_highZ_catalog(load_from_file=False): return load_SAM_catalog(mycomp+'Galacticus_1Gpc/Galacticus_1Gpc_z_0.56_tarsel_new_mags_CMASS_down_sample3_more_props_test_high-zcold.hdf5', '$high$-$Z_{cold}$')
+
 
 def CMASS_Galacticus_mass_catalog(load_from_file=False): return load_SAM_catalog(mycomp+'Galacticus_1Gpc/Galacticus_1Gpc_z_0.56_tarsel_new_mags_CMASS_mass_sample.hdf5', 'Gal-mass')
 def CMASS_Galacticus_density_catalog_Mzstar(load_from_file=False): return load_SAM_catalog(mycomp+'Galacticus_1Gpc/Galacticus_1Gpc_z_0.56_tarsel_new_mags_CMASS_density_sample_highest_Mzstar.hdf5', 'density Mzstar')
@@ -1102,9 +1124,9 @@ def load_SAM_catalog(filename,
                      legend):
     
     data=load_catalog(filename,
-                     'mstar',
-                     'sfr',
-                     name_add2='mstar_spheroid',
+                     'mhalo',
+                     'mAB_dA_total_g',
+                     name_add2='mAB_dA_total_i',
                      name_add3='mcold_spheroid',
                      name_add4='mstar')
 

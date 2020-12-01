@@ -91,7 +91,7 @@ class OutputData:
             elif myConfig.plot_config_array['cut_part2'].find('stats')!=-1:
                 latex_code_times=''
                 if myConfig.plot_config_array['cut_part2']=='stats_N':
-                    myConfig.plot_config_array['y_title']=r'N$_{\rm M1_{\rm found}}$/N$_{\rm M1_{\rm total}}$-1'
+                    myConfig.plot_config_array['y_title']=r'N$_{\rm M1_{\rm found}}$/N$_{\rm M1_{\rm total}}$'
                 elif myConfig.plot_config_array['cut_part2']=='stats_xbar_M1found_M1':
                     myConfig.plot_config_array['y_title']=r'$\overline{x}_{\rm M1_{\rm found}}$/$\overline{x}_{\rm M1}}$-1'                
                 elif myConfig.plot_config_array['cut_part2']=='stats_xbar_M1found_M2':
@@ -100,9 +100,11 @@ class OutputData:
                     myConfig.plot_config_array['y_title']=r'$\overline{x}_{\rm M1}$/$\overline{x}_{\rm M2}}$-1'
                 elif myConfig.plot_config_array['cut_part2']=='stats_xbar_M1-M2_M2':
                     myConfig.plot_config_array['y_title']=r'$\overline{x}_{\rm M1}$/$\overline{x}_{\rm M2}-1$'
-                    myConfig.plot_config_array['y_title']=r'$\overline{x}_{\rm M1_{found}}$/$\overline{x}_{\rm M1}-1$'
-                    myConfig.plot_config_array['y_title']=r'$\overline{x}_{\rm M1_{found}}$/$\overline{x}_{\rm M2}-1$'
-                    myConfig.plot_config_array['y_title']=r'($\overline{x}_{\rm M1}$-$\overline{x}_{\rm M1_{\rm found}}$)/$\overline{x}_{\rm M2}$'
+#                    myConfig.plot_config_array['y_title']=r'$\overline{x}_{\rm M1_{found}}$/$\overline{x}_{\rm M1}-1$'
+#                    myConfig.plot_config_array['y_title']=r'$\overline{x}_{\rm M1_{found}}$/$\overline{x}_{\rm M2}-1$'
+#                    myConfig.plot_config_array['y_title']=r'($\overline{x}_{\rm M1}$-$\overline{x}_{\rm M1_{\rm found}}$)/$\overline{x}_{\rm M2}$'
+                elif myConfig.plot_config_array['cut_part2']=='stats_xbar_MAD':
+                    myConfig.plot_config_array['y_title']=r'$\rm \sigma_{M1}$/$\rm \sigma_{M2}-1$'
             elif myConfig.plot_config_array[prefix+'cut_part2']!='':
                 latex_code_times=''
                 if prefix.startswith('xi_'):
@@ -118,7 +120,7 @@ class OutputData:
             else:
                 latex_code_times=''
             
-            print 'here:', latex_code_times
+            #print 'here: 123', latex_code_times
             return latex_code_times
 
 
@@ -772,7 +774,7 @@ class OutputData:
                 # definitions for the axes
                 left = 0.16
                 width=0.8-left
-                bottom=0.12
+                bottom=0.13
                 height=0.80-bottom
                 bottom_h = left_h = left + width
                 
@@ -796,7 +798,7 @@ class OutputData:
                 axHistx.xaxis.set_major_formatter(nullfmt)
                 axHisty.yaxis.set_major_formatter(nullfmt)
                                 
-                print 'x min/max:', xmin, '/', xmax, 'y min/max:', ymin, '/', ymax, 'mycolor:', mycolor, 'myls:', myls, 'myalpha:', myalpha,
+                print 'x min/max:', xmin, '/', xmax, 'y min/max:', ymin, '/', ymax, 'mycolor:', mycolor, 'myls:', myls, 'myalpha:', myalpha, 'myfacecolor:', myfacecolor
 
                 myhisto_ticks=np.linspace(float(myConfig.plot_config_array['histo_num_density_min']),float(myConfig.plot_config_array['histo_num_density_max']),int(myConfig.plot_config_array['histo_num_density_number_major_ticks']))                
 
@@ -813,7 +815,7 @@ class OutputData:
                 axHistx.set_xlim(xmin, xmax)
                 axHistx.set_ylim(float(myhisto_ticks[0]), float(myhisto_ticks[-1]))
 
-                print 'myhisto_ticks min/max:', float(myhisto_ticks[0]), float(myhisto_ticks[-1])              
+                #print 'myhisto_ticks min/max:', float(myhisto_ticks[0]), float(myhisto_ticks[-1])              
 
                 xticks=[]
                 if myConfig.plot_config_array['xticks']!='':
@@ -920,6 +922,67 @@ class OutputData:
                 cbaxis.ax.set_position([float(myConfig.plot_config_array['colorbar_anchor_right'])-0.04*len(myticks),0.15+0.1*offset,0.04*len(myticks),0.05])
                 cbaxis.ax.set_zorder(30)                
 
+            def set_axis_style_violin(ax, labels):
+                if myConfig.plot_config_array['no_xticks']!='True':
+                    ax.get_xaxis().set_tick_params(direction='out', length=major_ticks_lenght)
+                    ax.xaxis.set_ticks_position('bottom')
+                else:
+                    ax.xaxis.set_ticks_position('none')
+                ax.set_xticks(np.arange(1, len(labels) + 1))
+                ax.set_xticklabels(labels)
+                ax.set_xlim(0.45, len(labels) + 0.45)
+
+            def split_violin_bodies_left(ax, fcolor='r', ecolor='k', alpha=1.0):
+                """from https://stackoverflow.com/questions/29776114/half-violin-plot/29781988#29781988  22/09/2020"""              
+                
+                for b in ax['bodies']:
+                    # get the center
+                    m = np.mean(b.get_paths()[0].vertices[:, 0])
+                    # modify the paths to not go further right than the center
+                    b.get_paths()[0].vertices[:, 0] = np.clip(b.get_paths()[0].vertices[:, 0], -np.inf, m)
+
+                    b.set_facecolor(fcolor)
+                    b.set_edgecolor(ecolor)
+                    b.set_alpha(alpha)
+                    b.set_linewidths(2.0)
+                    
+                    for item, ls in zip(['cbars','cmins','cmaxes','cmeans','cmedians'],['-','-','-',':','--']):
+                        item = ax[item]
+                        item.set_facecolor('k')
+                        item.set_edgecolor('k')
+                        item.set_alpha(alpha)
+                        item.set_linewidth(2.0)
+                        item.set_linestyle(ls)
+                        m = np.mean(item.get_paths()[0].vertices[:, 0])
+                        # modify the paths to not go further left than the center
+                        #item.get_paths()[0].vertices[:, 0] = np.clip(item.get_paths()[0].vertices[:, 0], m, np.inf)
+                        item.get_paths()[0].vertices[:, 0] = np.clip(item.get_paths()[0].vertices[:, 0], -np.inf, m)
+
+            def split_violin_bodies_right(ax, fcolor='b', ecolor='k', alpha=1.0):
+                """from https://stackoverflow.com/questions/29776114/half-violin-plot/29781988#29781988  22/09/2020"""
+                
+                for b in ax['bodies']:
+                    # get the center
+                    m = np.mean(b.get_paths()[0].vertices[:, 0])
+                    # modify the paths to not go further left than the center
+                    b.get_paths()[0].vertices[:, 0] = np.clip(b.get_paths()[0].vertices[:, 0], m, np.inf)
+                    
+                    b.set_facecolor(fcolor)
+                    b.set_edgecolor(ecolor)
+                    b.set_alpha(alpha)
+                    b.set_linewidths(2.0)
+
+                    for item, ls in zip(['cbars','cmins','cmaxes','cmeans','cmedians'],['-','-','-',':','--']):                        
+                        item = ax[item]
+                        item.set_facecolor('k')
+                        item.set_edgecolor('k')
+                        item.set_alpha(alpha)
+                        item.set_linewidth(2.0)
+                        item.set_linestyle(ls)
+                        m = np.mean(item.get_paths()[0].vertices[:, 0])
+                        # modify the paths to not go further left than the center
+                        item.get_paths()[0].vertices[:, 0] = np.clip(item.get_paths()[0].vertices[:, 0], m, np.inf)  
+
             def Surface3DPlot(i,j):
 
                 N=int(myConfig.plot_config_array['contour_histo_nbins']) 
@@ -985,7 +1048,7 @@ class OutputData:
 
                 N=int(myConfig.plot_config_array['contour_histo_nbins']) 
                 if len(mydata['name'+str(j)+'_data'][mydata['col_name_x']])<5e6:
-                    N=70
+                    N=40
   
                 print 'CONTOUR-PLOT!'               
                 print 'j:', j, 'i:', i, 'marker:', mymarker_code, 'mylw:', float(myConfig.plot_config_array['mylw'])+float(myConfig.plot_config_array['lw_offset']), \
@@ -994,7 +1057,7 @@ class OutputData:
 
                 #print mydata['col_name_x'], mydata['col_name_y']
                 #print mydata['name'+str(j)+'_data'][mydata['col_name_x']], mydata['name'+str(j)+'_data'][mydata['col_name_y']]
-                print mydata['name'+str(j)+'_data'][mydata['col_name_weights']]      
+                #print mydata['name'+str(j)+'_data'][mydata['col_name_weights']]      
 
                 if j==2:
                     x = np.linspace(min(mydata['name'+str(j)+'_data'][mydata['col_name_x']]), max(mydata['name'+str(j)+'_data'][mydata['col_name_x']]), N)
@@ -1016,7 +1079,7 @@ class OutputData:
                                                     
                 #confidence levels / contour levels
                 if len(mydata['name'+str(j)+'_data'][mydata['col_name_x']])<1e6:
-                    mylevels=[#H.max()/100.0*0.1,
+                    mylevels=[#H.max()/100.0*2.1,
                               H.max()/100.0*13.6,
                               H.max()/100.0*31.74,
                               H.max()/100.0*68.26,
@@ -1051,8 +1114,8 @@ class OutputData:
                 print 'levels:', mylevels
                 #print xedges
                 #print yedges
-         
-                CS=key0.contour(X,Y,H, len(mylevels), linewidths=3.0, linestyles=mylinestyle, colors=mycolor_code, levels=mylevels)
+                  
+                CS=key0.contour(X,Y,H, len(mylevels), linewidths=3.5, linestyles=mylinestyle, colors=mycolor_code, levels=mylevels)
                 #plt.clabel(CS, colors = 'k', fmt = '%0.1f', fontsize=12)
                 if mycolor_map!='no':
                     CS=key0.contourf(X,Y,H, len(mylevels), levels=mylevels, cmap=mycolor_map, alpha=myalpha)     
@@ -1206,7 +1269,7 @@ class OutputData:
                 if colorbar=='yes':
                     plot_colorbar(hb, j, int(myConfig.plot_config_array['cb_min']), int(myConfig.plot_config_array['cb_max']), int(myConfig.plot_config_array['cb_steps']))
                     
-                return key0, None, None, myplotlegend            
+                return key0, None, None, myplotlegend                
 
             def Default():
             #START DEFAULT LOOP START DEFAULT LOOP START DEFAULT LOOP START DEFAULT LOOP START DEFAULT LOOP START DEFAULT LOOP
@@ -1215,7 +1278,7 @@ class OutputData:
 
                 print 'MAIN plot: i:', i, 'myls:', mylinestyle, 'marker:', mymarker_code, 'mylw:', float(myConfig.plot_config_array['mylw']), \
                       'mycolor_code:', mycolor_code, 'errorbars:', myConfig.plot_config_array['error_bars_y'], \
-                      'filled_between:', myConfig.plot_config_array['filled_between']
+                      'filled_between:', myConfig.plot_config_array['filled_between'], 'alpha: ', myalpha
 
  
                 #myax.set_zorder(20)
@@ -1365,6 +1428,49 @@ class OutputData:
                                 minor_y = MultipleLocator(float(myConfig.plot_config_array['minor_ticks_y_share_space']))
                                 key_share_y0.yaxis.set_minor_locator(minor_y)
                                 key_share_y0.set_zorder(50)
+
+                elif myPlottypeTable[str(i)]=='violin':
+                    print 'VIOLIN-PLOT: i:', i, 'mycolor:', mycolor_code, 'offset:', data_block_offset, mydata[:,1][0:5]
+ 
+                    data_vleft=mydata[:,1][np.where(mydata[:,1]!=-99.99)[:][0]]
+                    test=np.isfinite(data_vleft)
+                    data_vleft=data_vleft[np.where(test==True)[:][0]]
+
+                    axis0 = key0.violinplot(data_vleft,
+                                           positions=[i+1],
+                                           showmeans=True,
+                                           showmedians=True,
+                                           showextrema=True,
+                                           widths=0.7,
+                                           points=100)
+                    
+                    split_violin_bodies_left(axis0,
+                                             fcolor=mycolor_code,
+                                             ecolor=mycolor_code)                                             
+
+
+                    data_vright=mydata[:,2][np.where(mydata[:,2]!=-99.99)[:][0]]
+                    test=np.isfinite(data_vright)
+                    data_vright=data_vright[np.where(test==True)[:][0]]
+
+                    axis0_right = key0.violinplot(data_vright,
+                                           positions=[i+1],
+                                           showmeans=True,
+                                           showmedians=True,
+                                           showextrema=True,
+                                           widths=0.7,
+                                           points=100)
+                    
+                    split_violin_bodies_right(axis0_right,
+                                             fcolor=mycolor_code,
+                                             ecolor=mycolor_code)
+                    
+                    add_tick_params(key0, 'both', 'minor', length=minor_ticks_lenght, width=float(myConfig.plot_config_array['myframe_lw']), set_visible=False)
+                    add_tick_params(key0, 'both', 'major', length=major_ticks_lenght, width=float(myConfig.plot_config_array['myframe_lw']), set_visible=False) 
+    
+                    add_tick_params(myax, 'both', 'minor', length=minor_ticks_lenght, width=float(myConfig.plot_config_array['myframe_lw']), set_visible=True)
+                    add_tick_params(myax, 'both', 'major', length=major_ticks_lenght, width=float(myConfig.plot_config_array['myframe_lw']), set_visible=True)
+
       
                 else:
                     print 'BAR PLOT!'
@@ -1449,9 +1555,10 @@ class OutputData:
 
 ########################################################################################################################################################################
 #CHOOSE A PLOT TYPE OR GO TO DEFAULT Main() 
-
+#
             for f in [prefix+'x_range_min', prefix+'x_range_max', prefix+'y_range_min', prefix+'y_range_max', prefix+'share_x_range_min', prefix+'share_x_range_max', prefix+'share_y_range_min', prefix+'share_y_range_max']:
-                if f.find('min') and myConfig.plot_config_array[f]=='min':                    
+                #print f
+                if f.find('min') and myConfig.plot_config_array[f]=='min':
                     myConfig.plot_config_array[f]=min(mydata[:,i*data_block_offset])
                 elif f.find('max')  and myConfig.plot_config_array[f]=='max':
                     myConfig.plot_config_array[f]=max(mydata[:,i*data_block_offset])
@@ -1472,7 +1579,7 @@ class OutputData:
             ymax_share = myConfig.plot_config_array[prefix+'share_y_range_max']            
 
             #print myPlottypeTable[str(i)]            
-            if myPlottypeTable[str(i)]=='default' or myPlottypeTable[str(i)]=='barplot':
+            if myPlottypeTable[str(i)]=='default' or myPlottypeTable[str(i)]=='barplot' or myPlottypeTable[str(i)]=='violin':
 
                 key0, axis0, mylegend, myplotlegend = Default()
                 
@@ -1568,8 +1675,8 @@ class OutputData:
                       
                     c+=1                       
 
-                add_tick_params(myax, 'both', 'minor', color='r', length=minor_ticks_lenght, width=minor_ticks_width, set_visible=True)
-                add_tick_params(myax, 'both', 'major', color='r', length=major_ticks_lenght, width=major_ticks_width, set_visible=True)
+                #add_tick_params(myax, 'both', 'minor', color='r', length=minor_ticks_lenght, width=minor_ticks_width, set_visible=True)
+                #add_tick_params(myax, 'both', 'major', color='r', length=major_ticks_lenght, width=major_ticks_width, set_visible=True)
                 
                 if myConfig.plot_config_array['add_axis']=='yes':
                     add_tick_params(myax, 'both', 'major', length=0, width=major_ticks_width, set_visible=False)
@@ -1604,7 +1711,7 @@ class OutputData:
             legend_sep=[]
 
             i=1    
-            if (myPlottypeTable['0']=='default' or myPlottypeTable['0']=='barplot') and myPlotLegendTable['0']!='no':
+            if (myPlottypeTable['0']=='default' or myPlottypeTable['0']=='barplot' or myPlottypeTable['0']=='violin') and myPlotLegendTable['0']!='no':
                 axis = [axis0]
                 legend = [myConfig.plot_config_array['plot_legend0']]
             elif myplotlegend=='no':
@@ -1618,22 +1725,21 @@ class OutputData:
             while i<loops:
                 mymarker_code, mycolor_code, mylinestyle, mycolor_map, mymarkerfacecolor, mydashes, colorbar, myalpha, myplotlegend = get_styles(i,i) 
                 print 'LOOP plot: i:', i, 'c:', c, 'myls:', mylinestyle, 'marker:', mymarker_code, 'mylw:', float(myConfig.plot_config_array['mylw']), \
-                       'mycolor_code:', mycolor_code, 'fill between?', myConfig.plot_config_array['filled_between']           
+                       'mycolor_code:', mycolor_code, 'fill between:', myConfig.plot_config_array['filled_between'], 'alpha:', myalpha                       
 
-                #print mydata[:,[i*data_block_offset,i*data_block_offset+1]]
-#                myConfig.plot_config_array['error_bars_y']='no'
-#                print myConfig.plot_config_array['plot_legend'+str(i)]
-#                if myConfig.plot_config_array['plot_legend'+str(i)].find('Shan+17')!=-1:# and add_obs!=False:
-#                    myConfig.plot_config_array['error_bars_y']='yes'
-#                    myConfig.plot_config_array['errorbars']='False'
-#                    myConfig.plot_config_array['filled_between'] = 'True'
-#                elif myConfig.plot_config_array['plot_legend'+str(i)].find('g-i')!=-1:
-#                    myConfig.plot_config_array['errorbars']='True'
-#                    myConfig.plot_config_array['filled_between'] = 'False'                    
-                    
-                key1 = myax.twinx()
+
+                #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                #WARNING! using key1=myax or key1=myax.twin(x) make a lot of a different,
+                #change it carefully!
+                #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!                    
+
+                #use                    
+                #key1 = myax
+                #or
+                key1 = myax.twinx()                
+                
                 key2 = 'axis' + str(i)           
-                key1.set_zorder(20)
+                key1.set_zorder(10)
                 if i==int(myConfig.plot_config_array['set_thin_line']):
                     myConfig.plot_config_array['mylw']=float(myConfig.plot_config_array['mylw'])-int(myConfig.plot_config_array['thin_line'])
                 elif i==int(myConfig.plot_config_array['set_thin_line2']):
@@ -1658,6 +1764,8 @@ class OutputData:
                                   
                     #Errorbars
                     try:
+                        #WARNING!
+                        #only for SFH-paper when plotting the reduced sample!
                         if i==3 or i==5 or i==7 or i==8:
                             add_errorbars(key1,
                                           myConfig.plot_config_array['errorbars'],                              
@@ -1727,18 +1835,61 @@ class OutputData:
 
                             add_tick_params(key_share_y, 'both', 'minor', color='r', length=0, width=major_ticks_width, set_visible=False)                                
                             add_tick_params(key_share_y, 'both', 'major', color='r', length=0, width=major_ticks_width, set_visible=False)                                
+
+
+                elif myPlottypeTable[str(i)]=='violin':
+                
+                    print 'VIOLIN-PLOT: i:', i, 'mycolor:', mycolor_code, 'offset:', data_block_offset, mydata[:,i*data_block_offset+1][0:5]
+ 
+                    data_vleft=mydata[:,i*data_block_offset+1][np.where(mydata[:,i*data_block_offset+1]!=-99.99)[:][0]]
+                    test=np.isfinite(data_vleft)
+                    data_vleft=data_vleft[np.where(test==True)[:][0]]
+                   
+                    key_left = key1.violinplot(data_vleft,
+                                           positions=[i+1],
+                                           showmeans=True,
+                                           showmedians=True,
+                                           showextrema=True,
+                                           widths=0.7,
+                                           points=100)
+                    
+                    split_violin_bodies_left(key_left,
+                                             fcolor=mycolor_code,
+                                             ecolor=mycolor_code)
+
+
+                    data_vright=mydata[:,i*data_block_offset+2][np.where(mydata[:,i*data_block_offset+2]!=-99.99)[:][0]]
+                    test=np.isfinite(data_vright)
+                    data_vright=data_vright[np.where(test==True)[:][0]]
+
+                   
+                    key_right = key1.violinplot(data_vright,
+                                           positions=[i+1],
+                                           showmeans=True,
+                                           showmedians=True,
+                                           showextrema=True,
+                                           widths=0.7,
+                                           points=100)
+                    
+                    split_violin_bodies_right(key_right,
+                                              fcolor=mycolor_code,
+                                              ecolor=mycolor_code)                   
                                 
                 else:
                     print 'BAR PLOT!'
 
                     myConfig.plot_config_array['y_title']='fraction of galaxies'
-                    
-                    if mylinestyle=='':
+                
+                    if mymarker_code!='' and mylinestyle=='':
                         mylinewidth=0
                         mylinestyle='-'
-                    else:
+                        mymarkerfacecolor='None'
+                    elif mylinestyle!='':
                         mylinewidth=3
                         mymarkerfacecolor='None'
+                    else:
+                        mylinewidth=0
+                        mylinestyle='-'
                         
                     key2=key1.bar(mydata[:,i*data_block_offset], 
                                    mydata[:,i*data_block_offset+1]/sum(mydata[:,i*data_block_offset+1]),
@@ -1778,10 +1929,6 @@ class OutputData:
                     legend.extend([myConfig.plot_config_array['plot_legend'+str(i)]])
                 i+=1                           
 
-                #CMASS density+mass SMF cut
-                #plt.plot([np.log10(1.15741161e+11),np.log10(1.15741161e+11)],[np.log10(2.49150233e-04),-10], color='#225588',marker='', ls='-', lw=4.0, zorder=zorder_cut)  
-                #plt.plot([np.log10(1.80972295e+11),np.log10(1.80972295e+11)],[np.log10(1.82572068e-04),-10], color='k',marker='', ls=':', lw=4.0, zorder=zorder_cut) 
-
 ########################################################################################################################################################################
 #ADD OBSERVATIONS
             if my_add_subplot!=[] and nr_added_subplots!=0 and add_obs!=False:
@@ -1796,7 +1943,8 @@ class OutputData:
                             'scatter': ScatterPlot,
                             'hexbins': HexBinPlot,
                             'default': Default_sub,
-                            'barplot': Default_sub
+                            'barplot': Default_sub,
+                            'violin': Default_sub
                             }
                             
                         func = choose.get(plot_type)
@@ -1812,8 +1960,7 @@ class OutputData:
                     #print 'i:', i, 'c:', c, 'p:', p, 'f:', f#, 'data:', my_add_subplot[str(f)][0]
                     key_sub1, key_sub2, mylegend, myplotlegend = caseSwitcher(myPlottypeTable[str(int(i)+int(p))])
                     print 'legend:', mylegend, 'myplotlegend:', myplotlegend#'axis:', key_sub2
-#                    if mylegend.find('Big')!=-1:
-#                        key_sub2, = myax.plot([], color=mycolor_code, linewidth=8.0, alpha=0.3, ls='-')
+
                     if mylegend!=None and myplotlegend!='no':
                         if myplotlegend=='sep':
                             axis_sep.extend([key_sub2])
@@ -1827,28 +1974,35 @@ class OutputData:
 ########################################################################################################################################################################
 #FURTHER SPECIFICATIONS
 
-            #fig.text(0.15, 0.35, r'${\mathrm{\pi_{max}}=40}$ [Mpc]', fontsize=float(myConfig.plot_config_array['text_fontsize'])-5)             
-            #fig.text(0.6, 0.35, r'${\mathrm{\pi_{max}}=150}$ [Mpc]', fontsize=float(myConfig.plot_config_array['text_fontsize'])-5)
-            #fig.text(0.75, 0.92, r'${n \times 10^{-2}} {[h^3 Mpc^{-3}]}$', fontsize=float(myConfig.plot_config_array['text_fontsize'])-8)
-            #fig.text(0.85, 0.86, '$n$=3.160', fontsize=float(myConfig.plot_config_array['text_fontsize'])-8)
-            #fig.text(0.85, 0.79, '$n$=1.000', fontsize=float(myConfig.plot_config_array['text_fontsize'])-8)
-            #fig.text(0.88, 0.72, '$n$=0.316', fontsize=float(myConfig.plot_config_array['text_fontsize'])-8)
-            #plt.axvline(x=1.028, ymin=-100, ymax=100, color='k', ls='-', lw=2.0, zorder=30) 
-
             #ADD VERTICAL OR HORIZONTAL LINES:
             if myConfig.plot_config_array[prefix+'hline_ypos']!='False':
                 my_hlines=mL.multicolTestAlgorithm(myConfig.plot_config_array[prefix+'hline_ypos'])
                 a=0
                 while a<len(my_hlines):
-                    myax.axhline(y=float(my_hlines[a]), xmin=-100, xmax=100, color='k', ls='--', lw=2.0, zorder=100)
+                    myax.axhline(y=float(my_hlines[a]), xmin=-100, xmax=100, color='r', ls='-', lw=3.0, zorder=100)
                     a+=1                
 
             if myConfig.plot_config_array[prefix+'vline_xpos']!='False':
                 my_vlines=mL.multicolTestAlgorithm(myConfig.plot_config_array[prefix+'vline_xpos'])
                 a=0
                 while a<len(my_vlines):
-                    myax.axvline(x=float(my_vlines[a]), ymin=-100, ymax=100, color='k', ls='--', lw=2.0, zorder=100) 
+                    mycol='k'
+#                    if a>2:
+#                        mycol='k'
+#                        
+#                    if a==1 or a==4:
+#                        myls='-'
+#                        mylw=4.0                        
+#                    else:
+#                        myls='--'
+#                        mylw=3.0                      
+
+                    myax.axvline(x=float(my_vlines[a]), ymin=-100, ymax=100, color=mycol, ls='--', lw=2.0, zorder=100) 
                     a+=1                  
+
+            #For SF-history paper
+            #fig.text(float(0.04), float(0.5), '$filaments$', fontsize=float(myConfig.plot_config_array['legend_fontsize'])-4, color='k') 
+            #fig.text(float(0.04), float(0.4), '$knots$', fontsize=float(myConfig.plot_config_array['legend_fontsize'])-4, color='r') 
 
             #SET TICKS                   
             yticks=[]
@@ -1916,7 +2070,9 @@ class OutputData:
                                       length=minor_ticks_lenght, 
                                       width=float(myConfig.plot_config_array['myframe_lw']), 
                                       direction='in', 
-                                      zorder=20)                    
+                                      zorder=20,
+                                      color='r')
+                     
                 elif float(myConfig.plot_config_array['xticks_minor'])!=0.0:
                     minor_x = MultipleLocator(float(myConfig.plot_config_array['xticks_minor']))
                     myax.xaxis.set_minor_locator(minor_x)     
@@ -1963,7 +2119,9 @@ class OutputData:
                                  length=minor_ticks_lenght, 
                                  width=float(myConfig.plot_config_array['myframe_lw']), 
                                  direction='in', 
-                                 zorder=20)          
+                                 zorder=20,
+                                 color='k')
+                
                 minor_x = MultipleLocator(float(myConfig.plot_config_array['minor_ticks_x_space']))
                 myax.xaxis.set_minor_locator(minor_x)
                 myax.set_zorder(50)
@@ -2038,7 +2196,10 @@ class OutputData:
                            labelspacing=0.2)                
                 
                 mylegend.set_zorder(30)
-              
+
+            if myPlottypeTable[str(0)]=='violin':
+                set_axis_style_violin(myax, legend)
+                    
 
                    
 ########################################################################################################################################################################
@@ -2065,7 +2226,6 @@ class OutputData:
                 plt.setp(axis.get_yticklabels()[0], visible=False)    
                 plt.setp(axis.get_yticklabels()[-1], visible=False)
             elif myConfig.plot_config_array['no_first_yticks']=='True':
-                print 'HERE! 2062', axis.get_yticklabels()[0]
                 plt.setp(axis.get_yticklabels()[0], visible=False)
             elif myConfig.plot_config_array['no_last_yticks']=='True': 
                 plt.setp(axis.get_yticklabels()[-1], visible=False)
@@ -2113,7 +2273,7 @@ class OutputData:
                     x_pos=0.05
                     y_pos=0.05
                 elif myConfig.plot_config_array['histo_panels']=='yes':
-                    fig.subplots_adjust(hspace=0.0, wspace=0.0, left=0.16, bottom=0.12, right=0.80, top=0.80)
+                    fig.subplots_adjust(hspace=0.0, wspace=0.0, left=0.16, bottom=0.13, right=0.80, top=0.80)
                     x_pos=0.05
                     y_pos=0.0
                     fig_x_pos=0.5
@@ -2271,7 +2431,7 @@ class OutputData:
 #                                plt.setp(key.get_yticklabels(), visible=False)                       
 
                     try: 
-                        key.axhline(y=float(myConfig.plot_config_array[mydata[k]['name']+'hline_ypos']), xmin=-100, xmax=100, color='k', ls='--', lw=2.0, zorder=30)
+                        key.axhline(y=float(myConfig.plot_config_array[mydata[k]['name']+'hline_ypos']), xmin=-100, xmax=100, color='r', ls='-', lw=3.0, zorder=30)
                         print 'plotted axhline!'
                     except:
                         pass
@@ -2306,7 +2466,7 @@ class OutputData:
                 ax0.get_xaxis().set_major_formatter(mpl.ticker.FuncFormatter(lambda x, p: "{0:.1f}".format(x)))
             elif myConfig.plot_config_array['float_format_x']=='2f':
                 ax0.get_xaxis().set_major_formatter(mpl.ticker.FuncFormatter(lambda x, p: "{0:.2f}".format(x))) 
-            elif myConfig.plot_config_array['float_format_x']=='3f':
+            elif myConfig.plot_config_array['float_format_x']=='3ef':
                 ax0.get_xaxis().set_major_formatter(mpl.ticker.FuncFormatter(lambda x, p: "{0:.3f}".format(x)))
             elif myConfig.plot_config_array['float_format_x']=='4f':
                 ax0.get_xaxis().set_major_formatter(mpl.ticker.FuncFormatter(lambda x, p: "{0:.4f}".format(x)))
@@ -2315,7 +2475,7 @@ class OutputData:
                 ax0.get_yaxis().set_major_formatter(mpl.ticker.FuncFormatter(lambda x, p: "{0:.1f}".format(x)))
             elif myConfig.plot_config_array['float_format_y']=='2f':
                 ax0.get_yaxis().set_major_formatter(mpl.ticker.FuncFormatter(lambda x, p: "{0:.2f}".format(x)))
-            elif myConfig.plot_config_array['float_format_y']=='3f':
+            elif myConfig.plot_config_array['float_format_y']=='3ef':
                 ax0.get_yaxis().set_major_formatter(mpl.ticker.FuncFormatter(lambda x, p: "{0:.3f}".format(x)))
             elif myConfig.plot_config_array['float_format_y']=='4f':
                 ax0.get_yaxis().set_major_formatter(mpl.ticker.FuncFormatter(lambda x, p: "{0:.5f}".format(x)))

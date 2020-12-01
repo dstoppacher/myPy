@@ -2627,7 +2627,7 @@ def test_haloids(data):
 
 def calc_residuals(data, count, redshift, sample, prop):
     #print 'count:', count, 'redshift:', redshift, 'sample:', sample, 'prop:', prop 
-    
+    from statsmodels import robust 
     import pandas as pd
     data1 = pd.read_csv(mycomp+'anaconda/pro/data/Galacticus_1Gpc/SFH/SFH_Index_'+str(redshift)+'_'+sample+'_props_M1.txt', skiprows=2, names=['haloid', 'parentIndex', 'hostid', 'nodeIndex', 'satelliteNodeIndex', 'orphan', 'mhalo', 'mstar',  'SHMR', 'mcold',  'Mzgas',  'zcold', 'g-i', 'sfr', 'ssfr'], sep='\t')
     data_M1 = df_to_sarray(data1)
@@ -2664,14 +2664,13 @@ def calc_residuals(data, count, redshift, sample, prop):
         prop='mhalo'
         myprop_unit_map.update({'mhalo': 'log10(mstar/mhalo) [-])'})
         
-    myheader='('+str(i)+') z ('+str(i+1)+') N_M1found/N_M1 ('+str(i+2)+') N_M1found/N_M2 ('+str(i+3)+') N_M1/N_M1'+\
-             '('+str(i+4)+') '+myprop_unit_map[prop]+' M1found ('+str(i+5)+') +dy ('+str(i+6)+') -dy ('+str(i+7)+') N_M1found [-] '+\
-             '('+str(i+8)+') '+myprop_unit_map[prop]+' M1 ('+str(i+9)+') +dy ('+str(i+10)+') -dy ('+str(i+11)+') N_M1 [-] '+\
-             '('+str(i+12)+') '+myprop_unit_map[prop]+' M2 ('+str(i+13)+') +dy ('+str(i+14)+') -dy ('+str(i+15)+') N_M2 [-] '+\
-             '('+str(i+16)+') '+myprop_unit_map[prop]+' median(M1_found)/median(M1)-1 [-] '+\
-             '('+str(i+17)+') '+myprop_unit_map[prop]+' median(M1_found)/median(M2)-1 [-] '+\
-             '('+str(i+18)+') '+myprop_unit_map[prop]+' median(M1)/median(M2)-1 [-] '+\
-             '('+str(i+19)+') '+myprop_unit_map[prop]+' (median(M1found)-median(M1))/median(M2) [-]'
+    myheader='\n('+str(i)+') z ('+str(i+1)+') N_M1found/N_M1 ('+str(i+2)+') N_M1found/N_M2 ('+str(i+3)+') N_M1/N_M1'+\
+             '('+str(i+4)+') '+myprop_unit_map[prop]+' M1found ('+str(i+5)+') +dy ('+str(i+6)+') -dy ('+str(i+7)+') MAD ('+str(i+8)+') N_M1found [-] '+\
+             '('+str(i+9)+') '+myprop_unit_map[prop]+' M1 ('+str(i+10)+') +dy ('+str(i+11)+') -dy ('+str(i+12)+') MAD ('+str(i+13)+') N_M1 [-] '+\
+             '('+str(i+14)+') '+myprop_unit_map[prop]+' M2 ('+str(i+15)+') +dy ('+str(i+16)+') -dy ('+str(i+17)+') MAD ('+str(i+18)+') N_M2 [-] '+\
+             '('+str(i+19)+') '+myprop_unit_map[prop]+' median(M1_found)/median(M1)-1 [-] '+\
+             '('+str(i+20)+') '+myprop_unit_map[prop]+' median(M1_found)/median(M2)-1 [-] '+\
+             '('+str(i+21)+') '+myprop_unit_map[prop]+' median(M1)/median(M2)-1 [-] ('+str(i+22)+') '+myprop_unit_map[prop]+' MAD(M1)/MAD(M2)-1'
 
 
     data[count, 0] = redshift
@@ -2681,19 +2680,22 @@ def calc_residuals(data, count, redshift, sample, prop):
     data[count, 4] = np.nanmedian(data_M1_found[prop])
     data[count, 5] = np.nanmedian(data_M1_found[prop])-np.nanpercentile(data_M1_found[prop], 32)
     data[count, 6] = np.nanpercentile(data_M1_found[prop], 68)-np.nanmedian(data_M1_found[prop])
-    data[count, 7] = data_M1_found.size
-    data[count, 8] = np.nanmedian(data_M1[prop])
-    data[count, 9] = np.nanmedian(data_M1[prop])-np.nanpercentile(data_M1[prop], 32)
-    data[count, 10] = np.nanpercentile(data_M1[prop], 68)-np.nanmedian(data_M1[prop])
-    data[count, 11] = data_M1.size
-    data[count, 12] = np.nanmedian(data_M2[prop])
-    data[count, 13] = np.nanmedian(data_M2[prop])-np.nanpercentile(data_M2[prop], 32)
-    data[count, 14] = np.nanpercentile(data_M2[prop], 68)-np.nanmedian(data_M2[prop])
-    data[count, 15] = data_M2.size
-    data[count, 16] = np.nanmedian(data_M1_found[prop])/np.nanmedian(data_M1[prop])-1.0    
-    data[count, 17] = np.nanmedian(data_M1_found[prop])/np.nanmedian(data_M2[prop])-1.0
-    data[count, 18] = np.nanmedian(data_M1[prop])/np.nanmedian(data_M2[prop])-1.0
-    data[count, 19] = (np.nanmedian(data_M1_found[prop])-np.nanmedian(data_M1[prop]))/np.nanmedian(data_M2[prop]) 
+    data[count, 7] = robust.mad(data_M1_found[prop])
+    data[count, 8] = data_M1_found.size
+    data[count, 9] = np.nanmedian(data_M1[prop])
+    data[count, 10] = np.nanmedian(data_M1[prop])-np.nanpercentile(data_M1[prop], 32)
+    data[count, 11] = np.nanpercentile(data_M1[prop], 68)-np.nanmedian(data_M1[prop])
+    data[count, 12] = robust.mad(data_M1[prop])    
+    data[count, 13] = data_M1.size
+    data[count, 14] = np.nanmedian(data_M2[prop])
+    data[count, 15] = np.nanmedian(data_M2[prop])-np.nanpercentile(data_M2[prop], 32)
+    data[count, 16] = np.nanpercentile(data_M2[prop], 68)-np.nanmedian(data_M2[prop])
+    data[count, 17] = robust.mad(data_M2[prop])    
+    data[count, 18] = data_M2.size
+    data[count, 19] = np.nanmedian(data_M1_found[prop])/np.nanmedian(data_M1[prop])-1.0 
+    data[count, 20] = np.nanmedian(data_M1_found[prop])/np.nanmedian(data_M2[prop])-1.0
+    data[count, 21] = np.nanmedian(data_M1[prop])/np.nanmedian(data_M2[prop])-1.0
+    data[count, 22] = robust.mad(data_M1[prop])/robust.mad(data_M2[prop])-1.0
 
 #    if prop=='zcold' or prop=='g-i':
 #        min_prop_M1=str("{0:.2f}".format(min(data_M1[prop])))
@@ -2866,14 +2868,14 @@ def property_stats(data):
     #data=data[np.where(data['orphan']==0)[:][0]]
     size=data.size
       
-    pop=2
+    pop=0
     if pop==1 or pop==2:
         data=data[np.where(data['pop']==pop)[:][0]]
 
       
     print 'pop:', pop, 'ngal:', data.size, '\b', "{0:.2f}".format(100.0/size*data.size), '% of all galaxies', size
 #
-    for env, env_name in zip([-99, 0,1,2,3],['all', 'void','sheet','filament','knot']):
+    for env, env_name in zip([-99,1,2,3],['all', 'sheet','filament','knot']):
     #for env, env_name in zip([-99],['all']):            
         print '\n'
         if env_name!='all':
@@ -2885,15 +2887,99 @@ def property_stats(data):
         print '////////////////////////////////////////////////'
     
         print 'prop\t\tmedian\t32th / 68th\n-------------------------------\n'
-        for prop in ['mhalo', 'mhalo_200c', 'NFW_con', 'mstar', 'zcold', 'sfr', 'ssfr', 'mcold', 'Mzgas', 'cgf', 'mbh','MAB_dA_total_g', 'MAB_dA_total_r', 'MAB_dA_total_i', 'mAB_dA_total_cut_r_i','mAB_dA_total_cut_g_r','mAB_dA_total_cut_g_i', 'mean_age_stars_disk', 'mean_age_stars_spheroid']:
-        #for prop in ['mcold', 'mstar', 'zcold', 'mbh']:
+        #for prop in ['mhalo', 'mhalo_200c', 'NFW_con', 'mstar', 'zcold', 'sfr', 'ssfr', 'mcold', 'Mzgas', 'cgf', 'mbh','MAB_dA_total_g', 'MAB_dA_total_r', 'MAB_dA_total_i', 'mAB_dA_total_cut_r_i','mAB_dA_total_cut_g_r','mAB_dA_total_cut_g_i', 'mean_age_stars_disk', 'mean_age_stars_spheroid']:
+        for prop in ['mhalo']:#, 'mstar', 'mcold', 'Mzgas', 'mbh', 'zcold', 'rhalf_mass', 'BvsT', 'sfr', 'ssfr', 'Tcons', 'cgf', 'fbary', 'zcold_zstar']:
             print prop,
-            if prop.find('AB')==-1 and prop!='zcold' and prop!='NFW_con' and prop.find('age')==-1:
-                print '\t\t', "{0:.2f}".format(np.log10(np.nanmedian(sample[prop]))), '\t', "{0:.2f}".format(np.log10(np.nanmedian(sample[prop]))-np.log10(np.nanpercentile(sample[prop], 32))), '/', "{0:.2f}".format(np.log10(np.nanpercentile(sample[prop], 68))-np.log10(np.nanmedian(sample[prop])))
+            if prop.find('AB')==-1 and prop.find('zcold')==-1 and prop!='NFW_con' and prop.find('age')==-1 and prop!='fbary' and prop!='Tcons' and prop!='BvsT':
+                print '\t\t', "{0:.2f}".format(np.log10(np.nanmedian(sample[prop]))), '\t', "{0:.2f}".format(np.log10(np.nanmedian(sample[prop]))-np.log10(np.nanpercentile(sample[prop], 16))), '/', "{0:.2f}".format(np.log10(np.nanpercentile(sample[prop], 84))-np.log10(np.nanmedian(sample[prop])))
             else:
                 print '\t', "{0:.2f}".format(np.nanmedian(sample[prop])), '\t', "{0:.2f}".format(np.nanmedian(sample[prop])-np.nanpercentile(sample[prop], 32)), '/', "{0:.2f}".format(np.nanpercentile(sample[prop], 68)-np.nanmedian(sample[prop]))
 
 
     print '--> DONE!\n'
     exit()
-   
+
+def starforming_cut_Henriques20_A1(redshift):
+    """calculate starforming cut after LGALAXIES SAM paper from Henriques+20 Appendix 1"""
+    
+    from cosmolopy import cparam, cd,cc
+    fidcosmo = cparam.Planck(flat=True, extras=False)
+
+    t_H0=(1.0/cd.hubble_z(redshift, **fidcosmo))/cc.yr_s    
+    
+    print 'z=', redshift, 't_H0:' , t_H0, '[yr]'
+    print 'Henr+20:', format(10**(np.log10(2 * (1+redshift)**2/t_H0) - 1),'0.3e')
+    print 'Franx+08:', format(0.3/t_H0,'0.3e')
+    
+    return 10**(np.log10(2 * (1+redshift)**2/t_H0) - 1)
+
+def print_props_table_format():
+    
+    from statsmodels import robust
+    import pandas as pd
+    data1= pd.read_csv(mycomp+'anaconda/pro/data/Galacticus_1Gpc/Galacticus_1Gpc_z_0.56_tarsel_new_mags_CMASS_down_sample3_more_props_test_low-zcold_fewer_props.txt', skiprows=2, names=['mhalo','env_1024','pop','rhalf_mass','mbh','mstar','mcold','sfr','ssfr','cgf','Tcons','zcold','NFW_con'], sep='  ')
+    data_lowZ = df_to_sarray(data1)
+        
+    #print data_test_against[0:1]
+    #print np.info(data_lowZ)
+    
+    data2 = pd.read_csv(mycomp+'anaconda/pro/data/Galacticus_1Gpc/Galacticus_1Gpc_z_0.56_tarsel_new_mags_CMASS_down_sample3_more_props_test_high-zcold_fewer_props.txt', skiprows=2, names=['mhalo','env_1024','pop','rhalf_mass','mbh','mstar','mcold','sfr','ssfr','cgf','Tcons','zcold','NFW_con'], sep='  ')
+    data_highZ = df_to_sarray(data2)      
+    #print data_highZ[0:3]
+
+    myprop_unit_map={'mstar':  '$\log_{10}(M_{*}$ [$M_{\odot}$])',\
+                   'mhalo':    '$\log_{10}(M_{vir}$ [$M_{\odot}$])',\
+                   'mcold':    '$\log_{10}(M_{cold}$ [$M_{\odot}$])',\
+                   'mbh':      '$\log_{10}(M_{BH}$ [$M_{\odot}$])',\
+                   'zcold':    '$Z_{cold}$',\
+                   'Mzgas':    '$\log_{10}(M_{cold}$ [$M_{\odot}$])',\
+                   'sfr':      '$\log_{10}(SFR$ [$M_{\odot}yr^{-1}$])',\
+                   'ssfr':     '$\log_{10}(sSFR$ [$yr^{-1}$])',\
+                   'g-i':      'g-i',\
+                   'SHMR':     'log10(mstar/mhalo) [-])',\
+                   'cgf':      '$\log_{10}(M_{cold}/M_*)$)',\
+                   'Tcons':    '$T_{cons}$ [$Gyr$]',\
+                   'rhalf_mass': '$r_{1/2}$ [Mpc]',
+                   'NFW_con': 'c$_{NFW}$'\
+        }  
+
+
+    stats_props=''
+    header_stats_props=''
+    
+    data_lowZ['rhalf_mass']*=1000.0
+    data_highZ['rhalf_mass']*=1000.0
+    
+    for prop in ['NFW_con']:#,'mstar','mbh','rhalf_mass', 'sfr','ssfr', 'zcold', 'cgf', 'Tcons']:
+                
+        stats_props+=myprop_unit_map[prop]+'& '
+        for sample in ['low','high']:
+            
+            if sample=='low':
+                print 'here low-zcold'
+                mydata=data_lowZ
+            else:
+                print 'here high-zcold'
+                mydata=data_highZ
+            
+            for env, env_name in zip([3,2],['knots','filaments']):  
+                data2analyse=mydata[np.where(mydata['env_1024']==int(env))[:][0]]
+                header_stats_props+=env_name+' ('+str(int(100.0/mydata.size*data2analyse.size))+'\%) & '
+
+                
+                print 'envr:', env_name, data2analyse.size, 'sample:', sample, 'prop:', prop
+                if prop.find('AB')!=-1 or prop=='zcold' or prop=='NFW_con' or prop.find('age')!=-1 or prop=='fbary' or prop=='Tcons' or prop=='BvsT' or prop=='rhalf_mass':
+
+                    stats_props+=str("{0:.2f}".format(np.nanmedian(data2analyse[prop])))+'$_{-'+str("{0:.2f}".format(np.nanmedian(data2analyse[prop])-np.nanpercentile(data2analyse[prop], 32)))+'}^{+'+str("{0:.2f}".format(np.nanpercentile(data2analyse[prop], 68)-np.nanmedian(data2analyse[prop])))+'}$\t& ' 
+                
+                else:
+                    stats_props+=str("{0:.2f}".format(np.log10(np.nanmedian(data2analyse[prop]))))+'$_{-'+str("{0:.2f}".format(np.log10(np.nanmedian(data2analyse[prop]))-np.log10(np.nanpercentile(data2analyse[prop], 32))))+'}^{+'+str("{0:.2f}".format(np.log10(np.nanpercentile(data2analyse[prop], 68))-np.log10(np.nanmedian(data2analyse[prop]))))+'}$\t& ' 
+    
+            if sample=='high':
+                stats_props+='break'
+                
+    print header_stats_props
+    print stats_props
+            
+    exit()
+#    

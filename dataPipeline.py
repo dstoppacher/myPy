@@ -181,6 +181,7 @@ class Pipeline:
                     except:
                         print 'WARNING REDSHIFT WAS NOT CORRECTLY SET!!!'
        
+
         print 'myData.redshift:', myData.redshift, 'z in mysnap_array:', self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z'], 'myData.scale_factor:', myData.scale_factor       
         #try:            
         self.volume = mL.survey_VolumeSqDeg_to_Mpc(box_size=self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_box_size'], 
@@ -1109,6 +1110,11 @@ class Pipeline:
         except:
             pass
         try:
+            data['MzgasvsMzstar'] = data['Mzgas']/data['Mzstar']
+            #print 'Mzstar=Mzstar_disk+Mzstar_spheroid'            
+        except:
+            pass          
+        try:
             data['ssfr'] = data['sfr']/data['mstar']
             print 'ssfr=sfr/mstar'
             print 'ssfr min/max:', min(data['ssfr']), '/', max(data['ssfr'])            
@@ -1120,20 +1126,49 @@ class Pipeline:
         except:
             pass
         try:
+            data['zstar']=8.69+np.log10(data['Mzstar']/(data['mstar']*0.0134))
+            print 'zstar=8.69+log10(Mzstar/mstar/0.0134)'            
+        except:
+            pass
+        try:
+            data['zcold_zstar']=data['zcold']-data['zstar']
+            print 'zcold-zstar'           
+        except:
+            pass               
+        try:
             data['cgf']=data['mcold']/data['mstar']
             print 'cgf=mcold/mstar'
         except:
             pass
-
+        try:
+            data['fbary']=data['mcold']/(data['mcold']+data['mstar'])
+            print 'fbary=mcold/(mcold+mstar) --> from Riechers+20 Table 1'
+        except:
+            pass
+        try:
+            data['BvsT']=data['mstar_spheroid']/data['mstar']
+            print 'B/T=mstar_spheroid/mstar --> bulge mass to total stellar mass'
+        except:
+            pass
+        try:
+            data['rbulgevsrdisk']=data['bulge']/data['rdisk']
+            print 'rbulgevsrdsik=rbulge/rdisk --> bulge to disk radius'
+        except:
+            pass        
+        try:
+            data['Tcons']=data['mcold']/data['sfr']/1e9
+            print 'Tcons=mcold/sfr [Gyr] --> cold gas consumption/depletion time'
+        except:
+            pass 
         #print 'vmax: min/max:', format(min(data['vmax']), '0.2f'), '/', format(max(data['vmax']), '0.2f')           
         #print 'vdisp: min/max:', format(min(data['vdisp']), '0.2f'), '/', format(max(data['vdisp']), '0.2f')         
 
-#        try:
-#            data['mAB_dA_total_cut_r_i'] = data['MAB_dA_total_r']-data['MAB_dA_total_i']
-#            data['mAB_dA_total_cut_g_r'] = data['MAB_dA_total_g']-data['MAB_dA_total_r'] 
-#            data['mAB_dA_total_cut_g_i'] = data['MAB_dA_total_g']-data['MAB_dA_total_i']          
-#        except:
-#            pass
+        try:
+            data['mAB_dA_total_cut_r_i'] = data['MAB_dA_total_r']-data['MAB_dA_total_i']
+            data['mAB_dA_total_cut_g_r'] = data['MAB_dA_total_g']-data['MAB_dA_total_r'] 
+            data['mAB_dA_total_cut_g_i'] = data['MAB_dA_total_g']-data['MAB_dA_total_i']          
+        except:
+            pass
 #
         
         try:
@@ -1157,22 +1192,22 @@ class Pipeline:
             pass
         
 #        
-        try:
-            if np.all(data['pop']==-99):
-                print 'divide sample!'
-                y=np.log10(data['ssfr'])
-                x=np.log10(data['sfr'])
-                prop=(y+11.16)/1.12-x
-                print prop
-                data['pop'][np.where(prop<=0.0)]=2
-                data['pop'][np.where(prop>0.0)]=1
-    
-                print 'min/max', min(data['pop']), max(data['pop'])               
-        except:
-            pass   
+#        try:
+#            if np.all(data['pop']==-99):
+#                print 'divide sample!'
+#                y=np.log10(data['ssfr'])
+#                x=np.log10(data['sfr'])
+#                prop=(y+11.16)/1.12-x
+#                print prop
+#                data['pop'][np.where(prop<=0.0)]=2
+#                data['pop'][np.where(prop>0.0)]=1
+#    
+#                print 'min/max', min(data['pop']), max(data['pop'])               
+#        except:
+#            pass   
         
         
-#
+
 #        try:
 #            if np.all(data['env_512']==-99.0) or np.all(data['env_1024']==-99.0):
 #                print '\n+++++++++++++++++++\nset environment',
@@ -1293,7 +1328,6 @@ class Pipeline:
         except:
             pass
 #
-          
 #        import pandas as pd
 #        
 #        for n_cl in list(range(1,324)):
@@ -1371,11 +1405,14 @@ class Pipeline:
 #            pass
             
 
-##########################################################################################################################################################
-#        data = data[np.where(data['mstar']>5e8)[:][0]]
-#        #data = data[np.where(data['mstar']<=9e11)[:][0]]
-#        print data.size        
+###########################################################################################################################################################
+        #mL.print_props_table_format()
 
+#        data = data[np.where(data['mstar']>1e10)[:][0]]
+#        data = data[np.where(data['ssfr']>1e-11)[:][0]]
+#        data = data[np.where(data['mstar_disk']/data['mstar']>0.7)[:][0]]
+#        print data.size        
+        #mL.property_stats(data)
 #        preprocessing_only=True
 #
 #        print 'sample name:', 
@@ -1384,22 +1421,33 @@ class Pipeline:
 #
 #        mycut=myhdf5_filename[myhdf5_filename.find('CUT'):len(myhdf5_filename)-5]
 #        print 'mycut:', mycut
-#
-#        for item in ['mstar','sfr','ssfr','mhalo_cents_200c']:
+#        mycut='starforming!'
+#        for item in ['zcold', 'mstar', 'mstar_spheroid','sfr','ssfr']:
 #            mydata = data[item][np.where(data[item]>0.0)[:][0]]
-#            print item, 'min/max:', format(np.log10(np.nanmin(mydata)), '0.2f') , '/', format(np.log10(np.nanmax(mydata)), '0.2f')
-#            print '\t\t', "{0:.2f}".format(np.log10(np.nanmedian(mydata))), '\t', "{0:.2f}".format(np.log10(np.nanmedian(mydata))-np.log10(np.nanpercentile(mydata, 32))), '/', "{0:.2f}".format(np.log10(np.nanpercentile(mydata, 68))-np.log10(np.nanmedian(mydata)))
+#            if item=='zcold':
+#                
+#                print item, 'min/max:', format(np.nanmin(mydata), '0.2f') , '/', format(np.nanmax(mydata), '0.2f')
+#                print '\t\t', "{0:.2f}".format(np.nanmedian(mydata)), '\t', "{0:.2f}".format(np.nanmedian(mydata)-np.nanpercentile(mydata, 32)), '/', "{0:.2f}".format(np.nanpercentile(mydata, 68)-np.nanmedian(mydata))
+#                stats=str(redshift)+'\n'+str("{0:.2f}".format(np.nanmedian(mydata)))+'\t'+str("{0:.2f}".format(np.nanmedian(mydata)-np.nanpercentile(mydata, 32)))+'\t'+str("{0:.2f}".format(np.nanpercentile(mydata, 68)-np.nanmedian(mydata)))
 #
-#            stats=str(redshift)+'\t'+str("{0:.2f}".format(np.log10(np.nanmedian(mydata))))+'\t'+str("{0:.2f}".format(np.log10(np.nanmedian(mydata))-np.log10(np.nanpercentile(mydata, 32))))+'\t'+str("{0:.2f}".format(np.log10(np.nanpercentile(mydata, 68))-np.log10(np.nanmedian(mydata))))
+#            else:
+#                print item, 'min/max:', format(np.log10(np.nanmin(mydata)), '0.2f') , '/', format(np.log10(np.nanmax(mydata)), '0.2f')
+#                print '\t\t', "{0:.2f}".format(np.log10(np.nanmedian(mydata))), '\t', "{0:.2f}".format(np.log10(np.nanmedian(mydata))-np.log10(np.nanpercentile(mydata, 32))), '/', "{0:.2f}".format(np.log10(np.nanpercentile(mydata, 68))-np.log10(np.nanmedian(mydata)))               
+#                stats=str("{0:.2f}".format(np.log10(np.nanmedian(mydata))))+'\t'+str("{0:.2f}".format(np.log10(np.nanmedian(mydata))-np.log10(np.nanpercentile(mydata, 32))))+'\t'+str("{0:.2f}".format(np.log10(np.nanpercentile(mydata, 68))-np.log10(np.nanmedian(mydata))))
+#
 #            if redshift==0.0 or redshift=='0.0':
-#                myOutput.writeIntoFile(mycomp+'anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/'+self.myconfig_array['catname'+str(self.a)]+'_HOD-SFgalaxies_z-evolution_'+mycut+'_'+item+'.txt',
+#                myOutput.writeIntoFile(
+#                            #mycomp+'anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/'+self.myconfig_array['catname'+str(self.a)]+'_HOD-SFgalaxies_z-evolution_'+mycut+'_'+item+'.txt',
+#                           mycomp+'anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/'+self.myconfig_array['catname'+str(self.a)]+'_stats_Zcold_evolution_for_rob.txt',
 #                           [stats],
-#                           myheader='HOD-SFGalaxies project z-evolution of properties! cat: '+self.myconfig_array['catname'+str(self.a)]+' cut: '+mycut+' prop: '+item+'\n(1) z (2) log10('+item+') (3) -dy (4) +dy',
+#                           myheader='Statistics! Zcold vs Mstar plots for Robert Yates: '+self.myconfig_array['catname'+str(self.a)]+' cut: '+mycut+' prop: '+item+'\n(1) z (2) log10('+item+') (3) -dy (4) +dy',
 #                           append_mytext=False,
 #                           data_is_string=False,
 #                           data_format='%s')
 #            else:
-#                myOutput.writeIntoFile(mycomp+'anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/'+self.myconfig_array['catname'+str(self.a)]+'_HOD-SFgalaxies_z-evolution_'+mycut+'_'+item+'.txt',
+#                myOutput.writeIntoFile(
+#                           mycomp+'anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/'+self.myconfig_array['catname'+str(self.a)]+'_stats_Zcold_evolution_for_rob.txt',
+#                           #mycomp+'anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/'+self.myconfig_array['catname'+str(self.a)]+'_HOD-SFgalaxies_z-evolution_'+mycut+'_'+item+'.txt',
 #                           stats+'\n',
 #                           append_mytext=True,
 #                           data_is_string=True,
@@ -1452,8 +1500,17 @@ class Pipeline:
       
 #        exit()
 
-#        data.sort(order=['mcold'], axis=0)      
-#        data=data[data.size-530000:data.size]
+        #data = data[np.where(data['orphan']==0)[0][:]]
+#        size=int(data.size/100.0*20.0)
+#        prop='ssfr'
+#        print 'size:', size, 'prop:', prop
+#        #data.sort(order=[prop], axis=0)
+#        data[::-1].sort(order=[prop], axis=0)
+#        print data[prop][0:20]
+#
+#        data=data[0:size]
+
+        #data=data[data.size-size:data.size]
 #        print 'size sorted arry:', data.size
 #        data = data[np.where(data['orphan']==0)[0][:]] 
 #        
@@ -1514,7 +1571,7 @@ class Pipeline:
                 except:
                     print 'redshift could not be reset! Current redshift value is:', redshift
     
-            if self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_convert_sph_to_cart_coords']!='False':        
+            if self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_convert_sph_to_cart_coords']!='False':
                 try:
                     data=mL.convert_coordinates(data)
                     print 'data new coords:', 'x_pos','y_pos','z_pos','RA','DEC','Z'
@@ -2090,7 +2147,7 @@ class Pipeline:
                     
                     if tarsel_plot_name.find('mhalo')!=-1:
                         name_x='mhalo'
-                        print 'HERE: ssfr vs mhalo! name_x:', name_x, 'name_y:', name_y
+                        print 'HERE: ssfr vs mhalo! or g-i vs mhalo, name_x:', name_x, 'name_y:', name_y
                         print 'only centrals!'
                         data = myData.selectData2Compute(data, 
                                                         selected_col='orphan', 
@@ -2104,9 +2161,12 @@ class Pipeline:
 #                                                        condition=2)
 
                         if tarsel_plot_name.find('mstar')!=-1:
-                            data['mstar']= np.log10(data['mstar'])                              
-                        
-                        data[name_x]= np.log10(data['mhalo_200c'])
+                            data['mstar']= np.log10(data['mstar'])
+                              
+                        try:
+                            data[name_x]= np.log10(data['mhalo_200c'])
+                        except:
+                            data[name_x]= np.log10(data['mhalo'])
 
                     if tarsel_plot_name.find('mstar')!=-1 and tarsel_plot_name.find('mhalo')==-1:
                         name_x='mstar'                                              
@@ -2122,7 +2182,7 @@ class Pipeline:
                             data[name_y]=np.log10(data['sfr']/data['mstar'])                        
 
                         name_x='mstar'                                              
-                        data['mstar']=np.log10(data['mstar']) 
+                        #data['mstar']=np.log10(data['mstar']) 
                         
                     if tarsel_plot_name.find('_sfr')!=-1:
                         name_x='sfr'
@@ -2230,7 +2290,9 @@ class Pipeline:
                     elif name=='Mzstar':
                         myconds_array[name+'_name_in_plot']='$\log_{10}$ ($mass metals M_{_*}$ [$M_{\odot}$])'                        
                     elif name=='mhalo':
-                        myconds_array[name+'_name_in_plot']='$\log_{10}$ ($M_{200c}$ [$M_{\odot}$])'
+                        myconds_array[name+'_name_in_plot']='$\log_{10}$ ($M_{vir}$ [$M_{\odot}$])'
+                    elif name=='mhalo_200c':
+                        myconds_array[name+'_name_in_plot']='$\log_{10}$ ($M_{200c}$ [$M_{\odot}$])'                        
                     elif name=='mbh':
                         myconds_array[name+'_name_in_plot']='$\log_{10}$ ($M_{BH}$ [$M_{\odot}$])'
                     elif name=='mstar_spheroid':
@@ -3860,7 +3922,15 @@ class Pipeline:
             
 
             try:
-                data['ssfr']=data['sfr']/data['mstar'] 
+                data['sfr']=data['sfr_disk']+data['sfr_spheroid']
+                data['ssfr']=data['sfr']/(data['mstar'])
+                print 'DONE set ssfr!'
+            except:
+                try:
+                    data['ssfr']=data['sfr']/data['mstar']                    
+                except:
+                    pass
+            try:
                 print 'starforming cut?', starforming_cut,
                 
                 data=data[np.where(data['ssfr']>starforming_cut)[:][0]]
@@ -3879,12 +3949,12 @@ class Pipeline:
             except:
                 pass
 
-            data=data[np.where(data['mcold']>0.0)[:][0]]
-            print '-->',data.shape
             try:
-                data=data[np.where(data[str(add_axis)]>0.1)[:][0]]
+                data=data[np.where(data['mcold']>0.0)[:][0]]
+                print 'mcold>0 -->',data.shape
             except:
-                pass                   
+                pass
+                  
 
             # Converstion value 0365507 comes from ...
             # (O/H)_gal / (O/H)_sun = Z_gal / Z_sun
@@ -3899,9 +3969,14 @@ class Pipeline:
             try:
                 data[name_y]=8.69+np.log10(data['Mzgas']/data['mcold']/0.0134)
             except:
-                print 'calculation failed! Try with disk properties only!',
-                data[name_y]=8.69+np.log10(data['Mzgas_disk']/data['mcold_disk']/0.0134)
-                print '--> DONE!'
+                try:
+                    print 'calculation failed! Try with disk properties only!',
+                    data=data[np.where(data['mcold_disk']>0.0)[:][0]]
+                    print 'mcold>0 -->', data.shape
+                    data[name_y]=8.69+np.log10(data['Mzgas_disk']/data['mcold_disk']/0.0134)
+                    print '--> DONE!'
+                except:
+                    print '--> could not calculate Zcold!'
 
                 
             data=data[np.where(np.isfinite(data[name_y]))[:][0]]
@@ -3910,6 +3985,12 @@ class Pipeline:
                 data=data[np.where(np.isfinite(data[add_axis]))[:][0]]
             except:
                 pass
+
+#            try:
+#                data = data[np.where(data['mstar_disk']/data['mstar']>0.7)[:][0]]
+#                print 'alternative starforming cut: mstar_disk/mstar>0.7 -->', data.size
+#            except:
+#                pass
             
             #myfiltered_data[name_y]=12+np.log10(0.0365507*myfiltered_data['zcold'])
             print 'Zcold min/max', min(data[name_y]), '/', max(data[name_y]), '-->', data.shape
@@ -3934,16 +4015,32 @@ class Pipeline:
 
             
             try:
-                data['ssfr']=data['sfr']/data['mstar'] 
+                data['sfr']=data['sfr_disk']+data['sfr_spheroid']
+                data['ssfr']=data['sfr']/(data['mstar'])
+                print 'DONE set ssfr!'
+            except:
+                try:
+                    data['ssfr']=data['sfr']/data['mstar']                    
+                except:
+                    pass
+            try:
                 print 'starforming cut?', starforming_cut,
                 
-                data=myfiltered_data[np.where(data['ssfr']>starforming_cut)[:][0]]
+                data=data[np.where(data['ssfr']>starforming_cut)[:][0]]
                                                             
-                print 'min', min(data['ssfr']), 'max:', max(data['ssfr']), '-->', data.shape
+                print 'min', min(data['ssfr']), 'max:', max(data['ssfr']), '-->',data.shape
             except:
-                pass
-            
+                print 'starforming cut FAILED!'
+
             try:
+                data = data[np.where(data['mstar_disk']/data['mstar']>0.7)[:][0]]
+                print 'alternative starforming cut: mstar_disk/mstar>0.7 -->', data.size
+            except:
+                pass 
+
+           
+            try:
+                print 'min', min(data['zgas_disk']), 'max:', max(data['zgas_disk']), '-->', data.shape
                 data=data[np.where(data['zgas_disk']>0.0)[:][0]] 
                 data=data[np.where(data['zgas_disk']<=1.0)[:][0]] 
             except:
@@ -3951,7 +4048,7 @@ class Pipeline:
                 data=data[np.where(data['OH_gas_disk_bulge']<=1.0)[:][0]]
                 
             print 'check 0.0 > zgas >= 1.0 (its a metal abundance!) -->',data.shape
-            data=data[np.where(data[str(add_axis)]>0.1)[:][0]]
+            #data=data[np.where(data[str(add_axis)]>0.0)[:][0]]
             if self.myconfig_array['catname'+str(self.a)].startswith('SAGE'):
                 print 'SAGE!',
                                                              
@@ -3962,7 +4059,6 @@ class Pipeline:
 
 
             data=data[np.where(np.isfinite(data[name_y]))[:][0]]
-
             
             print 'oh min/max', min(data[name_y]), '/', max(data[name_y])
             try:
@@ -4001,6 +4097,15 @@ class Pipeline:
         
         print 'name_x:', name_x, 'col id:', self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_col_'+name_x], 'mycond x-axis: min/max', mycond_min_x, '/', mycond_max_x
 
+        try:
+            self.myData2Process['mstar']=self.myData2Process['mstar_spheroid']+self.myData2Process['mstar_disk']
+        except:
+            pass
+
+#        for item in ['mstar', 'mstar_disk', 'mstar_spheroid']:
+#            print 'item:', item
+#            self.myData2Process[item]=self.myData2Process[item]/0.6778
+
         #print np.info(self.myData2Process)
         myfiltered_data = mL.filter_data_before_analysis(self.myData2Process, 
                                                            mycond_min_x, 
@@ -4018,11 +4123,7 @@ class Pipeline:
             print '\t', name_y, 'selection: -->', myfiltered_data.shape
 
         try: 
-            print 'add_axis:', add_axis, 'col id', self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_col_'+add_axis]
-            myfiltered_data = mL.filter_data_before_analysis(myfiltered_data, 
-                                                               'min', 
-                                                               3.16e9, 
-                                                               'mstar')                                                       
+            print 'add_axis:', add_axis, 'col id', self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_col_'+add_axis]                                                   
             print '\t', add_axis, 'selection: -->', myfiltered_data.shape
         except:
             print '\tno axis to add ... '
@@ -4383,6 +4484,10 @@ class Pipeline:
                 cut_label=cut_list_operators_dict[operator]+str(float("{0:.2f}".format(np.log10(cut))))                  
             elif cut_list_operators_dict[operator].find('Mr')!=-1:
                 cut_label=cut_list_operators_dict[operator]
+            elif operator.find('Pop')!=-1:
+                 cut_label='_'+operator           
+            elif operator=='filaments' or operator=='knots':
+                cut_label='_'+operator               
             elif cut!='':
                 cut_label=cut_list_operators_dict[operator]+str(cut)
             else:
@@ -4421,7 +4526,7 @@ class Pipeline:
         else:
             pos_unit='Mpc'            
       
-        gtype_list=['no', 'centrals']#, 'all']
+        gtype_list=['centrals']#, 'all']
 
         gtype_dict=          {'centrals': 0,    'no': 2, 'no-sats': 1, 'all': 10}       
         gtype_dict_operators={'centrals': '==', 'no': '<', 'no-sats': '==', 'all': '<'}
@@ -4465,12 +4570,15 @@ class Pipeline:
             #cut_list_max_dict={1.5e11: 2e11, 1.73e11: 3e11, 1.05e11: 3.45e11}            
           
            
-            cut_list_operators=['>']
-            cut_list_operators_dict={'>':''}
+            cut_list_operators=['PopA+k', 'PopA+f', 'PopB+k', 'PopB+f']
+            cut_list_operators_dict={'PopA+k':'==', 'PopA+f':'==', 'PopB+k':'==', 'PopB+f':'=='}
+
+            cut_list_operators=['filaments', 'knots']
+            cut_list_operators_dict={'filaments': '2', 'knots': '3'}
             
             for cut in cut_list:
                 for operator in cut_list_operators:    
-                    #print 'second loop:\ncut:', cut, 'operator:', operator, 'cut_list_operators_dict:', cut_list_operators_dict[operator]
+                    print 'second loop:\ncut:', cut, 'operator:', operator, 'cut_list_operators_dict:', cut_list_operators_dict[operator]
                     try:
                         data      = self.myData2Process[np.where(self.myData2Process['Z']>0.05)]
                         #data['Z'] = cd.comoving_distance(data['Z'], **fidcosmo)*0.6777
@@ -4489,7 +4597,7 @@ class Pipeline:
                         
                         #print 'after selection galaxy type:', data.shape  
 
-                        if cut_list_operators_dict[operator].find('Mr')!=-1:
+                        if operator.find('Mr')!=-1:
                             print 'here Mr > -21.5'
                             data = myData.selectData2Compute(data, 
                                                             selected_col='MAB_dA_total_r', 
@@ -4532,15 +4640,42 @@ class Pipeline:
                             print 'RS!'
                             cut=2.35
                             data = data[(np.where(data['mAB_dA_total_g']-data['mAB_dA_total_i']>float(cut)))[:][0]]                         #print 'after selection 2:', cut_list_max_dict[cut], data.shape                                                
-            ##                                            
-            ##
-            #            data = myData.selectData2Compute(data, 
-            #                                            selected_col='MAB_dA_total_r', 
-            #                                            operator='>', 
-            #                                            condition=-19)
-            #            print 'after selection 2:', data.shape 
-            
-            
+
+
+                        if operator.find('Pop')!=-1:
+                          
+ 
+                            if operator.find('A')!=-1:
+                                data = myData.selectData2Compute(data, 
+                                                                selected_col='pop', 
+                                                                operator='==', 
+                                                                condition=1)
+                            else:
+                                 data = myData.selectData2Compute(data, 
+                                                                selected_col='pop', 
+                                                                operator='==', 
+                                                                condition=2)                               
+
+                            if operator.find('f')!=-1:
+                           
+                                data = myData.selectData2Compute(data, 
+                                                                selected_col='env_1024', 
+                                                                operator='==', 
+                                                                condition=2)
+                            else:
+                                 data = myData.selectData2Compute(data, 
+                                                                selected_col='env_1024', 
+                                                                operator='==', 
+                                                                condition=3)
+                                 
+                        if operator=='filaments' or operator=='knots':
+                            
+                            data = myData.selectData2Compute(data, 
+                                                            selected_col='env_1024', 
+                                                            operator='==', 
+                                                            condition=int(cut_list_operators_dict[operator]))                                
+                                     
+                        print 'size after cut:', data.size
                         centrals=len(np.where(data['orphan']==0)[0])
                         sats=len(np.where(data['orphan']==1)[0])
                         orphans=len(np.where(data['orphan']==2)[0])
@@ -4632,15 +4767,15 @@ class Pipeline:
                                        
                     
                           
-                            try:
+                            #try:
                                 #print 'calculate:', self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_twoPCF_calculate'],        
-                                results_CF, calc_time = caseSwitcher(self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_twoPCF_calculate'])           
-                                writeIntoFile(results_CF,  self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_twoPCF_calculate'])
-                                print '----------'
+                            results_CF, calc_time = caseSwitcher(self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_twoPCF_calculate'])           
+                            writeIntoFile(results_CF,  self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_twoPCF_calculate'])
+                            print '----------'
                                 #print '... succsessful calculated! within:', calc_time, 'min /', calc_time, 'sec' 
                                 
-                            except:
-                                pass
+#                            except:
+#                                pass
 #                                a=0
 #                                while a<10:
 #                                    try:

@@ -923,4 +923,50 @@ def IllustrisTNG300_HDF5_Subhalo_filestruct(catname,
     SAM_hdf5_filestruct_map[catname+'_y_pos']           = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/GroupPos'
     SAM_hdf5_filestruct_map[catname+'_z_pos']           = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/GroupPos'
     
+    return SAM_hdf5_filestruct_map
+
+def CHOLLA_50Mpc_HDF5_filestruct(catname,
+                                snapid,
+                                subdirid=1,
+                                path_to_directory=False): 
+
+  
+    SAM_hdf5_filestruct_map['catname']  = catname
+    SAM_hdf5_filestruct_map[catname+'_path_to_data']        = ''
+    SAM_hdf5_filestruct_map[catname+'_snapid']              = ''
+    SAM_hdf5_filestruct_map[catname+'_redshift_attribute']  = ''
+
+    myData = aD.ArangeData()
+    try:
+        data = myData.readAnyFormat(config=False, mydtype=np.str_, mypath=mycomp+'anaconda/pro/data/'+catname+'/file_names.txt', data_shape='shaped', comment='#')
+    except:          
+        data = myData.readAnyFormat(config=False, mydtype=np.str_, mypath=mycomp+'anaconda/pro/data/'+catname+'/'+catname+'_file_names.txt', data_shape='shaped', comment='#')
+    print data.size
+    i=0
+    while i<data.size:
+        if data.size==1:
+            SAM_hdf5_filestruct_map[catname+'_filename'+str(i)]            = path_to_directory+str(data)
+        else:
+            SAM_hdf5_filestruct_map[catname+'_filename'+str(i)]            = path_to_directory+data[i]
+        i+=1  
+    
+    SAM_hdf5_filestruct_map[catname+'_nr_files'] = i 
+
+    print 'path to data:', SAM_hdf5_filestruct_map[catname+'_path_to_data']
+ 
+    SAM_hdf5_filestruct_map[catname+'_density']         = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/density'    
+    SAM_hdf5_filestruct_map[catname+'_temperature']     = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/temperature'
+    SAM_hdf5_filestruct_map[catname+'_Engery']          = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/Engery'
+    SAM_hdf5_filestruct_map[catname+'_GasEnergy']       = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/GasEnergy'
+    SAM_hdf5_filestruct_map[catname+'_metal_density']   = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/metal_density'    
+    SAM_hdf5_filestruct_map[catname+'_e_density']       = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/e_density'    
+    SAM_hdf5_filestruct_map[catname+'_HI_density']      = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/HI_density'
+    SAM_hdf5_filestruct_map[catname+'_HII_density']     = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/HII_density'
+    SAM_hdf5_filestruct_map[catname+'_HeI_density']     = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/HeI_density'
+    SAM_hdf5_filestruct_map[catname+'_HeII_density']    = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/HeII_density'
+    SAM_hdf5_filestruct_map[catname+'_HeIII_density']   = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/HeIII_density'
+    SAM_hdf5_filestruct_map[catname+'_momentum_x']      = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/momentum_x'
+    SAM_hdf5_filestruct_map[catname+'_momentum_y']      = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/momentum_y'
+    SAM_hdf5_filestruct_map[catname+'_momentum_z']      = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/momentum_z'
+    
     return SAM_hdf5_filestruct_map 

@@ -7,6 +7,10 @@ import myLib as mL
 import outputData as oD
 import arangeData as aD
 
+import read_data_Cholla as rdC
+
+myOutput = oD.OutputData(config=False)
+
 import os
 system_info = os.getcwd()
 start = system_info.find('anaconda')
@@ -1014,7 +1018,7 @@ class	ArangeData:
             self.cat_attributes = {}                           
             i=0
             while i<len(f.attrs.keys()):
-                print f.attrs.keys()[i], f.attrs.values()[i]
+                #print f.attrs.keys()[i], f.attrs.values()[i]
                 self.cat_attributes[f.attrs.keys()[i]] = f.attrs.values()[i]
                 i+=1
             print '+++++++++++++++++++++++++++\n'
@@ -1069,6 +1073,144 @@ class	ArangeData:
             self.data_array = self.data_array[:f[mysave_colname].size]
             print 'self.data_array after read-in:', self.data_array.shape, 'redshift:', self.redshift, 'scale factor:', self.scale_factor
             #print self.data_array[0:3]
+
+        def readCHOLLAHDF5(halocat_code):
+            print '###################################################################################'
+            print 'read CHOLLA HDF5'
+            print ' '
+            print 'HDF5', 'catname:', catname
+            print 'HDF5 begin: mypath:', mypath
+
+#            #​dataDir = '/raid/bruno/data/'
+#            dataDir = '/data/groups/comp-astro/bruno/'
+#            dataDir = mycomp
+#            #inDir = dataDir + 'cosmo_sims/512_hydro_50Mpc/output_files_pchw18/'
+#            inDir = dataDir+'anaconda/pro/data/Cholla/'
+#            #'/data/groups/comp-astro/bruno/cosmo_sims/512_hydro_50Mpc/output_files_pchw18/'
+#            
+#            n_snapshot = 169
+#            
+#            data_type = 'hydro'
+#            # data_type = 'particles'
+#            
+#            fields = ['density']
+#            
+#            precision = np.float32
+#            Lbox = 5000		#kpc/h
+#            proc_grid = [ 4, 2, 2]
+#            box_size = [ Lbox, Lbox, Lbox ]
+#            grid_size = [ 512, 512, 512 ] #Size of the simulation grid
+#            subgrid = [ [0, 512], [0, 512], [0, 512] ] #Size of the volume to load
+#            data = rdC.load_snapshot_data_distributed(n_snapshot, inDir, data_type, fields, subgrid, precision, proc_grid,	box_size, grid_size, show_progess=True)
+#            density = data[data_type]['density']
+#            
+#            print density[0:10]
+
+            file_struc_info= hdf5lib.CHOLLA_50Mpc_HDF5_filestruct(catname, snapid, path_to_directory=mypath)
+
+            mytypes={}
+            a=0
+            while a<int(id_col_array['nr_entries']):
+                mytypes.update({id_col_array['name'+str(a)]: id_col_array['data_type'+str(a)]})                    
+                a+=1
+ 
+
+            dt = np.dtype([(k, mytypes[k]) for k in mytypes.keys()])
+            try:
+                self.data_array=np.zeros((nr_rows,), dtype=dt)
+                nr_entries=int(id_col_array['nr_entries'])
+            except:
+                self.data_array=np.zeros((nr_rows,), dtype=dt)
+                nr_entries=nr_col
+                           
+            i=start_fileID*nr_files_snapshot
+
+            if end_fileID!='False':
+                i_break = start_fileID*nr_files_snapshot+(end_fileID-start_fileID+1)*nr_files_snapshot
+            else:
+                i_break='False'
+
+            print 'start_fileID:', start_fileID, 'end_fileID:', end_fileID, 'start i:', i,'i break:', i_break, 'nr files2read:', file_struc_info[catname+'_nr_files']
+            #print file_struc_info
+
+            myOutput.writeIntoFile(
+                       mycomp+'/anaconda/pro/data/Cholla_50Mpc/Cholla_grid.txt',
+                       [''],
+                       myheader='CHOLLA data Puchwein+19 from Bruno \n(1) filename (2) a (3) z (4) H0 (5) Omego_L (6) Omega_M (7) bounds (8) dims'\
+                       +'(9) dims_local (10) domain (11) dt (12) dx (13) gamma (14) n_fileds (15) n_step (16) offset (17) t',
+                       append_mytext=False,
+                       data_is_string=False,
+                       data_format='%s')            
+            
+            
+            while i<int(file_struc_info[catname+'_nr_files']):           
+                                
+                if i==i_break and end_fileID!='False':
+                   break
+                path = file_struc_info[catname+'_filename'+str(i)]
+                #path='/store/multidark/NewMD_3840_Planck1/Galacticus/latest/job0/the_trees_0_1000000_0_results.hdf5'
+                #path='/data3/users/abenson/the_trees_0_1000000_0_results.hdf5'
+                f = hdf5.File(path, "r")
+                print path
+                stats=(path[path.find('pchw18/')+7:len(path)]).ljust(9)+'\t'
+                
+                for k in [0,1,5,6,7,8,9,10,12,13,14,15]:
+                    #print 'k:', k, f.attrs.keys()[k], f.attrs.values()[k][0]
+                    try:
+                        new_stats= str(f.attrs.values()[k][0])+'\t'+str(f.attrs.values()[k][1])+'\t'+str(f.attrs.values()[k][2])+'\t'
+                        new_stats= str(f.attrs.values()[k])+'\t'
+                    except:
+                        try:
+                            if k==0 or k==1 or k==2 or k==9 or k==10 or k==15:
+                                new_stats= str(format(f.attrs.values()[k][0],'0.5f'))+'\t'
+                            else:
+                                new_stats= str(f.attrs.values()[k][0])+'\t'
+                        except:
+                            new_stats='\t'
+                    stats+=new_stats
+                print '+++++++++++++++++++++++++++\n'
+                
+                stats=stats[:-1]
+                print stats
+    
+                myOutput.writeIntoFile(
+                           mycomp+'/anaconda/pro/data/Cholla_50Mpc/Cholla_grid.txt',
+                           stats+'\n',
+                           append_mytext=True,
+                           data_is_string=True,
+                           data_format='%s')                
+                
+                i+=1
+
+            exit()
+            print f
+            self.cat_attributes = {}        
+                  
+            i=0
+            while i<len(f.attrs.keys()):
+                print f.attrs.keys()[i], f.attrs.values()[i]
+                self.cat_attributes[f.attrs.keys()[i]] = f.attrs.values()[i]
+                i+=1
+            print '+++++++++++++++++++++++++++\n'
+            
+            self.redshift = self.cat_attributes['Current_z'][0]
+            self.scale_factor = self.cat_attributes['Current_a'][0]
+            
+            print 'z:', self.redshift, 'a:', self.scale_factor
+            
+            i=0
+            while i<nr_entries:
+                name=id_col_array['name'+str(i)]
+                self.data_array[id_col_array['name'+str(i)]][0:f[name].size] = f[name]
+                i+=1
+
+            #print 'mysave_colname', mysave_colname
+            self.data_array = self.data_array[:f[name].size]
+            print 'self.data_array after read-in:', self.data_array.shape, 'redshift:', self.redshift, 'scale factor:', self.scale_factor
+            print self.data_array[0:3]
+
+            exit()
+
 
         def readSAMHDF5(halocat_code):
             print '###################################################################################'
@@ -1474,6 +1616,7 @@ class	ArangeData:
                 'BINARY_SAGE': BINARY_SAGE,
                 'HDF5': HDF5,
                 'SAMHDF5': SAMHDF5,
+                'CHOLLAHDF5': CHOLLAHDF5,                
                 'HDF52HDF5': HDF52HDF5,
                 'READ2ARRAY': READ2ARRAY,
                 'FITS2HDF5': FITS2HDF5,
@@ -1494,6 +1637,9 @@ class	ArangeData:
            
         def SAMHDF5():
             readSAMHDF5(halocat_code)
+            
+        def CHOLLAHDF5():
+            readCHOLLAHDF5(halocat_code)            
         
         def HDF5():
             readHDF5()

@@ -9,7 +9,7 @@ SRON - Netherlands Institute for Space Research
 # colour table in HTML hex format the last two one are grey
 hexcols = ['#332288', '#88CCEE', '#44AA99', '#117733', '#999933', '#DDCC77', 
            '#CC6677', '#882255', '#AA4499', '#661100', '#6699CC', '#225588',
-           '#4477AA', '#333333', '#4c4c4c','#191919', '#AA4466','#ffab00', '#d2691e']
+           '#4477AA', '#333333', '#4c4c4c', '#191919', '#AA4466', '#ffab00', '#d2691e', '#000000']
 
 greysafecols = ['#809BC8', '#FF6666', '#FFCC66', '#64C204']
 
@@ -19,21 +19,25 @@ greysafecols = ['#809BC8', '#FF6666', '#FFCC66', '#64C204']
 xarr = [[11],
 	#[6], 
 	#[0], 
-        [11, 6],
-	#[6, 5], 
-        [11, 6, 5], 
+        #[11, 6],
+		[8, 3], 
+        #[11, 6, 5],
+	#SF-History paper when clustering of 3 sub-samples: red, lowZ, highZ
+        [6, 8, 3],  
         [11, 6, 5, 2],
         #[0, 2, 5, 6],
 	#for SDSS bands u=blue, y=red 
         [0, 1, 3, 5, 6],
+		#[11, 17, 6, 8, 3],
 	#Galacticus CMASS Clustering color sample
 	#[3, 4, 5, 6, 8], 
         #[12, 6, 5, 2, 0],
         #[0, 1, 2, 5, 6, 8],
         #[0, 1, 2, 3, 5, 6],
-		[0, 1, 2, 3, 17, 6], 
-        [0, 1, 2, 3, 5, 6, 8], 
-        [0, 1, 2, 3, 4, 5, 6, 8],
+		#[0, 1, 2, 3, 17, 6],
+		[0, 8, 3, 8, 3, 2], 
+        [0, 0, 17, 6, 8, 3, 11],
+        [0, 1, 17, 3, 2, 6, 19, 8],
 	#for 9 subsamples in the assembly bias paper, customized by Doris 
 	  	[0, 1, 2, 3, 5, 6, 12, 8, 9], 
         #[0, 1, 2, 3, 4, 5, 6, 7, 8],
