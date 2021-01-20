@@ -495,9 +495,7 @@ class DoAnalysis:
                 filename5 = register_path+self.myconfig_array[self.myconfig_array['catname'+str(self.myPipe.a)]+'_set_register_name']+'/'+self.myconfig_array['catname'+str(self.myPipe.a)]+'_z_'+str(float("{0:.2f}".format(self.snap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.myPipe.a)]+'_filename'+str(self.myPipe.i)]+'_snapid'+str(self.myPipe.i)]['z'])))+tarsel_code_space+self.myconfig_array[self.myconfig_array['catname'+str(self.myPipe.a)]+'_tarsel_code']+'.'+self.myconfig_array[self.myconfig_array['catname'+str(self.myPipe.a)]+'_fileformat']
             
             filename6 = register_path+self.myconfig_array[self.myconfig_array['catname'+str(self.myPipe.a)]+'_set_register_name']+'/'+self.myconfig_array['catname'+str(self.myPipe.a)]+'_z_'+str(float("{0:.2f}".format(self.snap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.myPipe.a)]+'_filename'+str(self.myPipe.i)]+'_snapid'+str(self.myPipe.i)]['z'])))+'_tarsel'+tarsel_code_space+self.myconfig_array[self.myconfig_array['catname'+str(self.myPipe.a)]+'_tarsel_code']+'.'+self.myconfig_array[self.myconfig_array['catname'+str(self.myPipe.a)]+'_fileformat']
-                            
-                            
-
+                           
             #print 'myfilename:', myfilename1, 'skip reading data? --> ', self.myconfig_array[self.myconfig_array['catname'+str(self.myPipe.a)]+'_skip_reading_data']
             
             return filename1, filename2, filename3, filename4, filename5, filename6
@@ -511,10 +509,12 @@ class DoAnalysis:
             print '#                                                                                                      '
             print '########################################################################################################'
             print ' ' 
+            
                         
             if self.b==0 or plot_key=='sfr2z' or plot_key=='cSFRD' or plot_key=='filterData' or plot_key=='plotXY' or plot_key=='twoPCF':
                 if self.myconfig_array[self.myconfig_array['catname'+str(self.myPipe.a)]+'_data_format']!='HDF5':# and self.myconfig_array[self.myconfig_array['catname'+str(self.myPipe.a)]+'_data_format']!='CROSSMATCH':                     
                     self.myPipe.readData()
+                                
                 else:
                     myfilename1, myfilename2, myfilename3, myfilename4, myfilename5, myfilename6 = check_filename()
                     #uncommand for test reason:
@@ -539,12 +539,16 @@ class DoAnalysis:
             if plot_key=='plotXY':
                 filename=myfilename
             else:
-                filename = self.mycomp+'anaconda/pro/myRun/histos/'+plot_key+'/'+plot_key+'_'\
+                try:
+                    filename = self.mycomp+'anaconda/pro/myRun/histos/'+plot_key+'/'+plot_key+'_'\
                                 +self.myconfig_array['catname'+str(self.myPipe.a)]\
                                 +'_z_'+str(float("{0:.2f}".format(self.snap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.myPipe.a)]+'_filename'+str(self.myPipe.i)]+'_snapid'+str(self.myPipe.i)]['z'])))\
                                 +'_tarsel'+tarsel_code_space+self.myconfig_array[self.myconfig_array['catname'+str(self.myPipe.a)]+'_tarsel_code']\
                                 +output_filename_code_space+str(self.myconfig_array[self.myconfig_array['catname'+str(self.myPipe.a)]+'_output_filename_code'])\
-                                +'.txt'                     
+                                +'.txt'
+                except:
+                    print 'FILENAME was not found --> set to NONE!'
+                    filename=None
 
             #self.myPipe.showConfig()
            
@@ -2500,11 +2504,7 @@ class DoAnalysis:
                                 # choose which method should be plotted m1 (method 1, subsample selected only once at z=0.56), m2 (method 2, subsample
                                 # selected at every snapshot)
                                 #-------------------------------------------
-                                mymethod='M1' 
-                                for reds in [0.0,0.1,0.56,0.7,3.0,4.15]:
-                                    mL.starforming_cut_Henriques20_A1(redshift=reds)
-                                    
-                                exit()
+                                mymethod='M2' 
                                 #M1: default only [1] for M2: [1,2] because there are much more subsample and the are divided into two plots
                                 #myplot_num ['_1','_2','_3,'demo']  1: standard sample 1 (all, low, high, active, passive, red, blue, redmstar11, 'redmhalo13)
                                 #                           2: standard sample 2 (all, mhalo12st, mhalo12gt, mstar10st, mstar11gt, zcold9st, zcold9gt, lowmstar11, lowmhalo13)

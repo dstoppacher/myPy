@@ -133,7 +133,11 @@ class Pipeline:
         if self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_tarsel_code']!='':
              self.tarsel_code_space='_'
        
-        if self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_data_format']=='SAMHDF5' or self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_data_format'].find('BINARY')!=-1 or self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_data_format']=='CATASCII':            
+        if self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_data_format']=='SAMHDF5' or\
+           self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_data_format'].find('BINARY')!=-1 or\
+           self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_data_format']=='CATASCII' or\
+           self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_data_format']=='ROCKSTAR_ASCII' or\
+           self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_data_format']=='CHOLLAHDF5':            
                 self.correctAndConvertUnits(halocat_code=myhalocat_code)
         else:
             try:
@@ -146,19 +150,35 @@ class Pipeline:
     def correctAndConvertUnits(self,
                                halocat_code=False):
         
+        #print 'self.mysnap_array:', self.mysnap_array
+        
         try:
             print 'test format of [z] in mysnap_array ...',
             print float(self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z'])+1.0
             print 'is float! CORRECT!'
         except:
-            print 'did not work! Convert [z] in mysnap_array to float!',
-            self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z'] =float(self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z'])
-            print float(self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z'])+1.0, '--> worked!'
+            try:
+                print 'filename correct? --> ',
+                self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z']=float(self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z'])
+                print 'YES!'
+                myData.redshift=float(self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z'])
+                myData.scale_factor=mL.redshift_to_expfactor(myData.redshift)
+                print 'z+1=', float(self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z'])+1.0, '--> worked!'
+            except:
+                print 'NO! Exclude filename! --> z=', float(self.mysnap_array[self.myconfig_array['catname'+str(self.a)]+'_snapid'+str(self.i)]['z']),
+                try:
+                    myData.redshift=float(self.mysnap_array[self.myconfig_array['catname'+str(self.a)]+'_snapid'+str(self.i)]['z'])
+                    myData.scale_factor=mL.redshift_to_expfactor(myData.redshift)
+                    print '--> worked!'
+                except:
+                    print 'did not work! Convert [z] in mysnap_array to float or check cat- and filenames!'
+        
 
+        if self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_data_format']=='SAMHDF5' or\
+           self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_data_format']=='BINARY_SAGE':
         
+            print 'here: correctAndConvertUnits() --> set redshift: '
         
-        print 'here: correctAndConvertUnits() --> set redshift: '
-        if self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_data_format']=='SAMHDF5' or self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_data_format']=='BINARY_SAGE':
             self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z'] = myData.redshift
         
             try:
@@ -182,7 +202,7 @@ class Pipeline:
                         print 'WARNING REDSHIFT WAS NOT CORRECTLY SET!!!'
        
 
-        print 'myData.redshift:', myData.redshift, 'z in mysnap_array:', self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i)]+'_snapid'+str(self.i)]['z'], 'myData.scale_factor:', myData.scale_factor       
+        print 'myData.redshift:', myData.redshift, 'myData.scale_factor:', myData.scale_factor       
         #try:            
         self.volume = mL.survey_VolumeSqDeg_to_Mpc(box_size=self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_box_size'], 
                                                redshift=myData.redshift,
@@ -204,18 +224,19 @@ class Pipeline:
                                                self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+id_col_array_code],
                                                self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_correct_little_h'],
                                                myData.scale_factor)
-                                                            
-        self.myData2Process = mL.convert_units_Galacticus(self.myconfig_array['catname'+str(self.a)],
-                                              self.myData2Process,
-                                              self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+id_col_array_code],
-                                              myData.redshift,
-                                              telescope_name=self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_telescope_name'],
-                                              apply_k_corr_app=self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_apply_k_corr_app'],
-                                              apply_k_corr_abs=self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_apply_k_corr_abs'],                                              
-                                              apply_z_boost=self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_apply_z_boost'],
-                                              hubble_par=self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_hubble_par'],
-                                              unit_code=self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_unit_code'],
-                                              use_kcorrect=self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_which_kcorrect'])
+
+        if self.myconfig_array['catname'+str(self.a)].find('Galacticus')!=-1:                                                            
+            self.myData2Process = mL.convert_units_Galacticus(self.myconfig_array['catname'+str(self.a)],
+                                                  self.myData2Process,
+                                                  self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+id_col_array_code],
+                                                  myData.redshift,
+                                                  telescope_name=self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_telescope_name'],
+                                                  apply_k_corr_app=self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_apply_k_corr_app'],
+                                                  apply_k_corr_abs=self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_apply_k_corr_abs'],                                              
+                                                  apply_z_boost=self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_apply_z_boost'],
+                                                  hubble_par=self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_hubble_par'],
+                                                  unit_code=self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_unit_code'],
+                                                  use_kcorrect=self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_which_kcorrect'])
     def matchHaloCatWithResultCat(self,
                                   myconds_array):
                     
@@ -325,7 +346,8 @@ class Pipeline:
         selection_name = 'Selection after galaxy and halo catalogue match:'
                                                       
         return self.filterAndExtractData(myconds_array, data=matched_cat, myheader=myheader, mylog=mylog, myselection_name=selection_name)
-        
+ 
+     
     def filterAndExtractData(self,
                              myconds_array,
                              data=False,
@@ -346,6 +368,33 @@ class Pipeline:
                     return self.myData2Process
             except:
                 return data
+
+
+        def check_redshift():
+            """Check if redshift is set correctly, do so if not"""
+            try:
+                print 'myData.redshift:', myData.redshift
+                redshift=myData.redshift
+            except:
+                print 'Could not find REDSHIFT! --> Taken from SCALE_FACTOR_MAPPING instead!\nz:',
+                print self.SAM_scale_factor_map
+                redshift=self.SAM_scale_factor_map[self.myconfig_array['catname'+str(self.a)]+'_redshift'+str(self.i)]
+                myData.redshift=redshift
+                print redshift
+            return redshift
+                
+        def check_scale_factor():
+            """Check if scale_factor is set correctly, do so if not"""              
+            try:
+                print 'myData.scale_factor:', myData.scale_factor
+                scale_factor=myData.scale_factor
+            except:
+                print 'Could not find SCALE FACTOR! --> Taken from SCALE_FACTOR_MAPPING instead!\na:'
+                scale_factor=self.SAM_scale_factor_map[self.myconfig_array['catname'+str(self.a)]+'_scale_factor'+str(self.i)]
+                myData.scale_factor=scale_factor
+                print scale_factor
+            return scale_factor
+
 
         def createProgenitorList(data,
                                  header,
@@ -905,11 +954,8 @@ class Pipeline:
         print ' ' 
 
         data = check_data(data)
-
-        if redshift==False:
-            redshift=myData.redshift
-        if scale_factor==False:
-            scale_factor=myData.scale_factor
+        redshift=check_redshift()
+        scale_factor=check_scale_factor()
 
         i=0
         count_Mzstar=0
@@ -1191,6 +1237,8 @@ class Pipeline:
         except:
             pass
         
+        
+        
 #        
 #        try:
 #            if np.all(data['pop']==-99):
@@ -1275,7 +1323,7 @@ class Pipeline:
 #        print np.info(data)
       
 
-        print 'CHECK HERE: redshift=', redshift
+        #print 'CHECK HERE: redshift=', redshift+1.0
         #redshift=0.0
         try:
             if np.all(data['mhalo_200c']==-99.0):
@@ -1406,146 +1454,83 @@ class Pipeline:
             
 
 ###########################################################################################################################################################
-        #mL.print_props_table_format()
-
-#        data = data[np.where(data['mstar']>1e10)[:][0]]
-#        data = data[np.where(data['ssfr']>1e-11)[:][0]]
-#        data = data[np.where(data['mstar_disk']/data['mstar']>0.7)[:][0]]
-#        print data.size        
-        #mL.property_stats(data)
-#        preprocessing_only=True
-#
-#        print 'sample name:', 
-#        mL.give_galaxy_type_info(data['orphan'])
-#
-#
-#        mycut=myhdf5_filename[myhdf5_filename.find('CUT'):len(myhdf5_filename)-5]
-#        print 'mycut:', mycut
-#        mycut='starforming!'
-#        for item in ['zcold', 'mstar', 'mstar_spheroid','sfr','ssfr']:
-#            mydata = data[item][np.where(data[item]>0.0)[:][0]]
-#            if item=='zcold':
-#                
-#                print item, 'min/max:', format(np.nanmin(mydata), '0.2f') , '/', format(np.nanmax(mydata), '0.2f')
-#                print '\t\t', "{0:.2f}".format(np.nanmedian(mydata)), '\t', "{0:.2f}".format(np.nanmedian(mydata)-np.nanpercentile(mydata, 32)), '/', "{0:.2f}".format(np.nanpercentile(mydata, 68)-np.nanmedian(mydata))
-#                stats=str(redshift)+'\n'+str("{0:.2f}".format(np.nanmedian(mydata)))+'\t'+str("{0:.2f}".format(np.nanmedian(mydata)-np.nanpercentile(mydata, 32)))+'\t'+str("{0:.2f}".format(np.nanpercentile(mydata, 68)-np.nanmedian(mydata)))
-#
-#            else:
-#                print item, 'min/max:', format(np.log10(np.nanmin(mydata)), '0.2f') , '/', format(np.log10(np.nanmax(mydata)), '0.2f')
-#                print '\t\t', "{0:.2f}".format(np.log10(np.nanmedian(mydata))), '\t', "{0:.2f}".format(np.log10(np.nanmedian(mydata))-np.log10(np.nanpercentile(mydata, 32))), '/', "{0:.2f}".format(np.log10(np.nanpercentile(mydata, 68))-np.log10(np.nanmedian(mydata)))               
-#                stats=str("{0:.2f}".format(np.log10(np.nanmedian(mydata))))+'\t'+str("{0:.2f}".format(np.log10(np.nanmedian(mydata))-np.log10(np.nanpercentile(mydata, 32))))+'\t'+str("{0:.2f}".format(np.log10(np.nanpercentile(mydata, 68))-np.log10(np.nanmedian(mydata))))
-#
-#            if redshift==0.0 or redshift=='0.0':
-#                myOutput.writeIntoFile(
-#                            #mycomp+'anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/'+self.myconfig_array['catname'+str(self.a)]+'_HOD-SFgalaxies_z-evolution_'+mycut+'_'+item+'.txt',
-#                           mycomp+'anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/'+self.myconfig_array['catname'+str(self.a)]+'_stats_Zcold_evolution_for_rob.txt',
-#                           [stats],
-#                           myheader='Statistics! Zcold vs Mstar plots for Robert Yates: '+self.myconfig_array['catname'+str(self.a)]+' cut: '+mycut+' prop: '+item+'\n(1) z (2) log10('+item+') (3) -dy (4) +dy',
-#                           append_mytext=False,
-#                           data_is_string=False,
-#                           data_format='%s')
-#            else:
-#                myOutput.writeIntoFile(
-#                           mycomp+'anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/'+self.myconfig_array['catname'+str(self.a)]+'_stats_Zcold_evolution_for_rob.txt',
-#                           #mycomp+'anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/'+self.myconfig_array['catname'+str(self.a)]+'_HOD-SFgalaxies_z-evolution_'+mycut+'_'+item+'.txt',
-#                           stats+'\n',
-#                           append_mytext=True,
-#                           data_is_string=True,
-#                           data_format='%s')                
-#            
-
-        #exit()
-#        data=mL.downsample_SMF(data)
-#        mL.give_galaxy_type_info(data['orphan'])
-
-        
-        #ngal=int((self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_box_size']/0.6778)**3*0.008)
-        #number density: Gal400
-        #data = mL.choose_random_sample(data,3288480)#n=0.016
-        #data = mL.choose_random_sample(data,2466360)#n=0.012
-        #data = mL.choose_random_sample(data,1664240)#n=0.008
-     
-        #data = mL.choose_random_sample(data,ngal)        
-        #print 'randomly chosen:', data.size
-
-
-#        data = mL.test_haloids(data)
-###
-#        #data = data[np.where(data['orphan']==1)[0][:]]
-#        print np.info(data)
-#        mL.property_stats(data)
-#        myOutput.writeIntoFile(mycomp+'anaconda/pro/data/Galacticus_1Gpc_run2/Galacticus_1Gpc_run2_z_0.56_same_haloid_Gal-dens.txt',
-#                   data[['haloid','hostid','orphan','mhalo','mstar', 'haloid_test_against', 'hostid_test_against', 'orphan_test_against', 'env_512', 'env_1024', 'pop']],
-#                   myheader= 'Galacticus 1Gpc z='+str(format(redshift, '0.2f'))+' CMASS sample of Gal2-dens sample galaxies with same hostid as Gal-dens \n(1) haloid (2) hostid (3) orphan (4) mhalo_200c [Msun] (5) mstar [Msun] (6) haloid_Gal2 (7) hostid_Gal2 (8) orphan_Gal2 (9) env_512 (10) env_1024 (11) pop',
-#                   data_format="%i\t%i\t%i\t%0.8e\t%0.8e\t%i\t%i\t%i\t%i\t%i\t%i",
-#                   mydelimiter='\t')         
-#
-#        myOutput.writeIntoFile(mycomp+'anaconda/pro/data/Galacticus_1Gpc_run2/Galacticus_1Gpc_run2_z_0.56_CMASS_down_sample3_haloid_from_Gal-dens.txt',
-#                   data[['haloid','hostid']],
-#                   myheader= 'Galacticus 1Gpc z='+str(format(redshift, '0.2f'))+' CMASS down sample3 (color cut: Guo+13)\n(1) haloid (2) hostid',
-#                   data_format="%i\t%i",
-#                   mydelimiter='\t')  
-        
-#        myOutput.writeIntoFile(mycomp+'anaconda/pro/data/Galacticus_400Mpc/Galacticus_400Mpc_z_0.55_CMASS_down_sample3_haloid.txt',
-#                   data[['haloid','hostid']],
-#                   myheader= 'Galacticus 400Mpc z='+str(format(redshift, '0.2f'))+' CMASS down sample3\n(1) haloid (2) hostid',
-#                   data_format="%i\t%i",
-#                   mydelimiter='\t')  
-
-#        myOutput.writeIntoFile(mycomp+'anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/'+self.myconfig_array['catname'+str(self.a)]+'_z_'+str(format(redshift, '0.2f'))+'_rand-sample_n_0.016.txt',
-#                   data[['mhalo_200c','orphan','mstar','sfr','ssfr','mhalo_cents_200c', 'mbh', 'mAB_total_cut_g_i', 'rhalf_mass', 'rdisk']],
-#                   myheader= self.myconfig_array['catname'+str(self.a)]+' z='+str(format(redshift, '0.2f'))+' rand sample n=0.016 [Mpc-1] as TNG300-1 (Mstar>3e8 [h-1Msun]) \n(1) mhalo_200c [Msun] (2) orphan (3) mstar [Msun] (4) sfr [Msunyr-1] (5) ssfr [yr-1] (6) mhalo_cents_200c [Msun] (7) mbh [Msun] (8) mAB_total_cut_g_i [-] (9) rhalf_mass [Mpc] (10) rdisk/rbulge [-]',
-#                   data_format="%0.10e\t%i\t%0.10e\t%0.10e\t%0.10e\t%0.10e\t%0.10e",
-#                   mydelimiter='\t') 
-      
-#        exit()
-
-        #data = data[np.where(data['orphan']==0)[0][:]]
-#        size=int(data.size/100.0*20.0)
-#        prop='ssfr'
-#        print 'size:', size, 'prop:', prop
-#        #data.sort(order=[prop], axis=0)
-#        data[::-1].sort(order=[prop], axis=0)
-#        print data[prop][0:20]
-#
-#        data=data[0:size]
-
-        #data=data[data.size-size:data.size]
-#        print 'size sorted arry:', data.size
-#        data = data[np.where(data['orphan']==0)[0][:]] 
-#        
-#        data = data[np.where(data['zcold']<=8.5)[0][:]]
-#        data = data[np.where(data['mstar']>4e10)[0][:]]
-#        print 'lowZ:', data.size      
-#        
-#
 #        try:
-#            if np.all(data['mhalo_200c']==-99.0):
-#                data['NFW_con'] = mL.calculate_NFW_con_with_fit(data['mhalo'], 
-#                                                       redshift,
-#                                                       cosmology='Planck', 
-#                                                       overdens='vir')
-#                
-#                data['mhalo_200c']=mL.convert_halo_mass(data['mhalo'], 
-#                                                                    data['NFW_con'],
-#                                                                    data['orphan'])
-#                print '--> DONE!\n'
+#            redshift_before=float(self.mysnap_array[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_filename'+str(self.i-1)]+'_snapid'+str(self.i-1)]['z'])
 #        except:
-#            pass
-#
-#
-#        print 'mcold CUT3 centrals', data.size        
-#        mL.property_stats(data)
-#
-#                   
-##        mydata = data[np.where(data['zcold']>8.5)[0][:]]
-##        mydata = mydata[np.where(mydata['mstar']>1e11)[0][:]]
-##        print 'highZ:', mydata.size     
-##        mL.property_stats(mydata)
-#        
-#                            
-#
-#        
+#            redshift_before=redshift
+        #data = mL.test_Rockstar(data,redshift_before)
+        
+        def construct_merger_tree(data):
+        
+            merger_dict={}
+            z_first_app={}
+    
+            snapidzred=myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/data/ROCKSTAR_50Mpc/Cholla_256_50Mpc_snapidzred.txt', data_format='ASCII', data_shape='shaped', delim=' ', mydtype=np.float, skiprow=2)        
+     
+            tree_list2analyse=range(0,24255,1)
+    
+            for tree_id in tree_list2analyse:
+                progs_tree=np.zeros((1),dtype=np.int8)
+                print 'tree_id:', tree_id
+                count_first_app=0
+                for redshift in snapidzred[:,0]:
+                    #print 'redshift:', redshift
+                    new_data, progID = mL.construct_merger_tree(redshift,tree_id=tree_id)
+                    if redshift==snapidzred[0,0] and tree_id==tree_list2analyse[0]:
+                        data_tree = new_data                   
+                    else:
+                        data_tree = np.append(data_tree, new_data, axis=0)
+                        
+                    if len(new_data)==0:
+                        #print 'counter+1', tree_id, redshift,
+                        count_first_app+=1
+                        #print count_first_app
+                       
+                    #print 'data_tree:', data_tree
+                    #print 'new_data:', new_data
+                                     
+                    progs_tree = np.append(progs_tree, progID, axis=0)
+    
+                merger_dict.update({tree_id:progs_tree})
+                z_first_app.update({tree_id:snapidzred[count_first_app][0]})
+                
+                
+            filename_trees=mycomp+'anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/'+self.myconfig_array['catname'+str(self.a)]+'_256_Cholla_merger_trees.txt'     
+            
+            for tree_id in merger_dict.keys():
+                if tree_id==tree_list2analyse[0]:
+                    myOutput.writeIntoFile(
+                               filename_trees,
+                               [str(format(z_first_app[tree_id],'0.2f'))+' '+str(tree_id)+' '+" ".join(str(item) for item in merger_dict[tree_id][1:])],
+                               myheader= self.myconfig_array['catname'+str(self.a)]+' run on Cholla 256. Main progenitor merger trees from the first appearance of halos at z=11.51 to z=0.81'\
+                                       'as haloid (ID in the orginal ROCKSTAR files)\n (1) z of first appearance of this tree with ID (2) unique ID of the merger tree (descendent) (3)-(n) progenitors',
+                               append_mytext=False,
+                               data_is_string=False,
+                               data_format='%s')
+                else:
+                    myOutput.writeIntoFile(
+                               filename_trees,
+                               str(format(z_first_app[tree_id],'0.2f'))+' '+str(tree_id)+' '+" ".join(str(item) for item in merger_dict[tree_id][1:])+'\n',
+                               append_mytext=True,
+                               data_is_string=True,
+                               data_format='%s')
+            
+            for name in data.dtype.names:
+                #print 'name:', name
+                data[name][0:data_tree.size] = data_tree[name]
+     
+    
+           
+            return data[:data_tree.size]
+        
+        
+        mL.crossmatch_hydro_particle_data(data)
+ 
+
+       
+        exit()
+
+      
 #        mL.property_stats(mydata)
 #        exit()        
 
@@ -1562,14 +1547,13 @@ class Pipeline:
                 print 'HERE 911'
                 data=createProgenitorList(data, myheader, mylog)                                                                                                   
     
-    
-    
-            if redshift=='False' or redshift==False:
+            if redshift=='False':
                 try:
                     redshift=float(self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_manual_input_redshift'])
                     print 'redshift reset to:', redshift
                 except:
                     print 'redshift could not be reset! Current redshift value is:', redshift
+                    
     
             if self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_convert_sph_to_cart_coords']!='False':
                 try:
@@ -1618,7 +1602,8 @@ class Pipeline:
                
                     
             mylog+='\nngalaxies in the file: '+str(len(data[self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_id_col_array']['name0']]))+'\nlink and filename of catalogue: '+myhdf5_filename
-          
+            print myhdf5_filename
+       
             #writeCoordinates(data, myhdf5_filename)
             if self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_OUTPUT_ASCII']!='False':				
                 writeASCII(data[sel_col_list], myhdf5_filename[0:len(myhdf5_filename)-5]+'.txt', myheader, mydataformat)
@@ -3142,7 +3127,7 @@ class Pipeline:
                 parentIndices, index1, index2 = np.intersect1d(data['parentIndex'], indices[:,1], return_indices=True)             
 
                 #we test wheater the nodeIndex of this snapshot, in particular, those we already found in the first step 
-                #(stored in index1) are linked to the a parentIndex. Thereby we check if those nodeIndices con be found in the
+                #(stored in index1) are linked to the a parentIndex. Thereby we check if those nodeIndices can be found in the
                 #parentIndex at any position.          
                 test = np.in1d(data['parentIndex'], data['nodeIndex'][index1])
                 #if that is true we include those indices in 'index1' too. In other words we have found all satellites to a certain halo                    
@@ -5092,7 +5077,9 @@ class Pipeline:
                       col_name,
                       col_unit,
                       binning='log',
-                      binup2D=False):
+                      nbins=25,
+                      binup2D=False,
+                      custom_min_max=True):
 
         if binup2D==True:
 
@@ -5102,7 +5089,7 @@ class Pipeline:
                 data = data[np.where(data[col_name]<1e15)[:][0]]
 
                 histo, binsize = myFuncs.binUp(data[[col_name,'mstar']],
-                                                    25,
+                                                    nbins,
                                                     histo_min=1e11,
                                                     histo_max=1e15,
                                                     log10bin=True,
@@ -5114,54 +5101,55 @@ class Pipeline:
             
         else:
                 
-            #print 'fast histogramm -->', col_name, '[', col_unit, ']',
-            if col_name=='sfr':
-                data_min = 1e-4
-                data_max = 1000
-
-            elif col_name=='zcold':
-                data_min = 8
-                data_max = 11.5
-
-            elif col_name=='g-i':
-                data_min = 0
-                data_max = 3.5
-
-            elif col_name=='ssfr':
-                data_min = 1e-13
-                data_max = 1e-8
+            print 'fast histogramm -->', col_name, '[', col_unit, ']',
+            if custom_min_max==True:
+                if col_name=='sfr':
+                    data_min = 1e-4
+                    data_max = 1000
     
-            elif col_name=='mstar':
-                data_min = 1e9
-                data_max = 1e12                                          
-
-            elif col_name=='mbh':
-                data_min = 1e5
-                data_max = 1e9
-            elif col_name=='rbulgevsrdisk':
-                data_min = 0.001
-                data_max = 10000    
-            elif col_name.find('mhalo')!=-1:
-                data_min = 1e11
-                data_max = 1e15
-            elif col_name.find('age')!=-1:
-                data_min = 0.1
-                data_max = 10
-            elif col_name.find('rhalfmass')!=-1:
-                data_min = 1e-4
-                data_max = 1                
-            elif col_name=='vmax' or col_name=='vdisp':
-                data_min = 10
-                data_max = 10000
-            elif col_name=='cgf':
-                data_min = 1e-5
-                data_max = 10                   
+                elif col_name=='zcold':
+                    data_min = 8
+                    data_max = 11.5
+    
+                elif col_name=='g-i':
+                    data_min = 0
+                    data_max = 3.5
+    
+                elif col_name=='ssfr':
+                    data_min = 1e-13
+                    data_max = 1e-8
+        
+                elif col_name=='mstar':
+                    data_min = 1e9
+                    data_max = 1e12                                          
+    
+                elif col_name=='mbh':
+                    data_min = 1e5
+                    data_max = 1e9
+                elif col_name=='rbulgevsrdisk':
+                    data_min = 0.001
+                    data_max = 10000    
+                elif col_name.find('mhalo')!=-1:
+                    data_min = 1e11
+                    data_max = 1e15
+                elif col_name.find('age')!=-1:
+                    data_min = 0.1
+                    data_max = 10
+                elif col_name.find('rhalfmass')!=-1:
+                    data_min = 1e-4
+                    data_max = 1                
+                elif col_name=='vmax' or col_name=='vdisp':
+                    data_min = 10
+                    data_max = 10000
+                elif col_name=='cgf':
+                    data_min = 1e-5
+                    data_max = 10                   
             else:
                 data_min=min(data)
                 data_max=max(data)
                 
             data = data[np.where(data>=data_min)[:][0]]
-            data = data[np.where(data<data_max)[:][0]]
+            data = data[np.where(data<=data_max)[:][0]]
 
             if binning=='log':           
                 data = np.log10(data)
@@ -5172,8 +5160,7 @@ class Pipeline:
     #        data = data[np.where(data>=np.percentile(data,0.01))[:][0]]
     #        data = data[np.where(data<np.percentile(data,99.9))[:][0]]
             #print data.shape                
-            #print 'data min/max:', min(data), '/', max(data),
-            nbins=25
+            print 'data min/max:', min(data), '/', max(data),
     
             #print 'data_min:', data_min, 'data_max:', data_max
             binsize = (data_max-data_min)/nbins
@@ -5182,6 +5169,7 @@ class Pipeline:
             #print bins
            
             counts, edges = np.histogram(data, bins)
+            #print edges
     
             histo=np.zeros((nbins, 7), dtype=np.float32)
            
@@ -5192,7 +5180,7 @@ class Pipeline:
     
             if self.volume=='False' or self.volume==False:
                 self.volume=(self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_box_size']/0.6777)**3
-                print '--> set volume:', self.volume
+                print 'box size:', self.myconfig_array[self.myconfig_array['catname'+str(self.a)]+'_box_size']/0.6777, '--> set volume:', self.volume
                 
             histo[:,1]=counts/binsize/self.volume
             histo[:,2]=binsize

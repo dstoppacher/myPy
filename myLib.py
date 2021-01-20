@@ -1,5 +1,6 @@
 # Load packages
 import arangeData as aD
+import outputData as oD
 import numpy as np
 import os
 system_info = os.getcwd()
@@ -1223,7 +1224,7 @@ def filter_data_before_write2file(data,
             max_data = int(max(data[name]))
             min_data = int(min(data[name]))
         else:
-            if name.startswith('L_') or name.find('age')!=-1 or name.find('ang')!=-1 or name.startswith('satelliteMergeTim') or name.startswith('mbasi') or name.startswith('sfr') or name.startswith('ssfr') or name.startswith('r') or name.startswith('mstar') or name.startswith('mhalo') or name.startswith('mcold') or name.startswith('mhot') or name.startswith('mbh') or name.find('bh_acc')!=-1 or name.startswith('zgas') or name.startswith('zstar') or name.startswith('zhot') or name.startswith('Mz'):
+            if name.startswith('delta_mhal') or name.startswith('Mpseu') or name.startswith('L_') or name.find('age')!=-1 or name.find('ang')!=-1 or name.startswith('satelliteMergeTim') or name.startswith('mbasi') or name.startswith('sfr') or name.startswith('ssfr') or name.startswith('r') or name.startswith('mstar') or name.startswith('mhalo') or name.startswith('mcold') or name.startswith('mhot') or name.startswith('mbh') or name.find('bh_acc')!=-1 or name.startswith('zgas') or name.startswith('zstar') or name.startswith('zhot') or name.startswith('Mz'):
                 
                 max_data = "{0:.2e}".format(max(data[name]))
                 min_data = "{0:.2e}".format(min(data[name]))
@@ -2576,6 +2577,368 @@ def show_mag_info(data):
         print 'median:', np.nanmedian(diff), 'std:', robust.mad(diff)            
         
     exit()
+
+
+def construct_merger_tree(redshift, tree_id=0):
+
+    import read_MDGal as rMD   
+    data = rMD.readMDGal(myfilename=mycomp+'anaconda/pro/data/ROCKSTAR_50Mpc/ROCKSTAR_50Mpc_z_'+str(redshift)+'_tarsel_tree.hdf5', mycol=[1,13,38,40,41,42,43,44,45,48,49,50,51,52,53,54,0,56,57,58,59])
+    
+    data=data[np.where(data['firstProgenitorID']==tree_id)[:][0]]
+
+    import numpy.lib.recfunctions as rcfuncs
+    data = rcfuncs.append_fields([data], ['Z'] , [np.zeros(data.size,)], dtypes=['f4'], usemask=False)
+    
+    data['Z']=redshift
+                 
+    return data, data['haloid']
+
+def test_Rockstar(data, redshift_before):
+    #print np.info(data)
+    print 'redshift_before:', redshift_before 
+    import read_MDGal as rMD
+    data_RS_now = data
+    #rMD.readMDGal(myfilename=mycomp+'anaconda/pro/data/ROCKSTAR_50Mpc/ROCKSTAR_50Mpc_z_10.33_tarsel.hdf5', mycol=[1,13,38,40,41,42,43,44,45,48,49,50,51,52,53])
+    print 'data_RS_now.size:', data_RS_now.size
+    try:
+        data_RS_before= rMD.readMDGal(myfilename=mycomp+'anaconda/pro/data/ROCKSTAR_50Mpc/ROCKSTAR_50Mpc_z_'+str(redshift_before)+'_tarsel_tree.hdf5', mycol=[1,13,38,40,41,42,43,44,45,48,49,50,51,52,53,54,0,56])
+        print 'data_RS_before.size:', data_RS_before['orphan'].size
+    except:
+        data_RS_before= rMD.readMDGal(myfilename=mycomp+'anaconda/pro/data/ROCKSTAR_50Mpc/ROCKSTAR_50Mpc_z_'+str(redshift_before)+'_tarsel.hdf5', mycol=[1,13,38,40,41,42,43,44,45,48,49,50,51,52,53])
+        import numpy.lib.recfunctions as rcfuncs
+        data_RS_before = rcfuncs.append_fields([data_RS_before], ['npros','orphan','firstProgenitorID'] , [np.zeros(data_RS_before.size,),np.zeros(data_RS_before.size,),np.zeros(data_RS_before.size,)], dtypes=['i4','i4','i8'], usemask=False)
+        data_RS_before['npros']= -99
+        data_RS_before['orphan']= 1
+        data_RS_before['firstProgenitorID']= -99       
+        print '-- set npros and orphan values at start redshift of tree! --> data_RS_before.size:', data_RS_before.size
+               
+    
+#    for k in range(0,100,1):
+ #       print 'k:', k, data_RS_now[np.where(data_RS_now['haloid']==k)[:][0]][['haloid','descIndex', 'mhalo','x_pos', 'y_pos', 'z_pos']], data_RS_before[np.where(data_RS_before['descIndex']==k)[:][0]][['haloid','descIndex', 'mhalo','x_pos', 'y_pos', 'z_pos']]
+
+    data_RS_now['delta_mhalo']=0.0
+    data_RS_now['delta_rvir']=0.0
+    
+    data_RS_before[::-1].sort(order=['descIndex','mhalo','haloid'], axis=0)
+    print 'start values --> data_RS_before:\n', data_RS_before[['haloid','descIndex','firstProgenitorID','orphan', 'npros', 'mhalo', 'x_pos', 'y_pos', 'z_pos']]
+    
+    #exit()
+    
+    non_unique, index, count = np.unique(data_RS_before['descIndex'], return_index=True, return_counts=True)
+    data_RS_before['npros'][index]=count
+    data_RS_before['orphan'][index]=0 
+  
+    print 'after finding uniques and setting npros, orphans and haloid --> data_RS_before:\n', data_RS_before[['haloid','descIndex','firstProgenitorID','orphan', 'npros', 'mhalo', 'x_pos', 'y_pos', 'z_pos']]     
+    print 'start values --> data_RS_now:\n', data_RS_now[['haloid','descIndex','predIndex','firstProgenitorID','orphan', 'npros', 'mhalo', 'delta_mhalo', 'x_pos', 'y_pos', 'z_pos']]
+    
+    
+    parentIndices, index_now, index_before = np.intersect1d(data_RS_now['haloid'], data_RS_before['descIndex'], return_indices=True)
+    
+    index_start=0
+    index_end=len(index_now)
+    print index_now[index_start:index_end], '\n', data_RS_now[['haloid','descIndex', 'firstProgenitorID','mhalo','x_pos', 'y_pos', 'z_pos']][index_now[index_start:index_end]],'\n', index_before[index_start:index_end], '\n', data_RS_before[['haloid','descIndex', 'mhalo','x_pos', 'y_pos', 'z_pos']][index_before[index_start:index_end]]
+       
+    data_RS_now['predIndex'][index_now]=data_RS_before['haloid'][index_before]    
+    data_RS_now['delta_mhalo'][index_now]=data_RS_now['mhalo'][index_now]-data_RS_before['mhalo'][index_before]
+    data_RS_now['delta_rvir'][index_now]=data_RS_now['rvir'][index_now]-data_RS_before['rvir'][index_before]
+    data_RS_now['npros'][index_now]=data_RS_before['npros'][index_before]
+    data_RS_now['orphan'][index_now]=data_RS_before['orphan'][index_before]
+    data_RS_now['firstProgenitorID'][index_now]=data_RS_before['firstProgenitorID'][index_before]
+    
+    data_RS_now[::-1].sort(order=['predIndex','mhalo','haloid'], axis=0)
+    data_RS_now[::-1].sort(order=['descIndex','mhalo','haloid'], axis=0)
+    
+    
+    print 'after linking snapshot --> data_RS_before:\n', data_RS_before[['haloid','descIndex','firstProgenitorID','orphan', 'npros', 'mhalo', 'x_pos', 'y_pos', 'z_pos']]#[np.where(data_RS_before['descIndex']==0)[:][0]]    
+    print 'data_RS_now:\n', data_RS_now[['haloid','descIndex','predIndex', 'firstProgenitorID', 'orphan', 'npros', 'mhalo', 'delta_mhalo', 'x_pos', 'y_pos', 'z_pos']]#[np.where(data_RS_now['predIndex']==0)[:][0]]
+
+
+    #set first Progenitor ID==root of the merger tree!
+       
+    data_wo_root=data_RS_now[np.where(data_RS_now['firstProgenitorID']==-99)[:][0]]
+      
+    data_wo_root.sort(order=['haloid'], axis=0)
+    
+    data_wo_root['firstProgenitorID']=range(data_RS_now.size-data_wo_root.size,data_RS_now.size,1)
+       
+    parentIndices, index_root, index_now = np.intersect1d(data_wo_root['haloid'], data_RS_now['haloid'], return_indices=True)
+    data_RS_now['firstProgenitorID'][index_now]=data_wo_root['firstProgenitorID'][index_root]
+    
+    print 'data_RS_now:\n', data_RS_now[['haloid','descIndex','predIndex', 'firstProgenitorID', 'orphan', 'npros', 'mhalo', 'delta_mhalo', 'x_pos', 'y_pos', 'z_pos']]    
+
+    return data_RS_now
+
+
+def binaryToDecimal(binary): 
+      
+    decimal, i, n = 0, 0, 0
+    while(binary != 0): 
+        dec = binary % 10
+        decimal = decimal + dec * pow(2, i) 
+        binary = binary//10
+        i += 1
+    
+    #print 'decimal:', decimal
+    
+    return decimal
+
+
+def crossmatch_hydro_particle_data(data):
+     
+    
+    myOutput = oD.OutputData(config=False)
+    myData = aD.ArangeData()
+    
+    #look for the position of the first progenitor in the merger tree
+    
+    print np.info(data)
+    
+    for prop in ['x_pos', 'y_pos', 'z_pos', 'rvir', 'delta_rvir']:
+        data[prop]*=0.6766
+        data[prop]*=1000.0
+        
+    for prop in ['mhalo', 'delta_mhalo']:
+        data[prop]*=0.6766
+
+    import pandas as pd
+    data1 = pd.read_csv(mycomp+'anaconda/pro/data/Cholla256_50Mpc/Cholla256_50Mpc_snapidzred.txt', skiprows=2, names=['snapid', 'z', 'a'], sep=' ')
+    snapid_array = df_to_sarray(data1)
+    
+    
+    
+    m_particle=540655554.0485799
+    
+    cube_size=25000.0
+    dx=195.3125
+    n_rvir=5
+    
+    filename_check_trees=mycomp+'anaconda/pro/data/Cholla256_50Mpc/Cholla256_50Mpc_check_merger_trees.txt' 
+       
+    print snapid_array
+    
+    for snapid,z in zip(snapid_array['snapid'][0:3], snapid_array['z'][0:3]):        
+        print 'snapid:', snapid, 'redshift:', z,
+                
+        data_prog = data[np.where(data['Z']==z)[:][0]]
+        
+        print 'n_progs:', data_prog.size, '\n////////////////////////////////////////////////////////\n'
+        
+        for k, prog in enumerate(data_prog[['x_pos', 'y_pos', 'z_pos']]):
+            
+            print 'prog:', k, 'prog:', prog, '\n===============================================\n'
+            print data_prog[k]
+            #which cell is it?
+            cell_loc = find_cell_location(prog, dx)
+        
+            print '--> cell_loc:', cell_loc,  
+            #In which sub-file is the cell stored!'
+            subcube_loc = find_cell_location(prog, cube_size)
+
+            print 'in sub-cube:', subcube_loc, '--> decimal:',
+            binary_rep=int(str(subcube_loc[0])+str(subcube_loc[1])+str(subcube_loc[2]), base=2)
+            print binary_rep
+        
+            if binary_rep==4:
+                binary_rep=1
+            elif binary_rep==1:
+                binary_rep=4
+            elif binary_rep==3:
+                binary_rep=6
+            elif binary_rep==6:
+                binary_rep=3     
+     
+            #load particle data -- positions
+            path_p='/data/256_hydro_50Mpc/'+str(snapid)+'_particles.h5.'+str(binaryToDecimal(binary_rep))
+            data_particle_pos= simple_hdf52struct_array(path_p, ['pos_x', 'pos_y', 'pos_z'])
+            
+            #load particle data -- density grid
+            #data_particle_grid= simple_hdf52struct_array(path_p, ['density', 'grav_potential'])
+            
+            #load hydro data
+            #path_f = '/data/256_hydro_50Mpc/'+snapid+'.h5.'+str(binaryToDecimal(binary_rep))
+            #data_hydro= simple_hdf52struct_array(path_f)
+            
+            #print np.info(data_particle_pos)    
+            #print np.info(data_particle_grid)    
+            #print np.info(data_hydro)
+            
+            #scan_file_format_Cholla(f_p, path_p)
+               
+            print 'r_vir', format(data['rvir'][k], '0.2f'), 'h-1kpc',        
+            
+            n_particle = len(find_members(data_particle_pos[['pos_x','pos_y','pos_z']], prog, n_rvir*data['rvir'][k])[:][0])
+            
+            print 'n_particles:', n_particle, 'halo mass:', format(n_particle*m_particle , '0.5e')
+            
+            output_string=''
+            myheader=''
+            
+            myprops={'0': {'name': 'haloid', 'unit':'-'}, '1': {'name':'descIndex', 'unit':'-'},'2': {'name':'predIndex','unit':'-'}, '3': {'name':'firstProgenitorID','unit':'-'},\
+                     '4': {'name':'npros','unit':'count'}, '5': {'name':'mhalo','unit':'h-1Msun'}, '6': {'name':'delta_mhalo','unit':'h-1Msun'}, '7': {'name':'rvir','unit':'h-1comkpc'},\
+                     '8': {'name':'delta_rvir','unit':'h-1comvkpc'}, '9': {'name':'x_pos','unit':'h-1comvkpc'}, '10': {'name':'y_pos','unit':'h-1comvkpc'}, '11': {'name':'z_pos','unit':'h-1comvkpc'},\
+                     '12': {'name':'Z','unit':'-'}}
+
+            for i in range(len(myprops)):
+                #print 'i:', i, myprops[str(i)]['name']
+                myheader+='('+str(i+1)+') '+myprops[str(i)]['name']+' ['+myprops[str(i)]['unit']+'] '
+                if myprops[str(i)]['name'].find('mhal')!=-1:
+                    output_string+=str(format(data[k][myprops[str(i)]['name']], '0.5e'))+' '
+                else:
+                    output_string+=str(data[k][myprops[str(i)]['name']])+' '
+            
+            #print myheader
+            #print output_string
+            
+            delta_mhalo = n_particle*m_particle-data[k]['mhalo']
+            
+            delta_mhalo_per = 100.0/data[k]['mhalo']*delta_mhalo
+            
+            if delta_mhalo_per>-5.0 and delta_mhalo_per<5.0:
+                check_delta_mhalo=1
+            else:
+                check_delta_mhalo=0                
+
+            if str(snapid)=='21' and k==0:
+                myOutput.writeIntoFile(
+                           filename_check_trees,
+                           [output_string+' '+str(n_particle)+' '+str(format(n_particle*m_particle, '0.5e'))+' '+str(format(delta_mhalo, '0.5e'))+' '+str(format(delta_mhalo_per, '0.1f'))+' '+str(check_delta_mhalo)],
+                           myheader='ROCKSTAR run on Cholla256 50h-1Mpc, 0.81 < z < 11.51, main progenitors crossmatch with particle field in Cholla particle file. Particles around '+str(n_rvir)+' x rvir [h-1comvkpc] where used./n'+myheader+' (15) n_particle [count] (Cholla particle data) (16) halo mass [h-1Msun] (n_particle x particle mass (Cholla particle data) (17) delta(mhalo_Rockstar-mhalo_particle) [h-1Msun] (18) percentage delta(mhalo_Rockstar-mhalo_particle) [%] (19) Bool [(18)<5%==1,else==0]',
+                           append_mytext=False,
+                           data_is_string=False,
+                           data_format='%s')
+            else:
+                myOutput.writeIntoFile(
+                           filename_check_trees,
+                           output_string+' '+str(n_particle)+' '+str(format(n_particle*m_particle, '0.5e'))+' '+str(format(delta_mhalo, '0.5e'))+' '+str(format(delta_mhalo_per, '0.1f'))+' '+str(check_delta_mhalo)+'\n',
+                           append_mytext=True,
+                           data_is_string=True,
+                           data_format='%s')
+                
+            print '\n===============================================\n'
+    exit()
+
+
+def find_cell_location(pos_vector, grid_res):
+        
+    #print 'find location with this coordinates: [', pos_vector[0], ',', pos_vector[1], ',', pos_vector[2], ']'
+    cell_vector=[0,0,0]
+    for i, pos in enumerate(pos_vector):
+        #print 'i:', i, 'pos:', pos
+        pos=int(np.floor(pos_vector[i]/grid_res))
+        if pos>=128:
+            pos-=128
+        cell_vector[i]=pos
+    
+    return cell_vector 
+   
+def find_members(data,
+                 vector,
+                 radius):
+       
+    return np.where(((data['pos_x']-vector[0])**2+(data['pos_y']-vector[1])**2+(data['pos_z']-vector[2])**2)**0.5 < radius)    
+  
+def simple_hdf52struct_array(path,
+                             cols=[]):
+    """Reads a set of columns dedicated by col from and hdf5-file to a structured array
+    thereby it uses the dtype of each column to generate the array:
+        
+        input
+        =========
+            
+        path:   the path to the hdf5-file
+        col:    keyword, exact name of the column to be accessed in the hdf5-file,
+                if not set, the column name from the hdf5-file is used and all columns
+                in the hdf5-file are read to the structured array
+                
+        output
+        =========
+        
+        returns a structured array with column names and dtypes and size as in the hdf5-file.
+        The array dimension is taken from the hdf5-file. The shape of the structured array
+        needs to be identical for all column which should be read in.
+    
+    """
+    import h5py as hdf5
+    
+    f=hdf5.File(path, "r")
+    print '\nSimle read-in hdf5 data to structured array! -->',
+    print 'path:', path
+    #scan_file_format_Cholla(f, path)
+    
+    if cols==[]:
+        cols=f.keys()
+
+    dt = np.dtype([(k, f[k].dtype) for k in cols])
+
+    data = np.zeros(f[cols[0]].shape, dtype=dt)
+   
+    #print np.info(data)
+    #print 'properties read into structured array!'
+    for name in cols:
+        #print 'property:', name,
+        for dim in range(len(f[cols[0]].shape)):
+            #print 'dim:', dim
+            try:
+                data[name][dim,:]=f[name][dim]
+            except:
+               data[name]=f[name][:] 
+    
+    f.close()
+        
+    return data
+    
+def scan_file_format_Cholla(f,path):   
+        
+
+    print '\n1) Attributes\n-------------------------'
+    for k in range(0,len(f.attrs.keys()),1):
+        print '\t', f.attrs.keys()[k], ':\t\t', f.attrs.values()[k][0]
+            
+
+    print '\n+++++++++++++++++++++\nSCANNING FILE FORMAT of ...', path,'\n'    
+    print '\n2) Data\n-------------------------'                
+    for name in f:
+        print 'name:\t', name,
+        try:
+            print 'size:\t', f[name].size, 
+            print f[name],
+            try:
+                print 'min/max:\t', format(min(f[name][:]), '0.2f'), '/', format(max(f[name][:]), '0.2f')
+            except:
+                for k in [0,1,2]:
+                    print ''
+                    for g in [0,1,2]:
+                        #print 'k:', k, 'g:', g,
+                        #print '\tdim: [:,'+str(k)+'][:,0]', format(min(f[name][:,k][:,0]), '0.5f'), '/', format(max(f[name][:,k][:,0]), '0.5f')
+                        #print '\tdim: [:,0][:,'+str(g)+']', format(min(f[name][:,0][:,g]), '0.5f'), '/', format(max(f[name][:,0][:,g]), '0.5f')
+                        print '\tsize:', f[name][:,k][:,g].size, '\tdim: [:,'+str(k)+'][:,'+str(g)+']', format(min(f[name][:,k][:,g]), '0.2f'), '/', format(max(f[name][:,k][:,g]), '0.2f')
+                    
+        except:
+            print '--> failed!'
+    print '\n'
+
+def crossmatch_Cholla(data):
+    
+    import read_MDGal as rMD
+    
+    data_RS = rMD.readMDGal(myfilename=mycomp+'anaconda/pro/data/ROCKSTAR_50Mpc/ROCKSTAR_50Mpc_z_0.0_tarsel.hdf5', mycol=[40,41,42,43,44,45])    
+    
+    data_RS['x_pos']
+    
+    
+    
+    
+    
+    #mask = np.where(((data_pos['x_pos'])**2+(data_pos['y_pos'])**2+(data_pos['z_pos'])**2)**0.5 < 0.5])
+
+
+
+
+
+
+
+        
+    return data
     
 def test_haloids(data):
 
@@ -2982,4 +3345,24 @@ def print_props_table_format():
     print stats_props
             
     exit()
-#    
+
+def generate_snapidzred_file(start_redshift, redshift):
+
+    if redshift==start_redshift:
+        myOutput.writeIntoFile(
+                   mycomp+'anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/Cholla_256_50Mpc_snapidzred.txt',
+                   [str(myData.redshift)+' '+str(myData.scale_factor)],
+                   myheader='Cholla 50 h-1Mpc\n(1) z (2) a',
+                   append_mytext=False,
+                   data_is_string=False,
+                   data_format='%s')
+    else:
+        myOutput.writeIntoFile(
+                   mycomp+'anaconda/pro/data/'+self.myconfig_array['catname'+str(self.a)]+'/Cholla_256_50Mpc_snapzidred.txt',
+                   str(myData.redshift)+' '+str(myData.scale_factor)+'\n',
+                   append_mytext=True,
+                   data_is_string=True,
+                   data_format='%s')         
+    
+       
+         

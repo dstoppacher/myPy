@@ -599,7 +599,7 @@ class Configuration:
         else:
                 i=0
                 while i<config_array[catkey+'_nr_zs_count']:
-                    #print 'key_filename:', inputfilename_part1+snapid+inputfilename_part2
+                    #print 'key_filename part1:', inputfilename_part1, 'snapid:', snapid, 'part2:', inputfilename_part2
 
                     if config_array[catkey+'_create_subcat']=='True':
                         #print 'create subcat!'
@@ -613,10 +613,13 @@ class Configuration:
                     elif config_array[catkey+'_load_from_file']=='True' or config_array[catkey+'_load_subcat']=='True':
                         #print 'manual z:', config_array[catkey+'_manual_input_redshift']
                         my_z=config_array[catkey+'_manual_input_redshift']
-                             
-                    self.snapid_array[catkey+'_'+inputfilename_part1+'_snapid'+str(i)] = {'z': my_z}
+                    
+                    if inputfilename_part1=='':
+                        self.snapid_array[catkey+'_snapid'+str(i)] = {'z': my_z}
+                    else:
+                        self.snapid_array[catkey+'_'+inputfilename_part1+'_snapid'+str(i)] = {'z': my_z}
                     i+=1               
-        #print self.snapid_array
+        print 'self.snapid_array:', self.snapid_array
         
     def filterDataConfig(self):
 
@@ -685,7 +688,7 @@ class Configuration:
             except:
                 print 'data_array=None'
 
-        #print 'HERE:', data_array
+        print 'HERE:', data_array
         
 
         check_data(data_array)

@@ -106,22 +106,41 @@ Get information about the MD-Galaxies output file of your choice
     #script e.g. the redshift of the snapshot
     redshift     = output_file_info['redshift']
     print 'redshift of this catalog is,' redshift
+    
+    
+Example
++++++++++++++++++++++++++++++++++++++++++++++++++++   
+    #enter filename you want to read in:
+    common_path ='/store/erebos/doris/SkiesANDUniverses/'
+    
+    SAM_name    = 'Galacticus'
+    redshift    = 0.00
+    #example for path+filename to read-in:
+    myfilename  = common_path+'MDPL2_'+SAM_name+'_z_'+str("{0:.2f}".format(redshift))+'.hdf5'
+    
+    f = hdf5.File(myfilename, "r")
   
 """
 
 import numpy as np
 import h5py as hdf5
 
-def readMDGal():        
-    print '#####################################################################'
-    print 'read MultiDark-Galaxies HDF5 file format\n'
+def readMDGal(myfilename=None,
+              mycol=[]):        
+    #print '#####################################################################'
+    #print 'read MultiDark-Galaxies HDF5 file format\n'
     
     #Dictionary in alphabethical order of the galaxy properties available!
     #Please note that not every model has all properties available ...
+    
+    #Galaxy property names of 'The MultiDark-Galaxies' as released
+
+    #Galaxy property names of 'myPy' data analysis pipline by DS
+    #under construction
     gal_properties={
-                     'name0': 'GalaxyType',
-                     'name1': 'HaloMass',
-                     'name2': 'HostHaloID',
+                     'name0': 'orphan',
+                     'name1': 'mhalo',
+                     'name2': 'hostid',
                      'name3': 'LstarSDSSg',
                      'name4': 'LstarSDSSi',
                      'name5': 'LstarSDSSr',
@@ -132,11 +151,11 @@ def readMDGal():
                      'name10': 'MagStarSDSSr',
                      'name11': 'MagStarSDSSu',
                      'name12': 'MagStarSDSSz',
-                     'name13': 'MainHaloID',
-                     'name14': 'Mbh',
+                     'name13': 'haloid',
+                     'name14': 'mbh',
                      'name15': 'McoldSpheroid',
                      'name16': 'MeanAgeStars',
-                     'name17': 'Mhot',
+                     'name17': 'mhot',
                      'name18': 'MstarDisk',
                      'name19': 'MstarIC',
                      'name20': 'MstarSpheroid',
@@ -157,73 +176,104 @@ def readMDGal():
                      'name35': 'SFRdisk',
                      'name36': 'SFRspheroid',
                      'name37': 'SpinParameter',
-                     'name38': 'Vmax',
-                     'name39': 'Vpeak',
-                     'name40': 'Vx',
-                     'name41': 'Vy',
-                     'name42': 'Vz',
-                     'name43': 'X',
-                     'name44': 'Y',
-                     'name45': 'Z',
+                     'name38': 'vmax',
+                     'name39': 'vpeak',
+                     'name40': 'x_vel',
+                     'name41': 'y_vel',
+                     'name42': 'z_vel',
+                     'name43': 'x_pos',
+                     'name44': 'y_pos',
+                     'name45': 'z_pos',
                      'name46': 'ZgasDisk', 
-                     'name47': 'ZgasSpheroid'                 
+                     'name47': 'ZgasSpheroid',
+                     'name48': 'rvir',
+                     'name49': 'descIndex',
+                     'name50': 'mhalo_200b',
+                     'name51': 'mhalo_200c',
+                     'name52': 'mhalo_500c',
+                     'name53': 'mhalo_2500c',
+                     'name54': 'npros',
+                     'name56': 'firstProgenitorID',
+                     'name57': 'predIndex',
+                     'name58': 'delta_mhalo',
+                     'name59': 'delta_rvir'
             }
 
-    #dfefault: all galaxy properties for a certain model will be read in!    
-    mycol=[]
+    #dfefault: all galaxy properties for a certain model will be read in im mycol is not set when calling the function!
+    
     #Enter the numbers of the galaxy properties you want to read in! -->
     #mycol=[0, 1, 2, 3, 4]
     
     if mycol==[]:
         mycol=[k for k in np.arange(len(gal_properties))]
-    
-    #enter filename you want to read in:
-    common_path ='/store/erebos/doris/SkiesANDUniverses/'
-    
-    SAM_name    = 'Galacticus'
-    redshift    = 0.00
-    #example for path+filename to read-in:
-    myfilename  = common_path+'MDPL2_'+SAM_name+'_z_'+str("{0:.2f}".format(redshift))+'.hdf5'
+
+
+    #If the 'myfilename' is not set, then you can enter here one manually!
+    if myfilename==None:
+        #enter filepath from which you want to read in:
+        common_path ='/store/erebos/doris/SkiesANDUniverses/'
+        
+        SAM_name    = 'Galacticus'
+        redshift    = 0.00
+        #example for path+filename to read-in:
+        myfilename  = common_path+'MDPL2_'+SAM_name+'_z_'+str("{0:.2f}".format(redshift))+'.hdf5'
+        
+        #print 'the following galaxy properties have been selected for\n\tSAM:\t ', \
+         #  SAM_name, '\n\tredshift: ', redshift, '\n\tfilename:', myfilename, '\n'
+    else:
+        pass
+        #print 'the following galaxy properties have been selected for:', myfilename
     
     f = hdf5.File(myfilename, "r")
-
     
     #construct data types for the your chosen galaxy properties 
     dt={}
-    print 'the following galaxy properties have been selected for\n\tSAM:\t ', \
-           SAM_name, '\n\tredshift: ', redshift, '\n\tfilename:', myfilename, '\n'
+
     class unit(object):
         """This class serve to trick numpy-structured arrays to accept two
         field 'titles' with the same name by assigning each an object with unit 
         identifier!"""
         def __init__(self,unit):
             self.unit = unit
-            
+
+
+
+    mytypes={}
+    
+         
     for col in mycol:
         try:
-            print 'ID', col, '\tproperty name:', gal_properties['name'+str(col)].ljust(18),\
-                  'unit:', str('['+f[gal_properties['name'+str(col)]].attrs['unit']+']').ljust(25), \
-                  'data type:', f[gal_properties['name'+str(col)]].dtype
+            
+            #print 'ID', col, '\tproperty name:', gal_properties['name'+str(col)].ljust(18),\
+                  #'unit:', str('['+f[gal_properties['name'+str(col)]].attrs['unit']+']').ljust(25), \
+                  #'data type:', f[gal_properties['name'+str(col)]].dtype
                   
-            dt.update({gal_properties['name'+str(col)]: (\
-                      np.dtype(f[gal_properties['name'+str(col)]].dtype),\
-                      col,\
-                      unit(f[gal_properties['name'+str(col)]].attrs['unit']))})
+#            dt.update({gal_properties['name'+str(col)]: (\
+#                      np.dtype(f[gal_properties['name'+str(col)]].dtype),\
+#                      col,\
+#                      unit(f[gal_properties['name'+str(col)]].attrs['unit']))})
+
+            mytypes.update({gal_properties['name'+str(col)]: (f[gal_properties['name'+str(col)]].dtype,unit(f[gal_properties['name'+str(col)]].attrs['unit']))})                   
+            
         except:
             print 'galaxy property is not available for this SAM!'
             pass
-        
+
+    dt = np.dtype([(k, mytypes[k][0]) for k in mytypes.keys()])        
     #construct a structured array which will be filled with the chosen galaxy
     #properties
-    data_struct=np.zeros((f[dt.items()[0][0]].size ,), dtype=dt)                  
+    
+    #print dt
+
+    data_struct=np.zeros((f[gal_properties['name'+str(mycol[0])]].size ,), dtype=dt)                  
  
-    print '\nprocessing ...\n'         
+    #print '\nprocessing ...\n'         
     #read all chosen galaxy properties to the structured array
     for name in data_struct.dtype.names:                  
-        print 'name', name.ljust(18), str('['+f[name].attrs['unit']+']').ljust(25), \
-              'ngal:', f[name].size, 
+        #print 'name', name.ljust(18), str('['+f[name].attrs['unit']+']').ljust(25), \
+              #'ngal:', f[name].size, 
         data_struct[name][0:f[name].size] = f[name]
-        print 'successfully read!'
+        #print 'successfully read!'
         
-print 'EOF - END OF FUN'
-print '-------------------------'
+    f.close()
+    return data_struct

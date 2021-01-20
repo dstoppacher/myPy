@@ -13,11 +13,13 @@ compileall.compile_dir(mycomp+'anaconda/pro/myPy/', force=1)
 
 import subprocess as subs
 
-if mycomp.startswith('/home'):
+if mycomp.startswith('/homer'):
     #subs.call(mycomp+'anaconda/pro/myRun/gen_input_cat.sh', shell=True)
     subs.call(mycomp+'anaconda/pro/myRun/gen_input_cat_home.sh', shell=True)
 else:
     #subs.call(mycomp+'anaconda/pro/myRun/gen_input_cat_filter_down.sh', shell=True)
+    #subs.call(mycomp+'anaconda/pro/myRun/gen_input_cat_filter_RS.sh', shell=True)
+    subs.call(mycomp+'anaconda/pro/myRun/gen_input_cat_filter_RS2.sh', shell=True)
     #subs.call(mycomp+'anaconda/pro/myRun/gen_input_cat_filter_LG2.sh', shell=True)
     #subs.call(mycomp+'anaconda/pro/myRun/gen_input_cat_filter_Gal.sh', shell=True)
     #subs.call(mycomp+'anaconda/pro/myRun/gen_input_cat_filter_Gal2.sh', shell=True) 
@@ -43,7 +45,7 @@ else:
     #subs.call(mycomp+'anaconda/pro/myRun/gen_input_cat_SFH_Gal400.sh', shell=True)
     #subs.call(mycomp+'anaconda/pro/myRun/gen_input_cat_SFH_run2.sh', shell=True)    
     #subs.call(mycomp+'anaconda/pro/myRun/gen_input_cat2.sh', shell=True)
-    subs.call(mycomp+'anaconda/pro/myRun/gen_input_cat.sh', shell=True) 
+    #subs.call(mycomp+'anaconda/pro/myRun/gen_input_cat.sh', shell=True) 
 #Check with this routine if a bad character is in a certain file!
 #with open(mycomp+'anaconda/pro/myPy/myLib.py') as fp:
 #    for i, line in enumerate(fp):

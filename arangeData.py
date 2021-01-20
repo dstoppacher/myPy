@@ -6,12 +6,13 @@ import SAM_hdf5_lib as hdf5lib
 import myLib as mL
 import outputData as oD
 import arangeData as aD
-
-import read_data_Cholla as rdC
+import os, sys
+from os import listdir
+from os.path import isfile, join
+#import read_data_Cholla as rdC
 
 myOutput = oD.OutputData(config=False)
 
-import os
 system_info = os.getcwd()
 start = system_info.find('anaconda')
 mycomp = system_info[:start]
@@ -359,7 +360,6 @@ class	ArangeData:
             
             self.data_array = self.data_array[:data_basic['haloid'].size]
             print 'self.data_array after read-in:', self.data_array.shape
-
            
         def readBINARY():
             print '###################################################################################'
@@ -997,8 +997,11 @@ class	ArangeData:
             mytypes={}
             a=0
             while a<int(id_col_array['nr_entries']):
+                
                 mytypes.update({id_col_array['name'+str(a)]: id_col_array['data_type'+str(a)]})                    
                 a+=1
+
+            print mytypes
  
             dt = np.dtype([(k, mytypes[k]) for k in mytypes.keys()])
 
@@ -1068,43 +1071,336 @@ class	ArangeData:
                         except:
                             self.data_array[id_col_array['name'+str(i)]] = -99
                 i+=1
+            
 
             #print 'mysave_colname', mysave_colname
             self.data_array = self.data_array[:f[mysave_colname].size]
             print 'self.data_array after read-in:', self.data_array.shape, 'redshift:', self.redshift, 'scale factor:', self.scale_factor
             #print self.data_array[0:3]
 
+
+        def readROCKSTAR_ASCII(halocat_code):
+            print '###################################################################################'
+            print 'read ROCSTAR ASCII FORMAT for'
+            print 'catname: ', catname, 'snapid:', snapid
+            #print 'mypath:', mypath
+            path = mypath+'out_'+str(snapid)+'.list'
+            print 'path:', path
+    
+            import pandas as pd
+            #Properties from Rockstar CHOLLA 50Mpc run
+            #ID DescID Mvir Vmax Vrms Rvir Rs Np X Y Z VX VY VZ JX JY JZ Spin rs_klypin Mvir_all M200b M200c M500c M2500c Xoff Voff spin_bullock 
+            #b_to_a c_to_a A[x] A[y] A[z] b_to_a(500c) c_to_a(500c) A[x](500c) A[y](500c) A[z](500c) T/|U| M_pe_Behroozi M_pe_Diemer Halfmass_Radius
+
+            data= pd.read_csv(path, skiprows=16, \
+                              names=['haloid','descIndex','mhalo','vmax','vdisp','rvir','rscale','debugR','x_pos','y_pos','z_pos','x_vel','y_vel', 'z_vel', 'x_ang', 'y_ang', 'z_ang', 'spinParameter',\
+                                     'rscale_Klypin','mhalo_unbound', 'mhalo_200b', 'mhalo_200c', 'mhalo_500c', 'mhalo_2500c', 'xoff', 'voff', 'spin_Bullock',\
+                                     'b_to_a', 'c_to_a','x_a', 'y_a', 'z_a', 'b_to_a_500c', 'c_to_a_500c', 'x_a_500c', 'y_a_500c', 'z_a_500c','T_U',\
+                                     'Mpseudo_Behroozi', 'Mpseudo_Diemer', 'rhalf_mass'], sep=' ')
+
+     
+            self.data_array = mL.df_to_sarray(data)
+            self.redshift=False
+            self.scale_factor=False
+            #exit()
+            #print self.data_array['mhalo_500c']
+            #print np.info(self.data_array)           
+                        
+
         def readCHOLLAHDF5(halocat_code):
+            
+            def get_domain_block( proc_grid, box_size, grid_size ):
+                np_x, np_y, np_z = proc_grid
+                Lx, Ly, Lz = box_size
+                nx_g, ny_g, nz_g = grid_size
+                dx, dy, dz = Lx/np_x, Ly/np_y, Lz/np_z
+                nx_l, ny_l, nz_l = nx_g//np_x, ny_g//np_z, nz_g//np_z
+                nprocs = np_x * np_y * np_z
+                domain = {}
+                domain['global'] = {}
+                domain['global']['dx'] = dx
+                domain['global']['dy'] = dy
+                domain['global']['dz'] = dz
+                for k in range(np_z):
+                    for j in range(np_y):
+                        for i in range(np_x):
+                            pId = i + j*np_x + k*np_x*np_y
+                            domain[pId] = { 'box':{}, 'grid':{} }
+                            xMin, xMax = i*dx, (i+1)*dx
+                            yMin, yMax = j*dy, (j+1)*dy
+                            zMin, zMax = k*dz, (k+1)*dz
+                            domain[pId]['box']['x'] = [xMin, xMax]
+                            domain[pId]['box']['y'] = [yMin, yMax]
+                            domain[pId]['box']['z'] = [zMin, zMax]
+                            domain[pId]['box']['dx'] = dx
+                            domain[pId]['box']['dy'] = dy
+                            domain[pId]['box']['dz'] = dz
+                            domain[pId]['box']['center_x'] = ( xMin + xMax )/2.
+                            domain[pId]['box']['center_y'] = ( yMin + yMax )/2.
+                            domain[pId]['box']['center_z'] = ( zMin + zMax )/2.
+                            gxMin, gxMax = i*nx_l, (i+1)*nx_l
+                            gyMin, gyMax = j*ny_l, (j+1)*ny_l
+                            gzMin, gzMax = k*nz_l, (k+1)*nz_l
+                            domain[pId]['grid']['x'] = [gxMin, gxMax]
+                            domain[pId]['grid']['y'] = [gyMin, gyMax]
+                            domain[pId]['grid']['z'] = [gzMin, gzMax]
+                return domain
+
+            def select_procid( proc_id, subgrid, domain, ids, ax ):
+                domain_l, domain_r = domain
+                subgrid_l, subgrid_r = subgrid
+                
+                if domain_l <= subgrid_l and domain_r > subgrid_l:
+                    ids.append(proc_id)
+                if domain_l >= subgrid_l and domain_r <= subgrid_r:
+                    ids.append(proc_id)
+                if domain_l < subgrid_r and domain_r >= subgrid_r:
+                    ids.append(proc_id)
+
+            def select_ids_to_load( subgrid, domain, proc_grid ):
+                subgrid_x, subgrid_y, subgrid_z = subgrid
+                nprocs = proc_grid[0] * proc_grid[1] * proc_grid[2]
+                ids_x, ids_y, ids_z = [], [], []
+                
+                print 'subrid x/y/z:', subgrid_x, subgrid_y, subgrid_z
+                
+                for proc_id in range(nprocs):
+                    domain_local = domain[proc_id]
+                    
+                    domain_x = domain_local['grid']['x']
+                    domain_y = domain_local['grid']['y']
+                    domain_z = domain_local['grid']['z']
+                    
+                    select_procid( proc_id, subgrid_x, domain_x, ids_x, 'x' )
+                    select_procid( proc_id, subgrid_y, domain_y, ids_y, 'y' )
+                    select_procid( proc_id, subgrid_z, domain_z, ids_z, 'z' )
+                    
+                set_x = set(ids_x)
+                set_y = set(ids_y)
+                set_z = set(ids_z)
+                set_ids = (set_x.intersection(set_y)).intersection(set_z )
+                return list(set_ids)
+
+            def load_snapshot_data_distributed( nSnap, inDir, data_type, fields, subgrid,  precision, proc_grid,  box_size, grid_size, show_progess=True ):
+                # Get the doamin domain_decomposition
+                domain = get_domain_block( proc_grid, box_size, grid_size )
+                
+                # Find the ids to load 
+                ids_to_load = select_ids_to_load( subgrid, domain, proc_grid )
+                print 'ids to load:', ids_to_load
+                print 'Loading Snapshot: {0}'.format(nSnap)
+                
+                #Find the boundaries of the volume to load
+                domains = { 'x':{'l':[], 'r':[]}, 'y':{'l':[], 'r':[]}, 'z':{'l':[], 'r':[]}, }
+                
+                for id in ids_to_load:
+                    for ax in list(domains.keys()):
+                        d_l, d_r = domain[id]['grid'][ax]
+                        domains[ax]['l'].append(d_l)
+                        domains[ax]['r'].append(d_r)
+                
+                boundaries = {}
+                for ax in list(domains.keys()):
+                    boundaries[ax] = [ min(domains[ax]['l']),  max(domains[ax]['r']) ]
+                    
+                # Get the size of the volume to load
+                nx = int(boundaries['x'][1] - boundaries['x'][0])    
+                ny = int(boundaries['y'][1] - boundaries['y'][0])    
+                nz = int(boundaries['z'][1] - boundaries['z'][0]) 
+                
+                dims_all = [ nx, ny, nz ]
+                data_out = {}
+                data_out[data_type] = {}
+                
+                for field in fields:
+                    
+                    data_particels = False
+                    if field in ['pos_x', 'pos_y', 'pos_z', 'vel_x', 'vel_y', 'vel_z']: data_particels = True 
+                    if not data_particels: data_all = np.zeros( dims_all, dtype=precision )
+                    else: data_all = []
+                    
+                    added_header = False
+                    n_to_load = len(ids_to_load)
+                    for i, nBox in enumerate(ids_to_load):
+                        name_base = 'h5'
+                        if data_type == 'particles': inFileName = '{0}_particles.{1}.{2}'.format(nSnap, name_base, nBox)
+                        if data_type == 'hydro': inFileName = '{0}.{1}.{2}'.format(nSnap, name_base, nBox)
+                        
+                        inFile = hdf5.File( inDir + inFileName, 'r')
+                        available_fields = inFile.keys()
+                        head = inFile.attrs
+                        
+                        if added_header == False:
+                            print ' Loading: '+inDir+inFileName 
+                            #print ' Available Fields:  ', available_fields
+                            for h_key in list(head.keys()):
+                                if h_key in ['dims', 'dims_local', 'offset', 'bounds', 'domain', 'dx', ]: continue
+                                data_out[h_key] = head[h_key][0]
+                                if h_key == 'current_z':
+                                    print ' current_z: {0}'.format( data_out[h_key])
+                                    self.redshift = float(format(data_out[h_key], '0.6f'))
+                                    #print 'here: redshift', self.redshift
+                                    
+                                if h_key == 'current_a':
+                                    #print ' current_a: {0}'.format( data_out[h_key])
+                                    self.scale_factor = float(format(data_out[h_key], '0.6f'))
+                                    #print 'here: scale factor', self.scale_factor
+                            added_header = True
+                            
+                        if show_progess:
+                            terminalString  = '\r Loading File: {0}/{1}   {2}'.format(i, n_to_load, field)
+                            sys.stdout. write(terminalString)
+                            sys.stdout.flush()
+                            
+                        if not data_particels:
+                            procStart_x, procStart_y, procStart_z = head['offset']
+                            procEnd_x, procEnd_y, procEnd_z = head['offset'] + head['dims_local']
+                            # Substract the offsets
+                            procStart_x -= boundaries['x'][0]
+                            procEnd_x   -= boundaries['x'][0]
+                            procStart_y -= boundaries['y'][0]
+                            procEnd_y   -= boundaries['y'][0]
+                            procStart_z -= boundaries['z'][0]
+                            procEnd_z   -= boundaries['z'][0]
+                            procStart_x, procEnd_x = int(procStart_x), int(procEnd_x)
+                            procStart_y, procEnd_y = int(procStart_y), int(procEnd_y)
+                            procStart_z, procEnd_z = int(procStart_z), int(procEnd_z)
+                            data_local = inFile[field][...]
+                            data_all[ procStart_x:procEnd_x, procStart_y:procEnd_y, procStart_z:procEnd_z] = data_local
+                            
+                        else:
+                            data_local = inFile[field][...]
+                            data_all.append( data_local )
+                        
+                    if not data_particels:
+                        # Trim off the excess data on the boundaries:
+                        trim_x_l = subgrid[0][0] - boundaries['x'][0]
+                        trim_x_r = boundaries['x'][1] - subgrid[0][1]  
+                        trim_y_l = subgrid[1][0] - boundaries['y'][0]
+                        trim_y_r = boundaries['y'][1] - subgrid[1][1]  
+                        trim_z_l = subgrid[2][0] - boundaries['z'][0]
+                        trim_z_r = boundaries['z'][1] - subgrid[2][1]  
+                        trim_x_l, trim_x_r = int(trim_x_l), int(trim_x_r) 
+                        trim_y_l, trim_y_r = int(trim_y_l), int(trim_y_r) 
+                        trim_z_l, trim_z_r = int(trim_z_l), int(trim_z_r) 
+                        data_output = data_all[trim_x_l:nx-trim_x_r, trim_y_l:ny-trim_y_r, trim_z_l:nz-trim_z_r,  ]
+                        data_out[data_type][field] = data_output
+                    else:
+                        data_all = np.concatenate( data_all )
+                        data_out[data_type][field] = data_all
+                        if show_progess: print ' '
+                return data_out
+
+            def read_and_write_attributes(file_struc_info, res):
+                
+                output_filename_grid=mycomp+'/anaconda/pro/data/Cholla'+res+'_50Mpc/Cholla'+res+'_grid.txt'
+                myOutput.writeIntoFile(
+                           output_filename_grid,
+                           [''],
+                           myheader='CHOLLA data resolution: '+res+' from Bruno \n(1) filename (2) a (3) z'\
+                           +'(4) dt (5) dx (6) n_fields (6) n_step (7) n_fields (8) offset (9) t (10) dims (11) dims_local (12) bounds and/or n_procs',
+                           append_mytext=False,
+                           data_is_string=False,
+                           data_format='%s')            
+             
+                i=0
+                while i<int(file_struc_info[catname+'_nr_files']):           
+                                    
+                    if i==i_break and end_fileID!='False':
+                       break
+                    path = file_struc_info[catname+'_filename'+str(i)]
+                    #path='/store/multidark/NewMD_3840_Planck1/Galacticus/latest/job0/the_trees_0_1000000_0_results.hdf5'
+                    #path='/data3/users/abenson/the_trees_0_1000000_0_results.hdf5'               
+                    f = hdf5.File(path, "r")
+                    print path
+                    if path.find('pchw18')!=-1:
+                        stats=(path[path.find('pchw18')+7:len(path)]).ljust(9)+'\t'
+                    else:
+                        stats=(path[path.find('_files')+7:len(path)]).ljust(9)+'\t'
+                    #stats=path+'\t'
+    
+            
+    
+    
+                    for k in ['Current_a','Current_z', 'dt', 'dx', 'n_fields','n_step','offset','t','dims','dims_local','bounds','n_procs']:
+                        print 'k:', k, 
+                        try:
+                            print f.attrs[k][0]
+                            new_stats= str(f.attrs[k][0])+'\t'+str(f.attrs[k][1])+'\t'+str(f.attrs[k][2])+'\t'
+                            new_stats= str(f.attrs[k])+'\t'
+                        except:
+                            try:
+                                if k.startswith('n_') or k.startswith('dim'):
+                                    new_stats= str(f.attrs[k][0])+'\t'
+                                else:
+                                    new_stats= str(format(f.attrs[k][0],'0.5f'))+'\t'
+                            except:
+                                new_stats='\t'
+                                print ''
+                        stats+=new_stats
+                    #print '+++++++++++++++++++++++++++\n'
+                    
+                    stats=stats[:-1]
+                    #print stats
+        
+                    myOutput.writeIntoFile(
+                               output_filename_grid,
+                               stats+'\n',
+                               append_mytext=True,
+                               data_is_string=True,
+                               data_format='%s')                
+                    
+                    i+=1
+    
+                exit()
+
+
+            def scan_file_format():
+                
+                i=0
+                while i<file_struc_info[catname+'_nr_files']:
+                    path = file_struc_info[catname+'_filename'+str(i)]    
+
+                    f = hdf5.File(path, "r")
+                    
+                    if i==0:
+                        print '\n1) Attributes\n-------------------------'
+                        for k in range(0,len(f.attrs.keys()),1):
+                            print '\t', f.attrs.keys()[k], ':\t\t', f.attrs.values()[k][0]
+                            
+
+                    print '\n+++++++++++++++++++++\nSCANNING FILE FORMAT of ...', path,'\n'    
+                    print '\n2) Data\n-------------------------'                
+                    for name in f:
+                        print 'name:\t', name,
+                        try:
+                            print 'size:\t', f[name].size, 
+                            print f[name],
+                            try:
+                                print 'min/max:\t', format(min(f[name][:]), '0.2f'), '/', format(max(f[name][:]), '0.2f')
+                            except:
+                                for k in [0,1,2]:
+                                    print ''
+                                    for g in [0,1,2]:
+                                        #print 'k:', k, 'g:', g,
+                                        #print '\tdim: [:,'+str(k)+'][:,0]', format(min(f[name][:,k][:,0]), '0.5f'), '/', format(max(f[name][:,k][:,0]), '0.5f')
+                                        #print '\tdim: [:,0][:,'+str(g)+']', format(min(f[name][:,0][:,g]), '0.5f'), '/', format(max(f[name][:,0][:,g]), '0.5f')
+                                        print '\tsize:', f[name][:,k][:,g].size, '\tdim: [:,'+str(k)+'][:,'+str(g)+']', format(min(f[name][:,k][:,g]), '0.2f'), '/', format(max(f[name][:,k][:,g]), '0.2f')
+                                    
+                        except:
+                            print '--> failed!'
+                    print '\n'
+                    i+=1
+                
+                exit()
+
+
             print '###################################################################################'
             print 'read CHOLLA HDF5'
             print ' '
             print 'HDF5', 'catname:', catname
             print 'HDF5 begin: mypath:', mypath
 
-#            #​dataDir = '/raid/bruno/data/'
-#            dataDir = '/data/groups/comp-astro/bruno/'
-#            dataDir = mycomp
-#            #inDir = dataDir + 'cosmo_sims/512_hydro_50Mpc/output_files_pchw18/'
-#            inDir = dataDir+'anaconda/pro/data/Cholla/'
-#            #'/data/groups/comp-astro/bruno/cosmo_sims/512_hydro_50Mpc/output_files_pchw18/'
-#            
-#            n_snapshot = 169
-#            
-#            data_type = 'hydro'
-#            # data_type = 'particles'
-#            
-#            fields = ['density']
-#            
-#            precision = np.float32
-#            Lbox = 5000		#kpc/h
-#            proc_grid = [ 4, 2, 2]
-#            box_size = [ Lbox, Lbox, Lbox ]
-#            grid_size = [ 512, 512, 512 ] #Size of the simulation grid
-#            subgrid = [ [0, 512], [0, 512], [0, 512] ] #Size of the volume to load
-#            data = rdC.load_snapshot_data_distributed(n_snapshot, inDir, data_type, fields, subgrid, precision, proc_grid,	box_size, grid_size, show_progess=True)
-#            density = data[data_type]['density']
-#            
-#            print density[0:10]
 
             file_struc_info= hdf5lib.CHOLLA_50Mpc_HDF5_filestruct(catname, snapid, path_to_directory=mypath)
 
@@ -1133,83 +1429,75 @@ class	ArangeData:
             print 'start_fileID:', start_fileID, 'end_fileID:', end_fileID, 'start i:', i,'i break:', i_break, 'nr files2read:', file_struc_info[catname+'_nr_files']
             #print file_struc_info
 
-            myOutput.writeIntoFile(
-                       mycomp+'/anaconda/pro/data/Cholla_50Mpc/Cholla_grid.txt',
-                       [''],
-                       myheader='CHOLLA data Puchwein+19 from Bruno \n(1) filename (2) a (3) z (4) H0 (5) Omego_L (6) Omega_M (7) bounds (8) dims'\
-                       +'(9) dims_local (10) domain (11) dt (12) dx (13) gamma (14) n_fileds (15) n_step (16) offset (17) t',
-                       append_mytext=False,
-                       data_is_string=False,
-                       data_format='%s')            
-            
-            
-            while i<int(file_struc_info[catname+'_nr_files']):           
-                                
-                if i==i_break and end_fileID!='False':
-                   break
-                path = file_struc_info[catname+'_filename'+str(i)]
-                #path='/store/multidark/NewMD_3840_Planck1/Galacticus/latest/job0/the_trees_0_1000000_0_results.hdf5'
-                #path='/data3/users/abenson/the_trees_0_1000000_0_results.hdf5'
-                f = hdf5.File(path, "r")
-                print path
-                stats=(path[path.find('pchw18/')+7:len(path)]).ljust(9)+'\t'
-                
-                for k in [0,1,5,6,7,8,9,10,12,13,14,15]:
-                    #print 'k:', k, f.attrs.keys()[k], f.attrs.values()[k][0]
-                    try:
-                        new_stats= str(f.attrs.values()[k][0])+'\t'+str(f.attrs.values()[k][1])+'\t'+str(f.attrs.values()[k][2])+'\t'
-                        new_stats= str(f.attrs.values()[k])+'\t'
-                    except:
-                        try:
-                            if k==0 or k==1 or k==2 or k==9 or k==10 or k==15:
-                                new_stats= str(format(f.attrs.values()[k][0],'0.5f'))+'\t'
-                            else:
-                                new_stats= str(f.attrs.values()[k][0])+'\t'
-                        except:
-                            new_stats='\t'
-                    stats+=new_stats
-                print '+++++++++++++++++++++++++++\n'
-                
-                stats=stats[:-1]
-                print stats
-    
-                myOutput.writeIntoFile(
-                           mycomp+'/anaconda/pro/data/Cholla_50Mpc/Cholla_grid.txt',
-                           stats+'\n',
-                           append_mytext=True,
-                           data_is_string=True,
-                           data_format='%s')                
-                
-                i+=1
+            if catname.find('512')!=-1:
+                res=512
+            else:
+                res=256
 
-            exit()
-            print f
-            self.cat_attributes = {}        
-                  
-            i=0
-            while i<len(f.attrs.keys()):
-                print f.attrs.keys()[i], f.attrs.values()[i]
-                self.cat_attributes[f.attrs.keys()[i]] = f.attrs.values()[i]
-                i+=1
-            print '+++++++++++++++++++++++++++\n'
-            
-            self.redshift = self.cat_attributes['Current_z'][0]
-            self.scale_factor = self.cat_attributes['Current_a'][0]
-            
-            print 'z:', self.redshift, 'a:', self.scale_factor
-            
-            i=0
-            while i<nr_entries:
-                name=id_col_array['name'+str(i)]
-                self.data_array[id_col_array['name'+str(i)]][0:f[name].size] = f[name]
-                i+=1
 
-            #print 'mysave_colname', mysave_colname
-            self.data_array = self.data_array[:f[name].size]
+
+            ####################################################################################
+            #   SCAN AND ANALYSE FILE STRUCTURE ONLY 
+
+            #scan_file_format()
+
+            #read_and_write_attributes(file_struc_info, str(res))
+
+            ####################################################################################
+            #   READ DATA CHOLLA FROM BRUNO ADJUSTED 
+            
+            
+            #​dataDir = '/raid/bruno/data/'
+            dataDir = '/data/groups/comp-astro/bruno/'
+            dataDir = mycomp
+            #inDir = dataDir + 'cosmo_sims/512_hydro_50Mpc/output_files_pchw18/'
+            inDir = '/data/256_hydro_50Mpc/'
+            #nDir = '/data/groups/comp-astro/bruno/cosmo_sims/512_hydro_50Mpc/output_files_pchw18/'
+            
+            n_snapshot = 72 #file_struc_info[catname+'_filename'+str(i)]
+            
+            data_type = 'hydro'
+            data_type = 'particles'
+  
+            colname_map = { 'pos_x':'x_pos',
+                            'pos_y':'y_pos',
+                            'pos_z':'z_pos',
+                            'vel_x':'x_vel',
+                            'vel_y':'y_vel',
+                            'vel_z':'z_vel'}
+
+            fields=[]
+            for col in colname_map:
+                fields+= [col]
+                
+            #print fields
+            #fields=['density']
+            precision = np.float32
+            Lbox = 50000		#kpc/h
+            #proc_grid = [ 4, 2, 2]
+            proc_grid = [ 2, 2, 2]
+            box_size = [ Lbox, Lbox, Lbox ]
+            grid_size = [ res, res, res ] #Size of the simulation grid
+            subgrid = [ [0, res], [0, res], [0, res] ] #Size of the volume to load
+            data = load_snapshot_data_distributed(n_snapshot, inDir, data_type, fields, subgrid, precision, proc_grid,	box_size, grid_size, show_progess=True)
+
+            print data
+
+            for k in data[data_type].keys():
+                print 'k:',
+                try:
+                    print k, data[data_type][k].size
+                    self.data_array[colname_map[k]][0:data[data_type][k].size]=data[data_type][k]
+                except:
+                    print '--> wrong format for structured array!'
+            
+            self.data_array = self.data_array[:data[data_type][k].size]
+            #print np.info(self.data_array)
+            #print self.data_array[0:3]
+
             print 'self.data_array after read-in:', self.data_array.shape, 'redshift:', self.redshift, 'scale factor:', self.scale_factor
-            print self.data_array[0:3]
 
-            exit()
+            #exit()
 
 
         def readSAMHDF5(halocat_code):
@@ -1600,12 +1888,7 @@ class	ArangeData:
             if catname.startswith('SAG_'): self.data_array = np.reshape(self.data_array, (len(self.data_array),))
             #print self.data_array
             print 'self.data_array after read-in:', self.data_array.shape
-            #print np.info(self.data_array)
-            #exit()
-#            print min(self.data_array['MAB_dA_total_u']), max(self.data_array['MAB_dA_total_u'])
-#            print min(self.data_array['MAB_dA_total_g']), max(self.data_array['MAB_dA_total_g'])
-#            print min(self.data_array['MAB_dA_total_i']), max(self.data_array['MAB_dA_total_i'])
-            #exit()
+
         def caseSwitcher(data_format):
 
             choose = {
@@ -1620,7 +1903,8 @@ class	ArangeData:
                 'HDF52HDF5': HDF52HDF5,
                 'READ2ARRAY': READ2ARRAY,
                 'FITS2HDF5': FITS2HDF5,
-                'CROSSMATCH': CROSSMATCH
+                'CROSSMATCH': CROSSMATCH,
+                'ROCKSTAR_ASCII': ROCKSTAR_ASCII
                 }
                 
             func = choose.get(data_format)
@@ -1637,6 +1921,9 @@ class	ArangeData:
            
         def SAMHDF5():
             readSAMHDF5(halocat_code)
+
+        def ROCKSTAR_ASCII():
+            readROCKSTAR_ASCII(halocat_code) 
             
         def CHOLLAHDF5():
             readCHOLLAHDF5(halocat_code)            
