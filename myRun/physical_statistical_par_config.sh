@@ -3,7 +3,7 @@
 set data_offset_histos 		= 7
 set data_offset_bin 		= 10
 set data_offset_cSFRD 		= 5
-set data_offset_sfr2z 		= 72
+set data_offset_sfr2z 		= 98
 set data_offset_ngal 		= 10
 set data_offset_CUTE 		= 6
 set data_offset_analyseTargetSelection 		= 10
@@ -81,8 +81,9 @@ else
 	set obs_analyse			= 'CMASS_spall_por_mer_056_DR12v4,SMF_CMASS_spall_por_mer_050_DR12v4'
 endif
 
-set obs_analyse		= 'CMASS_Galacticus_down3_low_catalog,CMASS_Galacticus_down3_passive_catalog,CMASS_Galacticus_down3_red_catalog,CMASS_Galacticus_down3_lowZ_catalog,CMASS_Galacticus_down3_highZ_catalog,CMASS_Galacticus_down3_blue_catalog'
-
+set obs_analyse		= 'CMASS_Galacticus_down3_low_catalog,CMASS_Galacticus_down3_passive_catalog,CMASS_Galacticus_down3_red_catalog,CMASS_Galacticus_down3_lowZ_catalog,CMASS_Galacticus_down3_highZ_catalog'
+#set obs_analyse		= 'myCatalog2,myCatalog6,myCatalog7,Salinas21_LSBGs_Fig6_jstar_mstar,Salinas21_LSBGs_Fig6_fit,Salinas21_LSBGs_Fig6_fit_dy_lower,Salinas21_LSBGs_Fig6_fit_dy_higher'
+#set obs_analyse		= 'myCatalog2,Salinas21_LSBGs_Fig6_jstar_mstar,Salinas21_LSBGs_Fig6_fit,Salinas21_LSBGs_Fig6_fit_dy_lower,Salinas21_LSBGs_Fig6_fit_dy_higher'
 #set obs_analyse		= 'LG_catalog,red_blue_cut,Montero16_RS'
 #set obs_analyse		= 'myCatalog,angM0,angM,angM2'
 #set obs_analyse			= 'CMASS_Galacticus_color_catalog,CMASS_SAGv4_color_catalog,SAG_run2_catalog,CMASS_dmesa_cut'
@@ -130,7 +131,7 @@ set obs_plotXY			= 'False'
 #set obs_plotXY			= 'format_MTs_Rockstar'
 #set obs_plotXY			= 'load_the_shit'
 #set obs_plotXY			= 'loadDiverse'
-
+#set obs_plotXY			= 'Elbaz11_function'
 
 
 #set physical boundary parameter used for calculations

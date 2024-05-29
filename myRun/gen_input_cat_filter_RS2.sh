@@ -19,7 +19,7 @@ echo 'DONT WORRY DORIS, YOU ARE DOING WELL TODAY ;-) '
 echo ' '
 #Set the name of the simulation: e.g. MDPL, Bolshoi, etc.!
 #+++++++++++++++++++++++++++++++++++++++++++
-set simulation_name = 'CHOLLA'
+set simulation_name = 'Gadget'
 
 #Set the name of the telescope: e.g. SDSS, etc.!
 #+++++++++++++++++++++++++++++++++++++++++++
@@ -52,6 +52,7 @@ set subplots = False
 set tarsel_code_default = 'Portsmouth_starforming_Salpeter'
 set tarsel_code_default = 'LOW_Z_Blanton+05'
 set tarsel_code_default = 'tree_main_prog_tree_ID0_24354'
+set tarsel_code_default = ''
 
 #Choose different catalogues to read!
 #+++++++++++++++++++++++++++++++++++++++++++
@@ -103,7 +104,7 @@ if ($HOME == /home/claudia || $HOME == /home/doriss) then
 	set PLOT_CUM = 'False'
 else
 	set HOME_MODE = False
-	set HDF5_read_code = 'HDF5'
+	set HDF5_read_code = 'ROCKSTAR_ASCII'
 
 	if ($HDF5_read_code == 'HDF5') then
 		set load_subcat = True
@@ -141,6 +142,7 @@ endif
 set MYSNAPS_62    			= '0.000'
 set MYSNAPS_125				= '107' 
 set MYSNAPS_400Mpc			= '96'
+set MYSNAPS_default			= '65'
 
 #redshifts Galacticus
 #set MYSNAPS_1Gpc			= '79 75 70 67 65 60 57 52 50 47 45 42 40 38 36 34 32 30 28 26 24 22 20 18 16 14 13 12 11 10 9 8 7 6 5 4 3 2 1'
@@ -151,7 +153,7 @@ set MYSNAPS_400Mpc			= '96'
 
 #set MYSNAPS_1Gpc			= '125 124 122 121 119 115 110 107 104 101 98 95 92 89 86 83 80 77 75 70 67 65 60 57 52 50 47 45 42 40 38 36 34 32 30 28 26 24 20'
 #set MYSNAPS_1Gpc			= '0.000 0.093 0.142 0.490 0.557 0.740 0.859 1.077 1.270 1.425 1.650 1.896 2.095 2.382 2.614 3.037 3.411 3.929 4.038 4.385 4.627 4.754 4.882 5.017 5.289 5.720 5.873 6.022 6.184 6.342 6.508 6.849 7.026 7.203 7.389 7.764 7.961 8.166 8.372'
-set MYSNAPS_50			= '21'
+set MYSNAPS_50			= '65'
 # 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51'
 #set MYSNAPS_50			= '27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51'
 # 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73'
@@ -569,8 +571,8 @@ set ngalaxies		= 99
 set haloid		= 0			
 set hostid		= 99
 set orphan		= 99				
-set orphan		= 5			
-set mhalo		= 6
+set orphan		= 99			
+set mhalo		= 99
 set mhalo_unbound	= 99
 set mhalo_200c		= 99
 set mhalo_cents		= 99
@@ -598,13 +600,13 @@ set siblingIndex	= 99
 set satelliteMergeTime	= 99
 set isolated		= 99
 set timeLastIsolated	= 99
-set firstProgenitorID	= 3
+set firstProgenitorID	= 99
 set lastProID		= 99
-set npros		= 4
+set npros		= 99
 set fofID		= 99
 set mainLeafID		= 99
-set descIndex		= 1
-set predIndex		= 2
+set descIndex		= 99
+set predIndex		= 99
 
 #only for SAG, SAGE, and ROCKSTAR
 set vmax		= 99
@@ -646,7 +648,7 @@ set rbulgevsrdisk		= 99
 set rhalf_mass		= 99
 
 #ROCKSTAR
-set rvir			= 8
+set rvir			= 99
 set rscale			= 99
 set rscale_Klypin	= 99
 set debugR			= 99
@@ -655,8 +657,8 @@ set y_ang			= 99
 set z_ang			= 99
 set spin_Bullock	= 99
 
-set delta_mhalo	= 7
-set delta_rvir		= 9
+set delta_mhalo	= 99
+set delta_rvir		= 99
 
 #only SAG and SAGE
 set mean_age_stars	= 99
@@ -749,9 +751,9 @@ set OH_gas_disk		= 99
 set OH_gas_bulge	= 99
 set OH_gas_disk_bulge	= 99
 
-set x_pos		= 10
-set y_pos		= 11
-set z_pos		= 12
+set x_pos		= 99
+set y_pos		= 99
+set z_pos		= 99
 set x_vel		= 99
 set y_vel		= 99
 set z_vel		= 99
@@ -761,7 +763,7 @@ set vdisk		= 99
 
 set DEC			= 99
 set RA			= 99
-set Z			= 13
+set Z			= 99
 set age			= 99
 set weight_tot		= 99
 #----------------------------------------
@@ -1510,6 +1512,7 @@ foreach MODEL (`ls -d $PATH_TO_SOFTLINKS/*`)
 					foreach plot_custom_item ($plot_custom_array)
 						echo redshift$a'= '$SNAPID >> "$plot_custom_config_array[$x]"
 						@ x++
+					end
 				else
 					echo redshift$a'= '$SNAPID >> "$plot_config_array[$c]"
 				endif
@@ -1520,6 +1523,8 @@ foreach MODEL (`ls -d $PATH_TO_SOFTLINKS/*`)
 
 		if ( $CUSTOM_SNAPNAME == 'hdf5' || $CUSTOM_SNAPNAME == 'binary') then  
 			set key = $NAME
+		else if ( $CUSTOM_SNAPNAME == 'list') then 
+			set key = `ls $MODEL/*$SNAPID*.list`
 		else
 			set key = `ls $MODEL/*$SNAPID*`
 			
@@ -1564,6 +1569,10 @@ foreach MODEL (`ls -d $PATH_TO_SOFTLINKS/*`)
 						#echo 'File:' $File
 						echo `basename $File` >> $FILENAME_LIST
 					end
+				else if ($NAME =~ ROCKSTAR*) then
+					set PATH_TO_SNAPSHOT = `basename $SOFTLINK_TO_DATA*$SNAPID | awk '{print $1}'`'/'
+					echo $SNAPNAME >> $FILENAME_LIST
+
 				else
 					if ($HDF5_read_code == 'SAMHDF5') then
 						
@@ -1625,19 +1634,19 @@ foreach MODEL (`ls -d $PATH_TO_SOFTLINKS/*`)
 								echo 'plot_legend'$z_i'= '$NAME >> "$plot_plotOnly_config_array[$k]"
 								@ k++
 							end
-		 			else if ("$method_name_array[$c]" == analyseTargetSelection && $analyseTargetSelection == 1) then				
+			 			else if ("$method_name_array[$c]" == analyseTargetSelection && $analyseTargetSelection == 1) then				
 							foreach analyseTargetSelection ($plot_analyseTargetSelection_config_array)
 								echo 'plot_legend'$z_i'= '$NAME >> "$plot_analyseTargetSelection_config_array[$k]"
 								@ k++
 							end
-					else if ($PLOT_CUSTOM_LOOP == True && $plotXY == 1) then
-						foreach plot_custom_item ($plot_custom_array)
-							echo 'plot_legend'$z_i'= '$NAME >> "$plot_custom_config_array[$x]"
-							@ x++
-					else
-							echo 'plot_legend'$z_i'= '$NAME >> "$plot_config_array[$c]"
+						else if ($PLOT_CUSTOM_LOOP == True && $plotXY == 1) then
+							foreach plot_custom_item ($plot_custom_array)
+								echo 'plot_legend'$z_i'= '$NAME >> "$plot_custom_config_array[$x]"
+								@ x++
+							end
 						endif
-						
+					else
+						echo 'plot_legend'$z_i'= '$NAME >> "$plot_config_array[$c]"												
 					endif
 					@ c++
 				end
@@ -2003,11 +2012,11 @@ foreach item ($method_array)
 					#echo 1421 $item2 "$analyse_tarsel_name_array[$i]"  $tarsel_code "$plot_analyseTargetSelection_config_array[$a]"
 				
 				$MAIN_PATH'myRun/plot_config.sh' "$analyse_tarsel_name_array[$i]" "$plot_analyseTargetSelection_config_array[$a]" $BOX_SIZE $CALI_CODE $CAT_NAME_IN_PLOT0 $CAT_NAME_IN_PLOT1 $REDSHIFT_PLOT0 $REDSHIFT_PLOT1 $SOFTLINK_CODE $c $tarsel_code_Galacticus $tarsel_code_SAG $MATPLOT_LINESTYLE $MATPLOT_COL $MATPLOT_MARKERSTYLE $MATPLOT_MARKERCOL $MATPLOT_COLORMAP $MATPLOT_COLORBAR $MATPLOT_PLOTTYPE $MATPLOT_ALPHA
-				@ a++
-			endif
-			@ i++
+					@ a++
+				endif
+				@ i++
 				
-		end
+			end
 
 	else 
 

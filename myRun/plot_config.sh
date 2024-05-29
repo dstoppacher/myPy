@@ -129,25 +129,29 @@ echo 'keyword_change14= default'	 			>> $2
 
 echo 'title_fontsize= 20'				 	 >> $2
 #default 32
-echo 'axis_label_fontsize= 32'				 	 >> $2
+echo 'axis_label_fontsize_x= 32'				 	 >> $2
+echo 'axis_label_fontsize_y= 32'				 	 >> $2
 #default 26
 echo 'text_fontsize= 28'					>> $2
 #default 30				 	 
 echo 'axis_ticks_fontsize= 30'				 	 >> $2
 #default 28
 echo 'legend_fontsize= 28'				 	 >> $2
+
+echo 'axis_label_fontsize= 32'				 	 >> $2
+
 echo 'legend_ncols= 1'						>> $2
 echo 'legend_fancy= True'					>> $2
 echo 'legend_handletextpad= 0.8'					>> $2
 
 echo 'marker= no'					 	 >> $2
 #Default 15
-echo 'markersize= 15'				 		 >> $2
+echo 'markersize= 12'				 		 >> $2
 echo 'markersize_offset= 5'				 		 >> $2
 echo 'marker_add_subplot= o'					 >> $2
 echo 'markersize_subplot= 13'				 	 >> $2
 
-echo 'mylw= 10'				 		 	 >> $2
+echo 'mylw= 8'				 		 	 >> $2
 echo 'mylw_offset= 4'				 		 	 >> $2
 echo 'alpha_offset= 0'		 		 	 >> $2
 #which line should be thinner (start with 0)
@@ -159,10 +163,11 @@ echo 'set_thin_line2= 99'				 	>> $2
 #How much thinner that the #mylw'
 echo 'thin_line2= 4'				 		 >> $2
 
-echo 'mymarkeredgewidth= 2.5'				 	 >> $2
-echo 'mymarkerfacecolor= w'				 	 >> $2
+#echo 'mymarkeredgewidth= 2.5'				 	 >> $2
+echo 'mymarkeredgewidth= 1'				 	 >> $2
+echo 'mymarkerfacecolor= k'				 	 >> $2
 echo 'myframe_lw= 3'					 	 >> $2
-echo 'lw_offset= -6'				 		 >> $2
+echo 'lw_offset= -3'				 		 >> $2
 echo 'size_x= 12'				 		 >> $2
 echo 'size_y= 9'				 		 >> $2
 
@@ -171,12 +176,12 @@ echo 'nr_plots_y= 1'				 		 >> $2
 echo 'nr_cats= 	1'				 		 >> $2
 
 #colorbar/hexbin/countour details
-echo 'cb_min= 1'				 		 >> $2
+echo 'cb_min= 0.5'				 		 >> $2
 echo 'cb_max= 2.5'				 		 >> $2
 echo 'cb_steps= 0.5'				 		 >> $2
 echo 'bins= log'				 		 >> $2
-echo 'min_count= 10'				 		 >> $2
-echo 'gridsize= 100'				 		 >> $2
+echo 'min_count= 25'				 		 >> $2
+echo 'gridsize= 75'				 		 >> $2
 echo 'colorbar_anchor_right= 0.4'		 		 >> $2
 
 set plot_CUT = 'False'
@@ -203,7 +208,7 @@ echo 'plot_lines_min_max_population= no'		 	 >> $2
 set OII_ls_set = 'False'
 set plotXY_key = 'sfr2z'
 set hod_plot_key = 'False'
-set use_cb_colors = 6
+set use_cb_colors = 0
 echo 'legend_ncols= 1'			>> $2
 echo 'legend_fancy= False'		>> $2
 ######################################################################################################################################################
@@ -288,7 +293,7 @@ echo '16= no'		>> $23
 
 #plot legend: 	MATPLOT_PLOTLEGEND
 #no= no legend will be plotted for that entry
-echo '0= yes'		>> $21
+echo '0= no'		>> $21
 echo '1= yes'		>> $21
 echo '2= yes'		>> $21
 echo '3= yes'		>> $21
@@ -311,29 +316,10 @@ echo 'legend_sep_xpos= 0.55'	>> $2
 echo 'legend_sep_ypos= 0.14'	>> $2
 echo 'legend_sep_offset= 0.038'	>> $2
 
-#marker alpha: 	MATPLOT_ALPHA
-echo '0= 0.5'		>> $20
-echo '1= 1'		>> $20
-echo '2= 1'		>> $20
-echo '3= 0.9'		>> $20
-echo '4= 0.5'		>> $20
-echo '5= 1'		>> $20
-echo '6= 1'		>> $20
-echo '7= 0.4'		>> $20
-echo '8= 0.3'		>> $20
-echo '9= 1'		>> $20
-echo '10= 1'		>> $20
-echo '11= 1'		>> $20
-echo '12= 1'		>> $20
-echo '13= 1'		>> $20
-echo '14= 1'		>> $20
-echo '15= 1'		>> $20
-echo '16= 1'		>> $20
-
 #marker colourmap: 	MATPLOT_COLORMAP
 #no= no colormap will be used
-echo '0= binary'		>> $17
-echo '1= coolwarm'	>> $17
+echo '0= Reds'		>> $17
+echo '1= Blues_r'	>> $17
 echo '2= no'		>> $17
 echo '3= no'		>> $17
 echo '4= no'		>> $17
@@ -372,7 +358,8 @@ echo '15= no'		>> $18
 echo '16= no'		>> $18
 
 #subplot type: 		MATPLOT_PLOTTYPE
-set key = 'histosf'
+#if you want a contour or histo plot, change the 'key'
+set key = 'contour'
 if ($24 =~ *hist*) then
 	echo '0= barplot' 	>> $19
 	echo '1= barplot' 	>> $19
@@ -396,7 +383,7 @@ else if ($key =~ *violi*) then
 	echo '8= violin' 	>> $19
 	echo '9= violin' 	>> $19
 	echo '10= violin' 	>> $19
-else
+else if ($key =~ con*) then
 	echo '0= hexbins' 	>> $19
 	echo '1= contour' 	>> $19
 	echo '2= contour' 	>> $19
@@ -404,6 +391,15 @@ else
 	echo '4= contour' 	>> $19
 	echo '5= contour' 	>> $19
 	echo '6= contour' 	>> $19
+else
+	echo '0= default' 	>> $19
+	echo '1= default' 	>> $19
+	echo '2= default' 	>> $19
+	echo '3= default' 	>> $19
+	echo '4= default' 	>> $19
+	echo '5= default' 	>> $19
+	echo '6= default' 	>> $19
+
 endif
 echo '7= default' 	>> $19
 echo '8= default' 	>> $19
@@ -416,18 +412,33 @@ echo '14= default' 	>> $19
 echo '15= default' 	>> $19
 echo '16= default' 	>> $19
 
-#echo 'CATNAME $5' $5
-if ($5 =~ 'Gal'*) then
-	set catname = 'Gal'
-else if ($5 == 'SAG') then
-	set catname = 'SAG'
-else if ($5 =~ 'SAGE'*) then
-	set catname = 'SAGE'
+#marker alpha: 	MATPLOT_ALPHA
+if ($key =~ con*) then
+	echo '0= 0.5'		>> $20
+	echo '1= 1'		>> $20
+	echo '2= 1'		>> $20
+	echo '3= 0.5'		>> $20
+	echo '4= 0.5'		>> $20
+	echo '5= 1'		>> $20
 else
-	set catname = $5
+	echo '0= 0.05'		>> $20
+	echo '1= 0.1'		>> $20
+	echo '2= 0.1'		>> $20
+	echo '3= 0.1'		>> $20
+	echo '4= 0.1'		>> $20
+	echo '5= 0.05'		>> $20
 endif
-
-#echo '$5' $5 'catname:' $catname
+echo '6= 1'		>> $20
+echo '7= 0.4'		>> $20
+echo '8= 0.3'		>> $20
+echo '9= 1'		>> $20
+echo '10= 1'		>> $20
+echo '11= 1'		>> $20
+echo '12= 1'		>> $20
+echo '13= 1'		>> $20
+echo '14= 1'		>> $20
+echo '15= 1'		>> $20
+echo '16= 1'		>> $20
 
 #Choose dimension of the plot: yes:2D-plot, else: 3D-plot
 echo '2D-plot= yes'					>> $2
@@ -437,12 +448,12 @@ echo 'use_cat_colors= False'					>> $2
 echo 'subplot_use_cat_colors= False'				>> $2
 
 echo 'subplot_is_obs= True'	 		 		 >> $2
-echo 'xticks= default'			 			>> $2
+echo 'xticks= '			 			>> $2
 echo 'xticks_minor= 0.1'				>> $2
 echo 'xticks_minor_offset= 0'				>> $2
 
-echo 'yticks= default'			 			>> $2
-echo 'yticks_minor= 0.1'				>> $2
+echo 'yticks= '			 			>> $2
+echo 'yticks_minor= 0.05'				>> $2
 echo 'yticks_minor_offset= 0'				>> $2
 
 #put minor ticks in the plot, if 'no' then no minor ticks will be plotted, if a float is given this will be the spacing of the thicks
@@ -476,11 +487,11 @@ echo 'log_scale_x_sub= no'					 >> $2
 echo 'log_scale_y_sub= no'					 >> $2
 
 echo 'error_bars_x= no'					 	 >> $2
-echo 'error_bars_y= no'					 >> $2
+echo 'error_bars_y= yes'					 >> $2
 echo 'filled_between= True'					 >> $2
 
 #if 'False', a shaded region if plotted, if 'True' then two lines in the same linestyle as the data is plotted without an filled
-echo 'fill_no_facecolor= False' 				>> $2
+echo 'fill_no_facecolor= True' 				>> $2
 echo 'errorbars= False'				 		 >> $2
 
 echo 'error_bars_x_sub= no'					 >> $2
@@ -489,8 +500,8 @@ echo 'subplot_errorbars= False' 		 			 >> $2
 echo 'filled_between_subplot= True' 		 		 >> $2
 
 #filling intensity of filled errorbars 0=0% 1=100% of the color chosen
-echo 'alpha= 0.05'					 >> $2
-echo 'alpha_sub= 0.05'					 >> $2
+echo 'alpha= 0.08'					 >> $2
+echo 'alpha_sub= 0.01'					 >> $2
 
 echo 'show_plot= yes'			 			 >> $2
 echo 'print_plot= yes'			 			 >> $2
@@ -512,16 +523,16 @@ echo 'hline_ypos= False'					 >> $2
 #Plot a vertical line: False=no line plotted, other: at that position you entered
 echo 'vline_xpos= False'					 >> $2	
 
-#Choose contour-plot specifications (NOTE: Only for catalogs with ngal>5e6, else default values ware taken!)
+#Choose contour-plot specifications (NOTE: Only for catalogs with ngal>5e6, else default values are taken!)
 echo 'nlevels= 5'			>> $2
-echo 'contour_histo_nbins= 50'		>> $2
+echo 'contour_histo_nbins= 15'		>> $2
 #SAG v3
 #echo 'nlevels= 7'			>> $2
 #echo 'contour_histo_nbins= 60'		>> $2
-echo 'contour_log= yes'		>> $2
+echo 'contour_log= no'		>> $2
 echo 'contour_log_wich_axis= x'		>> $2
-echo 'plot_colorbar= yes'		>> $2
-echo 'set_percent_to_zero= 100'		>> $2
+echo 'plot_colorbar= no'		>> $2
+echo 'set_percent_to_zero= 10'		>> $2
 
 #Scale color bar of contour plot with max(x)-max(x)/scale_color_bar, if scale_color_bar chlose to cero --> no scaling
 echo 'scale_color_bar= 0.0'		>> $2
@@ -1205,37 +1216,39 @@ else if ($1 == plotXY && ($plotXY_key == 'SMF' || $plotXY_key == 'HMF' || $plotX
 ############################################################################################################################################################################
 ############################################################################################################################################################################
 else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
-	set no_x = noxd
-	set no_y = noyd
+	set no_x = noxf
+	set no_y = noyf
+	echo 'no_first_xticks= False'        		>> $2
 	set share_y = 'no'
 	set no_top = False
 	set no_right = False
 	set xIsz = 'True'
-	echo 'legend_fontsize= 28'				 	 >> $2
-	echo 'text_fontsize= 35'				 	 >> $2
+	echo 'legend_fontsize= 32'				 	 >> $2
+	echo 'text_fontsize= 32'				 	 >> $2
 	echo 'plot_legend= no'			>> $2
 	echo 'print_redshift= True'				 	 >> $2
 	echo 'no_xticks= False'        		>> $2
 	#echo 'no_first_xticks= True'        		>> $2
 	#echo 'no_last_yticks= True'        		>> $2
-	set small_plot = 'True'
-	set reduced = 'True'
+	set small_plot = 'False'
+	set reduced = 'False'
 	set demo = 'False'
 	#choose which sample to plot: 1=M1/M2, 2a=M2 additional samples/original, 2b=M2 additional samples / reduced for paper, 300=cluster, 'more', 'pop'
-	set sample = 1b
+	set sample = final
 	set key = $24
 
-	set yerr = 1
+	set yerr = 3
 	echo 'fill_no_facecolor= False' 				>> $2
 
-	#echo 'vline_xpos= 0.7,1.38,2.12,3.54'					 >> $2
+
+
 
 	#echo 'print_redshift2= (b)'				>> $2
-	echo 'z_print_position_x2= 0.18'		>> $2
+	echo 'z_print_position_x2= 0.19'		>> $2
 	echo 'z_print_position_y2= 0.90'		>> $2
 
 	if ( $small_plot == 'True') then
-		echo 'size_x= 13'				 		 >> $2
+		echo 'size_x= 12'				 		 >> $2
 		echo 'size_y= 4.5'				 		 >> $2
 		echo 'adjust_left= 0.16'					>> $2
 		echo 'adjust_right= 0.99'					>> $2
@@ -1306,14 +1319,14 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 		echo 'adjust_bottom= 0.14'					>> $2
 		echo 'adjust_top= 0.99'					>> $2
 
-		echo 'z_print_position_x= 0.17'		>> $2
-		echo 'z_print_position_y= 0.75'		>> $2
+		echo 'z_print_position_x= 0.73'		>> $2
+		echo 'z_print_position_y= 0.80'		>> $2
 
 		#echo 'z_print_position_x= 0.2'		>> $2
 		#echo 'z_print_position_y= 0.15'		>> $2
 
-		echo 'use_loc_co_x= 0.25'		>> $2
-		echo 'use_loc_co_y= 0.87'		>> $2
+		echo 'use_loc_co_x= 0.02'		>> $2
+		echo 'use_loc_co_y= 0.95'		>> $2
 	endif
 
 	echo 'ylabel_pos= 0.55'	         			>> $2    
@@ -1356,12 +1369,45 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 				echo 'x_title= ' >> $2
 				echo 'no_xticks= True'        					>> $2			
 			endif
+
+		else if ($sample == C) then
+			echo 'log_scale_x= symlog'						 >> $2
+			echo 'x_range_min= 0'			 		 	 >> $2 
+			echo 'x_range_max= 6.67'			 			 >> $2
+
+			echo 'xticks_minor= 0'					>> $2
+			echo 'minor_ticks_x_space= no'			 	>> $2
+			echo 'xticks= 0.1,0.5,1,1.5,2,3,4,5,6'		>> $2
+			echo 'no_first_xticks= False'		 			 >> $2
+
+			echo 'mylw= 6'				 		 	 >> $2
+
+			echo 'size_x= 12'				 		 >> $2
+			echo 'size_y= 10'				 		 >> $2
+			echo 'adjust_left= 0.14'					>> $2
+			echo 'adjust_right= 0.99'					>> $2
+			echo 'adjust_bottom= 0.13'					>> $2
+			echo 'adjust_top= 0.87'					>> $2
+
+			echo 'legend_ncols= 3'		 			 >> $2
+
+			echo 'use_loc_co_x= 0.2'		>> $2
+			echo 'use_loc_co_y= 0.87'		>> $2
+
+			echo 'z_print_position_x= 0.01'		>> $2
+			echo 'z_print_position_y= 0.87'		>> $2
+
+			echo 'ylabel_pos= 0.49'	         			>> $2  
+
+			if ($no_x == 'nox') then
+				echo 'x_title= ' >> $2
+				echo 'no_xticks= True'        					>> $2			
+			endif
+
 		else
-			echo 'x_range_min= 0.5574'			 			 >> $2
-			#echo 'x_range_min= 0.5924'			 			 >> $2
-			echo 'x_range_min= 0.55'			 			 >> $2
+			echo 'x_range_min= 0.56'			 			 >> $2
 			echo 'x_range_max= 4.15'			 			 >> $2
-			echo 'xticks= 0.55,0.7,0.85,1,1.2,1.5,2,3,4'		>> $2
+			echo 'xticks= 0.56,0.7,0.85,1,1.2,1.5,2,3,4'		>> $2
 			if ($no_x == 'nox') then
 				echo 'x_title= ' >> $2
 				echo 'no_xticks= True'        					>> $2			
@@ -1384,7 +1430,6 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 	echo 'xticks_minor_offset= 0'				>> $2
 
 	echo 'float_format_y= 3f'         				>> $2 
-	#echo 'no_last_yticks= True'		 			 >> $2
 
 	if ($yerr == '1') then
 		echo 'error_bars_y= yes'					 >> $2
@@ -1415,11 +1460,8 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 
 	else if ($key == 'plotXY_sfr') then
 		echo 'y_title=  SFR [$M_{\odot}$ $yr^{-1}$]'  >> $2
-		echo 'y_range_min= 0.01'			 		 	 >> $2 
-		echo 'y_range_max= 200'			 			 >> $2
-
-		echo 'y_range_min= 0'			 		 	 >> $2 
-		echo 'y_range_max= 25'			 			 >> $2
+		echo 'y_range_min= -1'			 		 	 >> $2 
+		echo 'y_range_max= 26'			 			 >> $2
 		echo 'minor_ticks_y_space= 1'			>> $2
 		if ($sample == 300) then
 				echo 'y_range_min= 0.001'			 		 	 >> $2
@@ -1429,6 +1471,10 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 		echo 'z_print_position_y= 0.75'		>> $2
 		echo 'log_scale_y= no'						 >> $2
 		echo 'log_scale_y_sub= no'					 >> $2
+
+		echo 'print_redshift2= (c)'				>> $2
+
+		echo 'vline_xpos= 0.7,1.38,2.12,3.54'					 >> $2
 
 	else if ($key == 'plotXYsumSFR') then
 		echo 'y_title= $\sum$ SFR [$M_{\odot}$ $yr^{-1}$ $Mpc^{-3}$]'  >> $2
@@ -1442,7 +1488,7 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 
 		echo 'log_scale_y= yes'						 >> $2
 		echo 'log_scale_y_sub= yes'					 >> $2
-		echo 'z_print_position_x= 0.20'		>> $2
+		echo 'z_print_position_x= 0.28'		>> $2
 		echo 'z_print_position_y= 0.75'		>> $2
 
 	else if ($key == 'plotXY_ssfr') then
@@ -1457,8 +1503,16 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 				echo 'y_range_min= 1e-15'			 		 	 >> $2
 				echo 'y_range_max= 1e-8'			 			 >> $2
 		endif
-		echo 'z_print_position_x= 0.28'		>> $2
-		echo 'z_print_position_y= 0.75'		>> $2
+		echo 'z_print_position_x= 0.73'		>> $2
+		echo 'z_print_position_y= 0.25'		>> $2
+
+		#knots
+		echo 'vline_xpos= 1.12,0.97,0.7,1.38,2.12,3.54'					 >> $2
+		#filaments
+		#echo 'vline_xpos= 1.05,0.96,0.7,1.38,2.12,3.54'					 >> $2
+
+		echo 'hline_ypos= 1e-11'  										>> $2
+		echo 'print_redshift2= (b)'				>> $2
 
 	else if ($key == 'plotXY_mhalo') then
 		echo 'y_title= $M_{vir}$ [$M_{\odot}$]'  >> $2
@@ -1480,7 +1534,7 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 		echo 'log_scale_y= yes'						 >> $2
 		echo 'log_scale_y_sub= yes'					 >> $2
 
-	else if ($key == 'plotXY_SHMF') then
+	else if ($key == 'plotXY_SHMR') then
  		echo 'y_title= $M_{*}$/$M_{vir}$'  >> $2
 		echo 'y_range_min= 0.001'			 		 	 >> $2
 		echo 'y_range_max= 0.02'			 			 >> $2
@@ -1529,8 +1583,8 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 
 	else if ($key == 'plotXY_zcold') then
 		echo 'y_title= $Z_{cold}$'  >> $2
-		echo 'y_range_min= 8.7'			 		 	 >> $2
-		echo 'y_range_max= 10.5'			 			 >> $2
+		echo 'y_range_min= 8.8'			 		 	 >> $2
+		echo 'y_range_max= 10.3'			 			 >> $2
 
 		if ($sample == 300) then
 			echo 'y_range_max= 9.5'			 			 >> $2
@@ -1543,6 +1597,8 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 		echo 'z_print_position_x= 0.28'		>> $2		
 		echo 'z_print_position_y= 0.75'		>> $2
 		#echo 'z_print_position_y= 0.12'		>> $2
+		echo 'print_redshift2= (a)'				>> $2
+		echo 'vline_xpos= 0.7,1.38,2.12,3.54'					 >> $2
 
 		echo 'float_format_y= 1f'         >> $2
 
@@ -1562,11 +1618,26 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 		echo 'z_print_position_x= 0.70'		>> $2
 		echo 'z_print_position_y= 0.75'		>> $2
 
+	else if ($key == 'plotXY_mbar') then
+		echo 'y_title=  $M_{bar}$ [$M_{\odot}$]'  >> $2	
+		echo 'y_range_min= 1e10'			 	>> $2
+		echo 'y_range_max= 9e11'			>> $2
+
+		if ($sample == 300) then
+				echo 'y_range_min= 1e9'			 		 	 >> $2
+				echo 'y_range_max= 1e12'			 			 >> $2
+		endif
+
+		echo 'log_scale_y= yes'						 >> $2
+		echo 'log_scale_y_sub= yes'					 >> $2
+		echo 'z_print_position_x= 0.70'		>> $2
+		echo 'z_print_position_y= 0.75'		>> $2
+
+
 	else if ($key == 'plotXY_Mzgas') then
 		echo 'y_title=  $M_{z_{cold}}$ [$M_{\odot}$]'  >> $2	
-		echo 'y_range_min= 1e6'			 	>> $2
-		#echo 'y_range_min= 1e8'			 	>> $2  
-		echo 'y_range_max= 8e9'			>> $2
+		echo 'y_range_min= 5e6'			 	>> $2
+		echo 'y_range_max= 1.5e9'			>> $2
 
 		if ($sample == 300) then
 				echo 'y_range_min= 1e7'			 		 	 >> $2
@@ -1578,20 +1649,43 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 		echo 'log_scale_y_sub= yes'					 >> $2
 
 	else if ($key == 'plotXY_Tcons') then
-		echo 'y_title=  $M_{cold}/SFR$ [$yr$]'  >> $2	
-		echo 'y_range_min= 5e7'			 	>> $2
-		#echo 'y_range_min= 1e9'			 	>> $2 
-		echo 'y_range_max= 8e10'			>> $2
-
-		if ($sample == 300) then
-				echo 'y_range_min= 1e9'			 		 	 >> $2
-				echo 'y_range_max= 1e12'			 			 >> $2
-		endif
+		echo 'y_title=  $M_{cold}/SFR$ [$Gyr$]'  >> $2	
+		echo 'y_range_min= 0.1'			 	>> $2
+		echo 'y_range_max= 200'			>> $2
 
 		echo 'log_scale_y= yes'						 >> $2
 		echo 'log_scale_y_sub= yes'					 >> $2
-		echo 'z_print_position_x= 0.75'		>> $2
+
+		echo 'error_bars_y= yes'					 >> $2
+		echo 'error_bars_y_sub= yes'					 >> $2
+
+		echo 'z_print_position_x= 0.73'		>> $2
 		echo 'z_print_position_y= 0.80'		>> $2
+
+		#knots
+		#echo 'vline_xpos= 1.12,0.97,0.7,1.38,2.12,3.54'					 >> $2
+		#filaments
+		echo 'vline_xpos= 1.05,0.96,0.7,1.38,2.12,3.54'					 >> $2
+
+		echo 'print_redshift2= (c)'				>> $2
+
+	else if ($key == 'plotXY_bheff') then
+		echo 'y_title=  $M_{BH}/M_{vir}$'  >> $2	
+		echo 'y_range_min= 1e-8'			 	>> $2
+		echo 'y_range_max= 3e-5'			>> $2
+
+		echo 'log_scale_y= yes'						 >> $2
+		echo 'log_scale_y_sub= yes'					 >> $2
+
+		#knots
+		#echo 'vline_xpos= 1.12,0.97,0.7,1.38,2.12,3.54'					 >> $2
+		#filaments
+		echo 'vline_xpos= 1.05,0.96,0.7,1.38,2.12,3.54'					 >> $2
+
+		echo 'print_redshift2= (d)'				>> $2
+
+		echo 'z_print_position_x= 0.73'		>> $2
+		echo 'z_print_position_y= 0.25'		>> $2
 
 	else if ($key == 'plotXY_mbh') then
 		echo 'y_title=  $M_{BH}$ [$M_{\odot}$]'  >> $2	
@@ -1608,34 +1702,42 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 
 	else if ($key == 'plotXY_cgf') then
 		echo 'y_title=  $M_{cold}$/$M_{*}$'  >> $2
-		echo 'y_range_min= 0.00005'			 		 	 >> $2
-		echo 'y_range_max= 0.05'			 			 >> $2
+		echo 'y_range_min= 1e-4'			 		 	 >> $2
+		echo 'y_range_max= 5'			 			 >> $2
 		echo 'log_scale_y= yes'						 >> $2
 		echo 'log_scale_y_sub= yes'					 >> $2
-		echo 'z_print_position_x= 0.2'		>> $2
-		echo 'z_print_position_y= 0.75'		>> $2
+		echo 'z_print_position_x= 0.28'		>> $2
+		echo 'z_print_position_y= 0.80'		>> $2
+		echo 'vline_xpos= 0.7,1.38,2.12,3.54'					 >> $2
 
 	else if ($key == 'plotXY_g-i') then
 		echo 'y_title= $g-i$'  >> $2
 		echo 'y_range_min= -0.1'			 		 	 >> $2
 		#echo 'y_range_min= 1'			 		 	 >> $2
-		echo 'y_range_max= 3.5'			 			 >> $2
+		echo 'y_range_max= 3.7'			 			 >> $2
 		echo 'minor_ticks_y_space= 0.1'			>> $2
 		echo 'log_scale_y= no'						 >> $2
 		echo 'log_scale_y_sub= no'					 >> $2
 		echo 'float_format_y= 1f'         >> $2
 
+		echo 'vline_xpos= 0.7,1.38,2.12,3.54'					 >> $2
+
 	else if ($key == 'plotXY_r-i') then
 		echo 'y_title= $r-i$'  >> $2
 		echo 'y_range_min= -0.1'			 		 	 >> $2
-		echo 'y_range_max= 1.9'			 			 >> $2
+		echo 'y_range_max= 1.5'			 			 >> $2
+		echo 'no_last_yticks= True'		 			 >> $2
 
-		echo 'minor_ticks_y_space= 0.05'			>> $2
+		echo 'minor_ticks_y_space= 0.1'			>> $2
 		echo 'log_scale_y= no'						 >> $2
 		echo 'log_scale_y_sub= no'					 >> $2
 
 		echo 'z_print_position_x= 0.28'		>> $2		
-		echo 'z_print_position_y= 0.75'		>> $2
+		echo 'z_print_position_y= 0.25'		>> $2
+
+		echo 'print_redshift2= (b)'				>> $2
+
+		echo 'vline_xpos= 0.7,1.38,2.12,3.54'					 >> $2
 
 
 	else if ($key == 'plotXY_rhalfmass') then
@@ -1659,7 +1761,7 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 		echo 'log_scale_y_sub= no'					 >> $2
 		echo 'minor_ticks_y_space= 5'			>> $2
 
-	else if ($key =~ plotXY_r*) then
+	else if ($key =~ plotXY_rdis* || $key =~ plotXY_rbul*) then
 
 		if ($key == 'plotXY_rdisk') then
 			echo 'y_title=  $r_{disk}$ [$kpc$]'  >> $2
@@ -1704,6 +1806,48 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 		echo 'log_scale_y= yes'						 >> $2
 		echo 'log_scale_y_sub= yes'					 >> $2
 
+	else if ($key == 'plotXY_vbulge') then
+		echo 'y_title=  $V_{bulge}$ [$kms^{-1}$]'  >> $2	
+		echo 'y_range_min= 150'			 	>> $2
+		echo 'y_range_max= 850'			>> $2
+
+		echo 'minor_ticks_y_space= 50'			>> $2
+
+		echo 'log_scale_y= no'						 >> $2
+		echo 'log_scale_y_sub= no'					 >> $2
+
+		#knots
+		#echo 'vline_xpos= 1.12,0.97,0.7,1.38,2.12,3.54'					 >> $2
+		#filaments
+		echo 'vline_xpos= 1.05,0.96,0.7,1.38,2.12,3.54'					 >> $2
+
+		echo 'print_redshift2= (e)'				>> $2
+
+		echo 'z_print_position_x= 0.73'		>> $2
+		echo 'z_print_position_y= 0.80'		>> $2
+
+	else if ($key == 'plotXY_jbar') then
+		echo 'y_title=  $j_{bar}$ [$M_{\odot}$ kpc kms$^{-1}$]'  >> $2	
+		echo 'y_range_min= 1e2'			 	>> $2
+		echo 'y_range_max= 8e5'			>> $2
+
+		echo 'log_scale_y= yes'						 >> $2
+		echo 'log_scale_y_sub= yes'					 >> $2
+		echo 'z_print_position_x= 0.70'		>> $2
+		echo 'z_print_position_y= 0.75'		>> $2
+
+		#knots
+		#echo 'vline_xpos= 1.12,0.97,0.7,1.38,2.12,3.54'					 >> $2
+		#filaments
+		echo 'vline_xpos= 1.05,0.96,0.7,1.38,2.12,3.54'					 >> $2
+
+		echo 'z_print_position_x= 0.73'		>> $2
+		echo 'z_print_position_y= 0.80'		>> $2
+
+		echo 'print_redshift2= (f)'				>> $2
+
+		echo 'no_first_xticks= True'		 			 >> $2
+
 	else if ($key == 'plotXY_mean_age_stars_disk') then
 		echo 'y_title=  $age_{disk}$ [$Gyr$]'  >> $2	
 		echo 'y_range_min= 0'			 	>> $2
@@ -1719,6 +1863,25 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 
 		echo 'log_scale_y= no'						 >> $2
 		echo 'log_scale_y_sub= no'					 >> $2
+
+	else if ($key =~ *'per'* || $key =~ *'_one' || $key =~ *'_frac') then
+		echo 'y_title=  $\Delta_{(X_z-X_{z-1})}$ [%]'  >> $2
+		set plot_key = '0'
+		if ($plot_key == '0') then
+			echo 'y_range_min= -25'			 	>> $2
+			echo 'y_range_max= 25'			>> $2
+			echo 'hline_ypos= 0,10'					 >> $2
+		else
+			echo 'y_range_min= 60'			 	>> $2
+			echo 'y_range_max= 100'			>> $2
+
+			echo 'hline_ypos= 75,90,95'					 >> $2
+		endif
+
+		echo 'log_scale_y= no'						 >> $2
+		echo 'log_scale_y_sub= no'					 >> $2
+
+
 
 	else if ($key == 'con') then
 		echo 'y_title= $C_{NFW}$'  >> $2
@@ -1798,14 +1961,21 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 
 	else if ($key =~ plotXY_g* || $key =~ plotXY_sta*) then
 
-
 		if ($key == plotXY_gr) then
 			echo 'hline_ypos= 0.5'					 >> $2
 			echo 'y_range_min= 0.0'			 		 	 >> $2 
 			echo 'y_range_max= 1.08'			 			 >> $2
 
+			#echo 'y_range_max= 1.25'			 			 >> $2
+
 			echo 'y_title= X$_{z}$/X$_{z_0}$'				>> $2
 			echo 'no_last_yticks= False'		 			 >> $2
+			#echo 'no_first_xticks= True'		 			 >> $2
+
+			#z50% formation mhalo low/high-zcold-red filaments
+			echo 'vline_xpos= 1.37,1.44'					 >> $2
+			#z50% formation mhalo low/high-zcold-red knots
+			echo 'vline_xpos= 1.18,1.37'					 >> $2
 
 		else if ($key == plotXY_gr_res) then
 			echo 'hline_ypos= -0.5,0,0.5'					 >> $2
@@ -1886,13 +2056,122 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 			endif
 
 			echo 'plot_legend= no'				 	 >> $2
-			echo 'size_x= 13'				 		 >> $2
-			echo 'size_y= 5'				 		 >> $2
-			echo 'adjust_left= 0.17'				 >> $2
+			echo 'size_x= 12'				 		 >> $2
+			echo 'size_y= 4.5'				 		 >> $2
+			echo 'adjust_left= 0.16'				 >> $2
 			echo 'adjust_right= 0.99'					>> $2
-			echo 'adjust_bottom= 0.20'					>> $2
+			echo 'adjust_bottom= 0.22'					>> $2
 			echo 'adjust_top= 0.95'					>> $2
 		endif
+
+	else if ($key =~ plotXY_x* || $key =~ plotXY_r2x* || $key =~ plotXY_refx*) then
+
+		set use_cb_colors = 3
+
+		set key2 = 'noyd'
+		set key1 = 'noxd'
+
+		echo 'z_print_position_x= 0.75'		>> $2
+		echo 'z_print_position_y= 0.82'		>> $2
+
+		echo 'use_loc_co_x= 0.28'		>> $2
+		echo 'use_loc_co_y= 0.87'		>> $2
+		echo 'use_loc_co_y= 0.30'		>> $2
+
+		echo 'log_scale_x= yes'						 >> $2
+		echo 'log_scale_x_sub= yes'					 >> $2
+
+		echo 'adjust_top= 0.87'					>> $2
+		echo 'adjust_bottom= 0.13'					>> $2
+
+
+		set size_x = 8
+		echo 'size_x= '$size_x				 		 >> $2
+
+		if ($size_x == 8) then
+			echo 'adjust_left= 0.20'					>> $2
+		else
+			echo 'adjust_left= 0.18'					>> $2
+		endif
+
+		echo 'error_bars_y= no'					 >> $2
+		echo 'error_bars_y_sub= no'					 >> $2
+
+		if ($key =~ plotXY_r2x*) then
+			echo 'size_y= 6.5'				 		 >> $2
+			echo 'plot_legend= no'			>> $2
+			echo 'print_redshift= None'				 	 >> $2
+		else if ($key =~ plotXY_refx*) then
+			echo 'size_y= 3.25'				 		 >> $2
+			echo 'plot_legend= no'			>> $2
+			echo 'print_redshift= False'				 	 >> $2
+		else
+			echo 'size_y= 8.5'				 		 >> $2
+			echo 'hline_ypos= 0.0'					 >> $2
+		endif
+
+		#echo 'minor_ticks_x_space= no'			 	>> $2
+		echo 'xticks= 1,2,5,10,25,50,150'	>> $2
+		echo 'xticks= 1,2,5,10,25,50,95'	>> $2
+		echo 'xticks_minor= 0'					>> $2
+		echo 'xticks_minor_offset= 0'				>> $2
+		echo 'x_range_min= 1'			 		 >> $2
+		echo 'x_range_max= 200'			 		 >> $2
+		echo 'x_range_max= 120'			 		 >> $2
+
+		if ($key1 == 'nox') then
+			echo 'x_title= ' >> $2
+			echo 'no_xticks= True'        					>> $2
+		else
+			echo 'x_title= $r$ $[Mpc]$'	 	>> $2
+
+		endif
+
+		if ($key =~ plotXY_r2x* ) then
+			echo 'z_print_position_x= 0.68'		>> $2
+			echo 'z_print_position_y= 0.25'		>> $2
+
+			#echo 'z_print_position_x= 0.22'		>> $2
+			#echo 'z_print_position_y= 0.86'		>> $2
+			echo 'y_title= $\log_{10}$ ($r^2$ $\xi(r)$ $[Mpc^2]$)'	>> $2
+			echo 'y_range_min= 0.5'		 			 >> $2
+			echo 'y_range_max= 2.7'			 		 >> $2
+			echo 'no_first_last_yticks= True'        		>> $2
+			echo 'adjust_top= 0.99'					>> $2
+			echo 'adjust_bottom= 0.18'					>> $2
+			echo 'minor_ticks_y_space= 0.1'			>> $2
+			echo 'axis_label_fontsize_y= 30'				 	 >> $2
+			echo 'ylabel_pos= 0.55'	         			>> $2
+
+		else if ($key =~ plotXY_refx* ) then
+			echo 'y_title= $\xi(r)/\xi(r)_{ref}$ - 1'	>> $2
+			echo 'y_range_min= -1.5'		 			 >> $2
+			echo 'y_range_max= 1.5'			 		 >> $2
+			echo 'adjust_top= 0.98'					>> $2
+			echo 'adjust_bottom= 0.32'					>> $2
+			echo 'minor_ticks_y_space= 0.25'			>> $2
+			echo 'hline_ypos= 0.0'					 >> $2
+			echo 'ylabel_pos= 0.65'	         			>> $2
+			echo 'axis_label_fontsize_y= 22'				 	 >> $2
+			echo 'yticks= -1.0,0.0,1.0'	>> $2
+		else
+			echo 'y_title= $\log_{10}$ $\xi(r)$'	>> $2
+			echo 'minor_ticks_y_space= 0.1'			>> $2
+			echo 'y_range_min= -3'		 			 >> $2
+			echo 'y_range_max= 2'			 		 >> $2
+		endif
+
+		if ($key2 == 'noy') then
+			echo 'y_title= ' 				 >> $2
+			echo 'no_yticks= True'        					>> $2
+			echo 'no_last_yticks= False'        					>> $2
+			echo 'no_first_last_yticks= False'        					>> $2
+			if ($key1 != 'nox') then
+				echo 'no_first_xticks= True'        		>> $2
+			endif
+		endif
+
+
 
 	else if ($key =~ plotXY_w*) then
 
@@ -1944,6 +2223,8 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 
 		echo 'size_x= 10'			 		 >> $2
 		echo 'adjust_left= 0.18'					>> $2
+
+
 	else if ($key =~ plotXY_envr*) then
 
 		echo 'y_range_min= 0'			 			 >> $2
@@ -1956,17 +2237,25 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 
 	else
 		echo 'y_title= cSFR density [$M_{\odot}$ $yr^{-1}$ $Mpc^{-3}$]'  >> $2
-		#echo 'x_range_min= 0'			 			 >> $2
-		#echo 'x_range_max= 7'			 			 >> $2
-		#echo 'xticks= 0,1,2,3,4,5,6,7'		>> $2
-		#echo 'xticks_minor_offset= 1'				>> $2
-		echo 'y_range_min= 3e-7'			 		 	 >> $2 
-		echo 'y_range_max=  0.003'			 			 >> $2
 
+		echo 'y_range_min= 8e-7'			 		 	 >> $2 
+		echo 'y_range_max=  0.0015'			 			 >> $2
+		echo 'log_scale_y= yes'						 >> $2
+		echo 'log_scale_y_sub= yes'					 >> $2
 
-		echo 'z_print_position_x= 0.28'		>> $2
-		echo 'z_print_position_y= 0.75'		>> $2
+		echo 'z_print_position_x= 0.73'		>> $2
+		echo 'z_print_position_y= 0.25'		>> $2
+
+		echo 'print_redshift2= (a)'				>> $2
+
+		#knots
+		#echo 'vline_xpos= 1.12,0.97,0.7,1.38,2.12,3.54'					 >> $2
+		#filaments
+		echo 'vline_xpos= 1.05,0.96,0.7,1.38,2.12,3.54'					 >> $2
+
 	endif
+
+
 
 	if ($add_x == 'yes') then
 		#add axis x
@@ -2008,16 +2297,17 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 		echo 'y_title= ' >> $2
 		echo 'no_yticks= True'        					>> $2
 		echo 'no_last_yticks= False'        					>> $2
+		echo 'no_first_last_yticks= False'        					>> $2
 		echo 'plot_legend= no'			>> $2
 			
 	endif
 
-	echo 'float_format_y= 3f'         >> $2
+	#echo 'float_format_y= 3f'         >> $2
 
 	if ($key =~ *gr_one) then
-		set use_cb_colors = 7
-		echo 'legend_ncols= 7'		 			 >> $2
-		echo 'use_loc_co_y= 0.83'		>> $2
+		set use_cb_colors = 12
+		echo 'legend_ncols= 5'		 			 >> $2
+		echo 'use_loc_co_y= 0.78'		>> $2
 		echo 'use_loc_co_x= 0.01'		>> $2
 
 		echo 'z_print_position_x= 0.15'		>> $2
@@ -2025,23 +2315,77 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 
 		echo 'z_print_position_x= 0.3'		>> $2
 		echo 'z_print_position_y= 0.25'		>> $2
-		echo 'z_print_position_x= 0.75'		>> $2
-		echo 'z_print_position_y= 0.57'		>> $2
+
+		echo 'z_print_position_x= 0.28'		>> $2
+		echo 'z_print_position_y= 0.82'		>> $2
+
+		echo 'text_fontsize= 35'				 	 >> $2
+
 		echo 'adjust_top= 0.99'					>> $2
-		echo 'adjust_bottom= 0.17'					>> $2
+		echo 'adjust_bottom= 0.15'					>> $2
 
-		echo 'hline_ypos= 0.5,1.0'					 >> $2
+		echo 'hline_ypos= -10.0,0.0,10.0'		 >> $2
 
-		echo 'ylabel_pos= 0.5'	         			>> $2    
-		echo 'size_y= 6'	         			>> $2
+		echo 'minor_ticks_y_space= 5'			 	>> $2
+
+		echo 'ylabel_pos= 0.55'	         			>> $2    
+		echo 'size_y= 8'	         			>> $2
 		echo 'size_x= 12'	         			>> $2
 		echo 'keyword_change1= plot_legend0,$M_{vir}$' 		>> $2
 		echo 'keyword_change2= plot_legend1,$M_{*}$' 		>> $2
 		echo 'keyword_change3= plot_legend2,$M_{cold}$' 	>> $2
 		echo 'keyword_change4= plot_legend3,$M_{z_{cold}}$' 	>> $2
 		echo 'keyword_change5= plot_legend4,$M_{BH}$' 		>> $2
-		echo 'keyword_change6= plot_legend5,$r_{1/2}$' 		>> $2
+		echo 'keyword_change6= plot_legend5,$T_{cons}$' 		>> $2
 		echo 'keyword_change7= plot_legend6,$Z_{cold}$' 		>> $2
+		echo 'keyword_change8= plot_legend7,$CGF$' 		>> $2
+		echo 'keyword_change9= plot_legend8,$SFR$' 		>> $2
+		echo 'keyword_change10= plot_legend9,$sSFR$' 		>> $2
+		echo 'keyword_change11= plot_legend10,$cSFRD$' 		>> $2
+
+	else if ($key =~ *'gr_frac') then
+		set use_cb_colors = 6
+		echo 'legend_ncols= 3'		 			 >> $2
+		echo 'use_loc_co_y= 0.9'		>> $2
+		echo 'use_loc_co_x= 0.15'		>> $2
+
+		echo 'z_print_position_x= 0.28'		>> $2
+		echo 'z_print_position_y= 0.8'		>> $2
+
+		echo 'text_fontsize= 35'				 	 >> $2
+
+		echo 'adjust_top= 0.9'					>> $2
+		echo 'adjust_bottom= 0.15'					>> $2
+
+		echo 'hline_ypos= -10.0,0.0,10.0'		 >> $2
+
+		echo 'minor_ticks_y_space= 5'			 	>> $2
+		echo 'error_bars_y= no'					 >> $2
+		echo 'error_bars_y_sub= no'					 >> $2
+
+		echo 'ylabel_pos= 0.55'	         			>> $2    
+		echo 'size_y= 8'	         			>> $2
+		echo 'size_x= 12'	         			>> $2
+
+		echo 'keyword_change1= plot_legend0,Gal-dens' 	>> $2
+		echo 'keyword_change2= plot_legend1,low-SFR' 	>> $2
+		echo 'keyword_change3= plot_legend2,passive' 	>> $2
+		echo 'keyword_change4= plot_legend3,red' 	>> $2
+		echo 'keyword_change5= plot_legend4,low-$Z_{Cold}$' 	>> $2
+		echo 'keyword_change6= plot_legend5,high-$Z_{Cold}$' 	>> $2
+
+	else if ($key =~ *one) then
+		set use_cb_colors = 5
+		echo 'z_print_position_x= 0.17'		>> $2
+		echo 'z_print_position_y= 0.17'		>> $2
+		echo 'keyword_change1= plot_legend0,$M_{vir}$ [$h^{-1}M_{\odot}$]' 	>> $2
+		echo 'keyword_change2= plot_legend1,$R_{vir}$ [$h^{-1}$Mpc]' 	>> $2
+		echo 'keyword_change3= plot_legend2,X [$h^{-1}$Mpc]' 	>> $2
+		echo 'keyword_change4= plot_legend3,Y [$h^{-1}$Mpc]'	>> $2
+		echo 'keyword_change5= plot_legend4,Z [$h^{-1}$Mpc]' 	>> $2
+		#echo 'keyword_change1= plot_legend0,shared-frac $n_p$ halo1' 	>> $2
+		#echo 'keyword_change2= plot_legend1,shared-frac $n_p$ halo2' 	>> $2
+
 
 	else if ($key =~ *wp_one) then
 		#['0.56','0.59', '0.63', '0.66', '0.7','0.74','0.78','0.82','0.86','0.9','0.94','0.99',\
@@ -2155,22 +2499,16 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 		endif
 	else
 
-		#echo 'use_loc_co_y= 0.82'		>> $2
-		#echo 'use_loc_co_x= 0.01'		>> $2
+		#echo 'use_loc_co_y= 0.88'		>> $2
+		#echo 'use_loc_co_x= 0.02'		>> $2
 
-		#echo 'z_print_position_x= 0.73'		>> $2
-		#echo 'z_print_position_y= 0.77'		>> $2
+		#echo 'z_print_position_x= 0.75'		>> $2
+		#echo 'z_print_position_y= 0.65'		>> $2
 
-		echo 'use_loc_co_x= 0.02'		>> $2
-		echo 'use_loc_co_y= 0.58'		>> $2
+		#echo 'use_loc_co_x= 0.70'		>> $2
+		#echo 'use_loc_co_y= 0.25'		>> $2
 
-		echo 'legend_ncols= 1'			>> $2
-
-		if ($sample == 1b) then
-			set use_cb_colors = 14
-		else
-			set use_cb_colors = 9
-		endif
+		#echo 'legend_ncols= 1'			>> $2
 
 		if ($sample == 1 || $sample == 1a || $sample == 1b) then
 			echo 'keyword_change1= plot_legend0,low-SFR' 	>> $2
@@ -2224,12 +2562,27 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 
 
 		else if ($sample == final) then
-			set use_cb_colors = 5
-			echo 'keyword_change1= plot_legend0,low-SFR' 	>> $2
-			echo 'keyword_change2= plot_legend1,passive' 	>> $2
-			echo 'keyword_change3= plot_legend2,red' 	>> $2
-			echo 'keyword_change4= plot_legend3,low-$Z_{Cold}$' 	>> $2
-			echo 'keyword_change5= plot_legend4,high-$Z_{Cold}$' 	>> $2
+			set use_cb_colors = 6
+			echo 'keyword_change1= plot_legend0,Gal-dens' 	>> $2
+			echo 'keyword_change2= plot_legend1,low-SFR' 	>> $2
+			echo 'keyword_change3= plot_legend2,passive' 	>> $2
+			echo 'keyword_change4= plot_legend3,red' 	>> $2
+			echo 'keyword_change5= plot_legend4,low-$Z_{Cold}$' 	>> $2
+			echo 'keyword_change6= plot_legend5,high-$Z_{Cold}$' 	>> $2
+
+			echo 'keyword_change2= plot_legend1,low-$Z_{Cold}$' 	>> $2
+			echo 'keyword_change3= plot_legend2,high-$Z_{Cold}$' 	>> $2
+
+			#echo 'keyword_change1= plot_legend0,all knots' 	>> $2
+			#echo 'keyword_change2= plot_legend1,low-$Z_{Cold}$ knots' 	>> $2
+			#echo 'keyword_change3= plot_legend2,high-$Z_{Cold}$ knots' 	>> $2
+			#echo 'keyword_change4= plot_legend3,all filaments' 	>> $2
+			#echo 'keyword_change5= plot_legend4,low-$Z_{Cold}$ filaments' 	>> $2
+			#echo 'keyword_change6= plot_legend5,high-$Z_{Cold}$ filaments' 	>> $2
+
+			#echo 'keyword_change1= plot_legend0,all' 	>> $2
+			#echo 'keyword_change5= plot_legend1,knots' 	>> $2
+			#echo 'keyword_change6= plot_legend2,filaments' 	>> $2
 
 		else if ($sample == 2a) then
 			set use_cb_colors = 11
@@ -2273,7 +2626,7 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 			echo 'keyword_change4= plot_legend3,low $M_{vir}$' 	>> $2
 			echo 'keyword_change5= plot_legend4,low $M_*$' 	>> $2
 			echo 'keyword_change6= plot_legend5,low $M_{Z_{gas}}$' 	>> $2
-		else
+		else if ($sample == demo) then
 			echo 'keyword_change1= plot_legend0,red' 	>> $2
 			echo 'keyword_change2= plot_legend1,red' 	>> $2
 			echo 'keyword_change3= plot_legend2,red' 	>> $2
@@ -2282,6 +2635,19 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 			echo 'keyword_change6= plot_legend5,blue' 	>> $2
 			echo 'keyword_change7= plot_legend6,blue' 	>> $2
 			echo 'keyword_change8= plot_legend7,blue' 	>> $2
+		else
+			set use_cb_colors = 3
+			echo 'legend_ncols= 5'			>> $2
+			echo 'keyword_change1= plot_legend0,treeID19-MM' 	>> $2
+			echo 'keyword_change2= plot_legend1,treeID19-LH' 	>> $2
+			echo 'keyword_change3= plot_legend2,treeID19-HH' 	>> $2
+			echo 'keyword_change4= plot_legend3,treeID3' 	>> $2
+			echo 'keyword_change5= plot_legend4,treeID4' 	>> $2
+			echo 'keyword_change6= plot_legend5,treeID5' 	>> $2
+			echo 'keyword_change7= plot_legend6,treeID6' 	>> $2
+			echo 'keyword_change8= plot_legend7,treeID7' 	>> $2
+			echo 'keyword_change9= plot_legend8,treeID8' 	>> $2
+			echo 'keyword_change10= plot_legend9,treeID9' 	>> $2
 		endif
 	endif
 
@@ -2331,7 +2697,7 @@ else if ($1 == plotXY && $plotXY_key == 'zevol') then
 		echo 'size_y= 4.5'				 		 >> $2
 		echo 'adjust_left= 0.16'					>> $2
 		echo 'adjust_right= 0.99'					>> $2
-		echo 'adjust_bottom= 0.20'					>> $2
+		echo 'adjust_bottom= 0.2'					>> $2
 		echo 'adjust_top= 0.80'					>> $2
 
 		echo 'z_print_position_x= 0.005'		>> $2
@@ -2957,8 +3323,8 @@ if ($1 =~ analyse_tarsel_*sfr_* || $1 =~ analyse_tarsel_*zcold*) then
 	echo 'legend_ncols= 2'			>> $2
 
 	if ($1 =~ *ssfr*) then
-		echo 'y_range_min= -14'		 			 	 >> $2
-		echo 'y_range_max= -10.4'				 		 >> $2
+		echo 'y_range_min= -14.2'		 			 	 >> $2
+		echo 'y_range_max= -10.2'				 		 >> $2
 		echo 'float_format_y= 0f'         				>> $2
 		echo 'yticks= -14,-13,-12,-11'		>> $2
 		echo 'yticks_minor_offset= 0'				>> $2
@@ -2969,12 +3335,12 @@ if ($1 =~ analyse_tarsel_*sfr_* || $1 =~ analyse_tarsel_*zcold*) then
 
 	echo 'plot_legend= yes'		 			>> $2
 
-	echo 'hline_ypos= 2.35'					 >> $2
+	echo 'hline_ypos= -11'					 >> $2
 
 	echo 'use_loc_co_x= 0.48'				>> $2
 	echo 'use_loc_co_y= 0.15'				>> $2
 	echo 'z_print_position_x= 0.65'		>> $2
-	echo 'z_print_position_y= 0.68'		>> $2
+	echo 'z_print_position_y= 0.72'		>> $2
 
 	echo 'xticks_minor_offset= 0'				>> $2
 
@@ -3055,10 +3421,10 @@ if ($1 =~ analyse_tarsel_*sfr_* || $1 =~ analyse_tarsel_*zcold*) then
 		echo 'yticks= 8.5,9.0,9.5,10.0,10.5'		>> $2
 		echo 'yticks_minor_offset= 0'				>> $2
 	else
-		echo 'x_range_min= 10.65'			 		 >> $2
-		echo 'x_range_max= 12.1'			 		 >> $2
+		echo 'x_range_min= 10.8'			 		 >> $2
+		echo 'x_range_max= 11.9'			 		 >> $2
 		echo 'minor_ticks_x_space= 0.05'			 >> $2
-		echo 'xticks= 11,11.5,12'		>> $2
+		echo 'xticks= 10.8,11.0,11.2,11.4,11.6,11.8'		>> $2
 	endif
 	
 	echo 'histo_num_density_max= 0.20'				>> $2
@@ -3066,17 +3432,6 @@ if ($1 =~ analyse_tarsel_*sfr_* || $1 =~ analyse_tarsel_*zcold*) then
 	#echo 'no_yticks= False'			>> $2
 	echo 'minor_ticks_x_space= 0.1'			 >> $2
 	echo 'minor_ticks_y_space= 0.1'			 >> $2
-
-	#Violetas Paper:
-	#----------------------	
-	#ssfr = 0.3/t_H(z) Gyr-1
-	#echo 'hline_ypos= -1.66'					 >> $2
-	#ssfr = 1/t_H(z) Gyr-1
-	#echo 'hline_ypos= -1.14'					 >> $2
-	#echo 'y_range_min= -6'		 			 	 >> $2
-	#echo 'y_range_max= 1'				 		 >> $2
-	#echo 'no_last_xticks= True'         			>> $2
-	#echo 'no_last_yticks= True'         			>> $2
 
 else if ($1 =~ analyse_tarsel_*g-*_ssfr) then
 	echo 'plot_type= hexbins'				>> $2
@@ -3141,6 +3496,51 @@ else if ($1 =~ analyse_tarsel_*dmesa*_ssfr) then
 	#echo 'no_last_xticks= True'         			>> $2
 	echo 'no_last_yticks= True'         			>> $2
 
+#radus vs i
+else if ($1 =~ *rdisk_i*) then
+	echo 'x_title= $m_{AB}_i$'		 			 >> $2
+	echo 'y_title= $\log_{10}(r [$kpc$])'		 			 >> $2
+	echo 'print_redshift= False' >> $2
+	echo 'tight_layout= False'		 		 	>> $2
+	echo 'plot_type= hexbins'				>> $2
+	#colorbar/hexbin/countour details
+	echo 'cb_min= 2'				 		 >> $2
+	echo 'cb_max= 6'				 		 >> $2
+	echo 'cb_steps= 1'				 		 >> $2
+	echo 'bins= log'				 		 >> $2
+	echo 'min_count= 100'				 		 >> $2
+	echo 'gridsize= 75'				 		 >> $2
+
+	echo 'contour_log= no'		>> $2
+	echo 'minor_ticks_x_space= 0.25'			 	>> $2
+	echo 'minor_ticks_y_space= 0.1'			 	>> $2
+	set mag = 'm'
+	set band = 'i'
+	if ($mag == M) then
+		echo 'x_range_min= -23.3'		 			 >> $2
+		echo 'x_range_max= -19.6'			 		 >> $2
+		echo 'xticks= -23,-22,-21,-20'		>> $2
+	else
+		echo 'x_range_min= 13.0'		 			 >> $2
+		echo 'x_range_max= 23.0'		 		 >> $2
+
+	endif
+
+	echo 'y_range_min= -1'		 			 >> $2
+	echo 'y_range_max= 3.2'				 	 >> $2
+
+	echo 'histo_num_density_max= 0.28'				>> $2
+	echo 'histo_panels= yes'				>> $2
+	echo 'error_bars_y_sub= no'					 >> $2
+	echo 'z_print_position_x= 0.18'				>> $2
+	echo 'z_print_position_y= 0.85'				>> $2
+	echo 'use_loc_co_x= 0.18'				>> $2
+	echo 'use_loc_co_y= 0.15'				>> $2
+	echo 'plot_legend= yes'		 			>> $2
+	#echo 'no_last_xticks= True'         			>> $2
+	echo 'no_first_last_yticks= True'         			>> $2
+	echo 'xticks= 14,16,18,20,22'		>> $2
+
 else if ($1 =~ analyse_tarsel_*rdisk* || $1 =~ analyse_tarsel_*rhalf*) then
 	echo 'plot_type= hexbins'				>> $2
 	echo 'contour_log= no'			>> $2
@@ -3168,7 +3568,7 @@ else if ($1 =~ analyse_tarsel_*rdisk* || $1 =~ analyse_tarsel_*rhalf*) then
 		echo 'y_range_max= 3'				 		 >> $2
 	endif
 
-	echo 'plot_legend= no'		 			>> $2
+	echo 'plot_legend= yes'		 			>> $2
 	echo 'use_loc_co_x= 0.9'			>> $2
 	echo 'use_loc_co_y= 0.17'			>> $2
 
@@ -3290,31 +3690,41 @@ else if ($1 =~ analyse_tarsel_Mzgas*mstar) then
 	echo 'minor_ticks_x_space= 0.1'			 >> $2
 	echo 'minor_ticks_y_space= 0.1'			 >> $2
 
-else if ($1 =~ analyse_tarsel_ang*mbar) then
+else if ($1 =~ analyse_tarsel_ang*m*) then
 	echo 'plot_type= hexbins'				>> $2
-	echo 'contour_log= yes'			>> $2
-	echo 'contour_log_wich_axis= both'		>> $2
-	echo 'colorbar_title= '       >> $2 
-	echo 'x_range_min= 9.4'			 		 >> $2
-	echo 'x_range_max= 11.6'			 		 >> $2
-	echo 'y_range_min= 1'		 			 	 >> $2
-	echo 'y_range_max= 4.5'				 		 >> $2
-	echo 'plot_legend= yes'		 			>> $2
-	echo 'use_loc_co_x= 0.55'			>> $2
-	echo 'use_loc_co_y= 0.14'			>> $2								
+	echo 'cb_min= 2'				 		 >> $2
+	echo 'cb_max= 6'				 		 >> $2
+	echo 'cb_steps= 1'				 		 >> $2
+	echo 'min_count= 100'				 		 >> $2
+	echo 'gridsize= 100'				 		 >> $2
+	echo 'contour_log= no'			>> $2
+	echo 'error_bars_y_sub= no'					 >> $2
 
-	echo 'xticks= 9.4,9.8,10.2,10.6,11.0,11.4'		>> $2
+	echo 'colorbar_title= '       >> $2 
+	echo 'x_range_min= 7.3'			 		 >> $2
+	echo 'x_range_max= 11.3'			 		 >> $2
+	echo 'y_range_min= 1'		 			 	 >> $2
+	echo 'y_range_max= 4.2'				 		 >> $2
+	echo 'plot_legend= yes'		 			>> $2
+	echo 'use_loc_co_x= 0.20'			>> $2
+	echo 'use_loc_co_y= 0.6'			>> $2
+	echo 'use_loc_co_x= 0.53'			>> $2
+	echo 'use_loc_co_y= 0.16'			>> $2								
+	echo 'z_print_position_x= 0.65'		>> $2
+	echo 'z_print_position_y= 0.73'		>> $2
+	echo 'xticks= 7.5,8.5,9.5,10.5'		>> $2
 	echo 'xticks_minor_offset= 0'				>> $2
 	echo 'histo_panels= yes'			>> $2
 	echo 'minor_ticks_x_space= 0.1'			 	>> $2
 	echo 'minor_ticks_y_space= 0.25'			 	>> $2
 	echo 'no_yticks= False'					>> $2
 	#echo 'no_last_xticks= True'					>> $2
-	echo 'no_last_yticks= True'					>> $2
-	echo 'minor_ticks_x_space= 0.1'			 >> $2
+	#echo 'no_last_yticks= True'					>> $2
+
 	echo 'minor_ticks_y_space= 0.1'			 >> $2
 
-	echo 'histo_num_density_max= 0.12'				>> $2
+	echo 'histo_num_density_max= 0.2'				>> $2
+
 
 else if ($1 =~ analyse_tarsel_bdisk*) then
 	echo 'plot_type= hexbins'				>> $2
@@ -3440,10 +3850,14 @@ else if ($1 =~ *-i_i*) then
 	echo 'plot_legend= yes'		 			>> $2
 	echo 'no_last_xticks= False'         			>> $2
 	echo 'no_last_yticks= True'         			>> $2
+
+
+
 #contour r-i vs mstar
 else if ($1 == analyse_tarsel_r-i_mstar || $1 == analyse_tarsel_g-i_mstar || $1 == analyse_tarsel_g-i_mhalo) then
 	echo 'plot_type= hexbins'				>> $2
 	echo 'tight_layout= False'		 		 	>> $2
+
 	echo 'contour_log= no'			>> $2
 	echo 'contour_log_wich_axis= x'		>> $2
 
@@ -3465,10 +3879,10 @@ else if ($1 == analyse_tarsel_r-i_mstar || $1 == analyse_tarsel_g-i_mstar || $1 
 	
 	set band = 'g'
 	if ($band == g) then
-		echo 'y_range_min= 1.8'		 			 >> $2
+		echo 'y_range_min= 2.1'		 			 >> $2
 		echo 'y_range_max= 2.9'				 	 >> $2
 
-		echo 'yticks= 1.8,2.0,2.2,2.4,2.6,2.8'		>> $2
+		echo 'yticks= 2.2,2.4,2.6,2.8'		>> $2
 		echo 'hline_ypos= 2.35'					 >> $2
 	else
 		echo 'y_range_min= 0.0'		 			 >> $2
@@ -3494,8 +3908,16 @@ else if ($1 == analyse_tarsel_r-i_mstar || $1 == analyse_tarsel_g-i_mstar || $1 
 	echo 'no_last_xticks= False'         			>> $2
 	echo 'no_last_yticks= False'         			>> $2
 
-#contour g-r vs r-i
-else if ($1 =~ *r-i*g-*) then
+#contour g-r vs r-i OR g-r vs g-i
+else if ($1 =~ *r-i*g-* || $1 =~ *g-*g-i*) then
+	#colorbar/hexbin/countour details
+	echo 'cb_min= 2'				 		 >> $2
+	echo 'cb_max= 6'				 		 >> $2
+	echo 'cb_steps= 1'				 		 >> $2
+	echo 'bins= log'				 		 >> $2
+	echo 'min_count= 100'				 		 >> $2
+	echo 'gridsize= 75'				 		 >> $2
+	
 	echo 'contour_log= no'		>> $2
 	echo 'no_last_yticks= False'         			>> $2
 
@@ -3503,7 +3925,14 @@ else if ($1 =~ *r-i*g-*) then
 	echo 'x_range_max= 1'			 		 >> $2
 	echo 'y_range_min= 0.0'		 			 >> $2
 	echo 'y_range_max= 0.8'				 		 >> $2
-	echo 'histo_num_density_max= 0.15'				>> $2
+
+
+	echo 'x_range_min= -0.25'		 			 >> $2
+	echo 'x_range_max= 1.6'			 		 >> $2
+	echo 'y_range_min= -0.25'		 			 >> $2
+	echo 'y_range_max= 1.15'				 		 >> $2
+
+	echo 'histo_num_density_max= 0.26'				>> $2
 
 	echo 'legend_sep_xpos= 0.16'	>> $2
 	echo 'legend_sep_ypos= 0.63'	>> $2
@@ -3521,25 +3950,29 @@ else if ($1 =~ *r-i*g-*) then
 	echo 'minor_ticks_y_space= 0.1'			 	>> $2
 	echo 'error_bars_y_sub= no'					 >> $2
 	echo 'colorbar_anchor_right= 0.9'		 		 >> $2
-	echo 'plot_legend= no'		 			>> $2
+	echo 'plot_legend= yes'		 			>> $2
 
 	set histo_panels = 'yes'
 	echo 'histo_panels= '$histo_panels				>> $2
 	if ($histo_panels == 'yes') then
 		echo 'use_loc_co_x= 0.53'				>> $2
 		echo 'use_loc_co_y= 0.15'				>> $2
-		echo 'z_print_position_x= 0.16'		>> $2
+		echo 'z_print_position_x= 0.18'		>> $2
 		echo 'z_print_position_y= 0.75'		>> $2
 	else
 		echo 'use_loc_co_x= 0.60'				>> $2
 		echo 'use_loc_co_y= 0.85'				>> $2
-		echo 'z_print_position_x= 0.16'		>> $2
+		echo 'z_print_position_x= 0.18'		>> $2
 		echo 'z_print_position_y= 0.9'		>> $2
 	endif
-	echo 'no_last_xticks= False'         			>> $2
-	echo 'no_last_yticks= True'         			>> $2
+	echo 'no_first_xticks= True'         			>> $2
+	echo 'no_first_last_yticks= True'         			>> $2
 
 	#echo 'xticks= 0,0.5,1,1.5,2'		>> $2
+	#echo 'xticks= 0,0.5,1'		>> $2
+	#echo 'yticks= 0,0.5,1,1.5'		>> $2
+
+	echo 'vline_xpos= 0.64' >> $2
 
 #contour dmesa vs i-band
 else if ($1 == analyse_tarsel_dmesa_i) then
@@ -3547,7 +3980,7 @@ else if ($1 == analyse_tarsel_dmesa_i) then
 	echo 'plot_legend= yes'		 			>> $2
 	echo 'minor_ticks_x_space= 0.1'			 >> $2
 	echo 'minor_ticks_y_space= 0.05'			 >> $2
-	echo 'histo_num_density_max= 0.18'				>> $2
+	echo 'histo_num_density_max= 0.20'				>> $2
 	echo 'legend_sep_xpos= 0.57'	>> $2
 
 	set zoom = 'no'
@@ -4455,22 +4888,6 @@ echo 'caption1= ' >> $2
 echo 'caption2= ' >> $2
 echo 'caption3= ' >> $2
 
-if ($catname == 'SAGg') then
-
-	echo '0= --'	>> $13
-	echo '1= :'	>> $13
-	echo '2= '	>> $13
-
-	echo '2= o'	>> $15
-	echo '3= ^'	>> $15
-	echo '4= s'	>> $15
-
-	echo '2= w'	>> $16
-	echo '3= #ffe200' >> $16
-	echo '4= #c5c1c2' >> $16
-
-endif	
-
 #DEFAULT colour style for contour plots
 if ($1 =~ analyse* || $1 =~ plotX*) then
 
@@ -4480,26 +4897,27 @@ if ($1 =~ analyse* || $1 =~ plotX*) then
 	#linestyle colour table:MATPLOT_COL
 	echo '0= w' >> $14 
 	echo '1= k' >> $14  
-	echo '3= r' >> $14
-	echo '2= #ffab00' >> $14
+	echo '2= r' >> $14
+	echo '4= #ffab00' >> $14
 	#Butterfly green
-	echo '5= #4baf0c' >> $14
-	echo '4= #AA4499' >> $14
-	echo '6= #4da6ff' >> $14
+	#echo '4= #4baf0c' >> $14
+	#echo '4= #AA4499' >> $14
+	echo '6= k' >> $14
+	echo '3= #ffab00' >> $14
 	echo '7= k' >> $14
-	echo '8= k' >> $14
-	echo '9= k' >> $14
-	echo '10= k' >> $14
+	echo '3= k' >> $14
+	echo '2= k' >> $14
+	echo '4= k' >> $14
 	echo '5= k' >> $14
 	#echo '3= #f3bb1d' >> $14
-	#echo '3= k' >> $14
+
 	#echo '6= k' >> $14
 
 	#greysafecols = ['#809BC8', '#FF6666', '#FFCC66', '#64C204']f
 
 	#Choose nr of colours-code which should be color-blind (cb) friendly created: choose 0, if you do not want any cb friendly color
-	#echo 'use_cb_colors= '$use_cb_colors	>> $2
-	echo 'use_cb_colors= 0'	>> $2
+	set use_cb_colors = 0
+	echo 'use_cb_colors= '$use_cb_colors	>> $2
 
 	if ($1 =~ analyse*) then
 		echo 'legend_fontsize= 18'				 	 >> $2
@@ -4523,39 +4941,49 @@ if ($1 =~ analyse* || $1 =~ plotX*) then
 			echo '2= #ffe200'	>> $16
 			echo '3= k'	>> $16
 
-		else if ($1 =~ analyse*dmesa* || $1 =~ analyse*r-i* || $1 =~ analyse*rdisk* || $1 =~ analyse*rhalf* || $1 =~ analyse*mstar* || $1 =~ analyse*mbar* || $1 =~ analyse*bdisk* || $1 =~ analyse*u-*r* || $1 =~ analyse*zgas*  || $1 =~ analyse*sfr* || $1 =~ analyse*mhalo*  ) then
+		else if ($1 =~ analyse*dmesa* || $1 =~ analyse*r-i* || $1 =~ analyse*rdisk* || $1 =~ analyse*rhalf* || $1 =~ analyse*mstar* || $1 =~ analyse*mbar* || $1 =~ analyse*bdisk* || $1 =~ analyse*u-*r* || $1 =~ analyse*zgas*  || $1 =~ analyse*sfr* || $1 =~ analyse*mhalo*  || $1 =~ analyse*g-*g-i*  ) then
 			echo '1= :'	>> $13
 			echo '2= -'	>> $13
 			echo '3= --'	>> $13
 			echo '4= -'	>> $13
 			echo '5= -'	>> $13
-			echo '6= :'	>> $13
-			echo '7= '	>> $13
+			echo '6= -'	>> $13
+			echo '7= --'	>> $13
 			echo '8= --'	>> $13
-			echo '9= --'	>> $13
+
+			#linestyle colour table:MATPLOT_COL
+			echo '0= k' >> $14
+			echo '1= #03396c' >> $14  
+			echo '2= #ffab00' >> $14  
+			echo '3= r' >> $14
+			echo '4= #AA4499' >> $14
+			echo '5= k' >> $14
+			#echo '5= #dbdbdb' >> $14  
+			echo '6= k' >> $14
+			echo '7= k' >> $14
 
 			#markerstyle table: 	MATPLOT_MARKERSTYLE
 			echo '0= '	>> $15
 			echo '1= '	>> $15
 			echo '2= '	>> $15
 			echo '3= '	>> $15
-			echo '4= '	>> $15
+			echo '2= '	>> $15
 			echo '5= '	>> $15
 			echo '6= '	>> $15
-			echo '7= o'	>> $15
+			echo '7= '	>> $15
 			echo '8= '	>> $15
-			echo '9= '	>> $15
+			echo '4= '	>> $15
 
 			#marker colour table: 	MATPLOT_MARKERCOL
-			echo '0= w'	>> $16
-			echo '1= w'	>> $16
+			echo '0= k'	>> $16
+			echo '1= k'	>> $16
 			echo '2= #ffab00'	>> $16
 			echo '3= w'	>> $16
 			echo '4= #AA4499'	>> $16
+			#echo '4= None' >> $16
 			echo '5= None'	>> $16
-			echo '6= None'	>> $16
-			#echo '6= k'	>> $16
-			echo '7= #ffe200'	>> $16
+			echo '6= k'	>> $16
+			echo '7= k'	>> $16
 			echo '8= #ffe200'	>> $16
 			echo '9= #ffe200'	>> $16
 
@@ -4563,21 +4991,21 @@ if ($1 =~ analyse* || $1 =~ plotX*) then
 
 			#linestyle colour table:MATPLOT_COL
 			echo '0= k' >> $14
-			echo '1= #225588' >> $14  
+			echo '1= k' >> $14  
 			echo '2= k' >> $14  
 			echo '3= w' >> $14
 			echo '4= #4baf0c' >> $14
 			echo '5= m' >> $14
 			echo '6= k' >> $14
-			echo '6= k' >> $14
-			echo '7= k' >> $14
-			echo '8= m' >> $14
+			echo '1= k' >> $14
+			echo '2= k' >> $14
+			echo '3= k' >> $14
 
 
-			echo '1= -'	>> $13
-			echo '2= :'	>> $13
-			echo '3= --'	>> $13
-			echo '4= '	>> $13
+			echo '1= :'	>> $13
+			echo '2= --'	>> $13
+			echo '3= -'	>> $13
+			echo '4= --'	>> $13
 			echo '5= --'	>> $13
 			echo '6= -'	>> $13
 			echo '7= -'	>> $13
@@ -4589,7 +5017,7 @@ if ($1 =~ analyse* || $1 =~ plotX*) then
 			echo '1= '	>> $15
 			echo '2= '	>> $15
 			echo '3= '	>> $15
-			echo '4= o'	>> $15
+			echo '4= '	>> $15
 			echo '5= '	>> $15
 			echo '6= '	>> $15
 			echo '7= '	>> $15
@@ -4599,7 +5027,7 @@ if ($1 =~ analyse* || $1 =~ plotX*) then
 			#marker colour table: 	MATPLOT_MARKERCOL
 			echo '0= w'	>> $16
 			echo '1= w'	>> $16
-			echo '6= w'	>> $16
+			echo '3= w'	>> $16
 			echo '2= w'	>> $16
 			echo '3= #ffe200'	>> $16
 			echo '5= m'	>> $16
@@ -4638,7 +5066,7 @@ if ($1 =~ analyse* || $1 =~ plotX*) then
 	else if ($24 =~ *isto* ) then
 
 		#Choose nr of colours-code which should be color-blind (cb) friendly created: choose 0, if you do not want any cb friendly color
-		echo 'use_cb_colors= 0'					>> $2
+		echo 'use_cb_colors= 1'					>> $2
 		#linestyle table: 	MATPLOT_LINESTYLE
 		echo '0= -'	>> $13
 		echo '1= -'	>> $13
@@ -4728,7 +5156,7 @@ if ($1 =~ analyse* || $1 =~ plotX*) then
 
 	else if ($use_cb_colors == 2 || $use_cb_colors == 3 ) then
 
-		echo '0= -'	>> $13						
+		echo '0= :'	>> $13						
 		echo '1= -'	>> $13
 		echo '2= c1'	>> $13
 		echo '3= --'	>> $13
@@ -4742,7 +5170,7 @@ if ($1 =~ analyse* || $1 =~ plotX*) then
 		
 		#markerstyle table: 	MATPLOT_MARKERSTYLE
 		echo '0= '	>> $15
-		echo '1= '	>> $15
+		echo '1= .'	>> $15
 		echo '2= '	>> $15
 		echo '3= '	>> $15
 		echo '4= '	>> $15
@@ -4750,7 +5178,7 @@ if ($1 =~ analyse* || $1 =~ plotX*) then
 
 		#marker colour table: 	MATPLOT_MARKERCOL
 		echo '0= w'	>> $16
-		echo '1= r'	>> $16
+		echo '1= w'	>> $16
 		echo '2= w'	>> $16
 		echo '2= k'	>> $16
 		echo '3= #225588'	>> $16
@@ -4790,10 +5218,10 @@ if ($1 =~ analyse* || $1 =~ plotX*) then
 		echo '1= -'	>> $13
 		echo '2= --'	>> $13
 		echo '3= -'	>> $13
-		echo '4= -'	>> $13
+		echo '4= c1'	>> $13
 		
 		#markerstyle table: 	MATPLOT_MARKERSTYLE
-		echo '0= '	>> $15
+		echo '0= .'	>> $15
 		echo '1= '	>> $15
 		echo '2= '	>> $15
 		echo '3= '	>> $15
@@ -4807,7 +5235,32 @@ if ($1 =~ analyse* || $1 =~ plotX*) then
 		echo '3= w'	>> $16
 		echo '4= #CC6677'	>> $16
 
-	else if ($use_cb_colors > 5) then
+	else if ($use_cb_colors == 6) then
+
+		echo '0= :'	>> $13	
+		echo '1= -'	>> $13						
+		echo '2= -'	>> $13
+		echo '3= --'	>> $13
+		echo '4= -'	>> $13
+		echo '5= c1'	>> $13
+	
+		#markerstyle table: 	MATPLOT_MARKERSTYLE
+		echo '0= '	>> $15
+		echo '1= .'	>> $15
+		echo '2= '	>> $15
+		echo '3= '	>> $15
+		echo '4= '	>> $15
+		echo '5= '	>> $15
+
+		#marker colour table: 	MATPLOT_MARKERCOL
+		echo '0= #ffe200'	>> $16
+		echo '1= w'	>> $16
+		echo '2= k'	>> $16
+		echo '3= w'	>> $16
+		echo '4= w'	>> $16
+		echo '5= k'	>> $16
+
+	else if ($use_cb_colors > 6) then
 
 		#linestyle colour table:MATPLOT_COL
 		echo '0= k' >> $14
@@ -4867,7 +5320,8 @@ if ($1 =~ analyse* || $1 =~ plotX*) then
 		else if ($use_cb_colors == 9) then
 			echo '7= -'	>> $13
 			echo '8= -'	>> $13
-		else if ($use_cb_colors == 11) then
+			echo '9= :'	>> $13
+		else if ($use_cb_colors == 10) then
 			echo '7= -'	>> $13
 			echo '8= -.'	>> $13
 			echo '9= -'	>> $13
@@ -5288,86 +5742,12 @@ if ($1 =~ analyse* || $1 =~ plotX*) then
 
 	endif
 
-else if ($OII_ls_set == 'True') then
-
-	#Choose nr of colours-code which should be color-blind (cb) friendly created: choose 0, if you do not want any cb friendly color
-	echo 'use_cb_colors= '$use_cb_colors					>> $2
-	#linestyle table: 	MATPLOT_LINESTYLE
-	echo '0= -.'	>> $13
-	echo '1= --'	>> $13
-	echo '2= -'	>> $13
-	echo '3= '	>> $13
-	echo '4= '	>> $13
-	echo '5= '	>> $13
-	echo '6= '	>> $13
-	echo '7= --'	>> $13
-	echo '8= -.'	>> $13
-	echo '9= :'	>> $13
-	echo '10= :'	>> $13
-
-	#linestyle colour table: MATPLOT_COL
-	echo '0= w' >> $14 
-	echo '1= #c5c1c2' >> $14  
-	echo '2= r' >> $14
-	echo '4= k' >> $14
-	echo '3= g' >> $14
-
-	echo '5= k' >> $14
-	echo '6= r' >> $14
-
-	echo '14= b' >> $14
-	echo '8= b' >> $14
-	echo '9= k' >> $14
-	echo '3= k' >> $14
-	#dark grey
-	echo '9= #212121'	>> $14
-	#middle grey
-	echo '2= #4d4d4d'	>> $14
-	#light grey
-	echo '10= #797979'	>> $14
-
-	#marker style table: 	MATPLOT_MARKERSTYLE
-	echo '0= '	>> $15
-	echo '1= '	>> $15
-	echo '2= '	>> $15
-	echo '3= o'	>> $15
-	echo '4= o'	>> $15
-	echo '5= o'	>> $15
-	echo '6= ^'	>> $15
-	echo '7= '	>> $15
-	echo '8= '	>> $15
-	echo '9= '	>> $15
-	echo '10= '	>> $15
-
-
-	#marker colour table: 	MATPLOT_MARKERCOL
-	echo '0= w'	>> $16
-	echo '1= k'	>> $16
-	echo '2= w'	>> $16
-	echo '3= k'	>> $16
-	#echo '3= #ffe200'	>> $16
-	echo '4= w'	>> $16
-	echo '5= k'	>> $16
-	echo '6= r'	>> $16
-	echo '7= w'	>> $16
-	echo '8= w' >> $16
-	echo '9= w'	>> $16
-	echo '10= w'	>> $16
-	#very light grey
-	echo '11= #c5c1c2' >> $16
-
-
 else
 
 	#Choose nr of colours-code which should be color-blind (cb) friendly created: choose 0, if you do not want any cb friendly color
 	#echo 'use_cb_colors= 3'					>> $2
 	#linestyle table: 	MATPLOT_LINESTYLE
-
-	if ($catname =~ 'Ga'*) then
-		set colors = 3
-	else
-		set colors = 2
-	endif		
+	
 	if ($colors == 2) then
 		echo '0= :'	>> $13
 		echo '1= --'	>> $13
@@ -5451,28 +5831,13 @@ else
 
 endif
 
-if ($demo == 'True') then
-		echo 'use_cb_colors= 0'	>> $2
-
-		echo '0= #CC6677' >> $14
-		echo '1= #CC6677' >> $14
-		echo '2= #CC6677' >> $14
-		echo '3= #225588' >> $14
-		echo '4= #225588' >> $14
-		echo '5= #225588' >> $14
-
-		echo '0= --'	>> $13						
-		echo '1= -'	>> $13
-		echo '2= c1'	>> $13
-		echo '3= --'	>> $13
-		echo '4= -'	>> $13
-		echo '5= c1'	>> $13
-
-else
+if ($key =~ plotXY_refx*) then
+	#remove line from the reference sample
+	echo '0= '	>> $13
+endif
 #print polka-dots on Gal-dens all galaxie sample
-#echo '0= '	>> $15
+#echo '0= '	>> $13
+#echo '0= .'	>> $15
 #echo '0= w'	>> $16
-
-#echo '1= .'	>> $15
-#echo '1= w'	>> $16
+#echo 'HERE: sample' $sample 'use_cb_colors:' $use_cb_colors
 echo 'Plot config .... DONE!'

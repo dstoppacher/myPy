@@ -14,7 +14,7 @@ foreach item ($3)
 
 	if ("$array[$i]" != $6) then
 
-		if ($5 != 'plotOnly' && $5 != 'analyseTargetSelection') then
+		if ($5 != 'plotOnly' && $5 != 'analyseTargetSelection' && $5 !~ plotXY_*) then
 			if (! -e $1'myRun/plots/'$item'/') 	mkdir $1'myRun/plots/'$item'/'
 			if (! -e $1'myRun/histos/'$item'/') 	mkdir $1'myRun/histos/'$item'/'
 		endif

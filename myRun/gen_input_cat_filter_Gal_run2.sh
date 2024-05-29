@@ -52,16 +52,16 @@ set subplots = False
 #set tarsel_code_default = 'BOSS_CMASS_Kroupa_0.5_z_0.6'
 set tarsel_code_default = 'Portsmouth_starforming_Salpeter'
 set tarsel_code_default = 'LOW_Z_Blanton+05'
-set tarsel_code_default = ''
+set tarsel_code_default = 'CMASS_down_sample3'
 
 #Choose different catalogues to read!
 #+++++++++++++++++++++++++++++++++++++++++++
 
 set tarsel_code_SAG = 'v3_new'
 set tarsel_code_SAGE = 'v3_new'
-set tarsel_code_Galacticus = ''
+set tarsel_code_Galacticus = 'CMASS_down_sample3'
 
-set output_filename_code_Galacticus=''
+set output_filename_code_Galacticus='test'
 set output_filename_code_SAG = ''
 set output_filename_code_SAGE = ''
 
@@ -75,7 +75,7 @@ set change_IMF = 'False'
 #+++++++++++++++++++++++++++++++++++++++++++
 
 #NOTE standard: [plot_key]_[catname+boxsize]_z_[redshift(0.2f)].[fileformat]
-set output_filename_code_default = ''
+set output_filename_code_default = 'test'
 #name of the register you want to write/read data, if default register is not desired! Change 'default' to 'your name'
 set set_register_name = 'default'
 #++++++++++++++++++++++++++++++++++++++++++
@@ -104,7 +104,7 @@ if ($HOME == /home/claudia || $HOME == /home/doriss) then
 	set PLOT_CUM = 'False'
 else
 	set HOME_MODE = False
-	set HDF5_read_code = 'SAMHDF5'
+	set HDF5_read_code = 'HDF5'
 	if ($HDF5_read_code == 'HDF5') then
 		set load_subcat = True
 	else
@@ -192,7 +192,7 @@ if ($HDF5_read_code == 'SAMHDF5' || $HDF5_read_code == 'BINARY_SAGE') then
 
 	endif
 else
-	set MYSNAPS_1Gpc	= '75'	
+	set MYSNAPS_1Gpc	= '59'	
 endif
 
 #CMASS catalog
@@ -233,7 +233,7 @@ set filter_density_cut_name = 'tarsel_CMASS_density_sample'
 set filter_density_select_highest = True
 set filter_density_write_coordinates = False
 set ASCII_TO_HDF5 = True
-set HDF5_TO_ASCII = False
+set HDF5_TO_ASCII = True
 
 set which_kcorrect = 'approx'
 
@@ -583,11 +583,11 @@ set env_1024		= 99
 set pop			= 99
 
 #only for Galacticus
-set mhalo_sat		= 54
-set nodeIndex		= 55
-set parentIndex		= 56
-set satelliteNodeIndex	= 57
-set satelliteIndex	= 58
+set mhalo_sat		= 99
+set nodeIndex		= 99
+set parentIndex		= 99
+set satelliteNodeIndex	= 99
+set satelliteIndex	= 99
 set siblingIndex	= 99
 set satelliteMergeTime	= 99
 set isolated		= 99
@@ -614,6 +614,8 @@ set rdisk			= 40
 set rbulge			= 4
 set rhalf_mass		= 5
 
+set rbulgevsrdisk   = 54
+
 #only SAG and SAGE
 set mean_age_stars	= 99
 
@@ -630,6 +632,8 @@ set bh_rad_eff		= 28
 set mstar_spheroid	= 8
 set mstar_disk		= 9
 set mstar			= 2
+
+set BvsT			= 55
 
 set mcold_disk		= 11
 
@@ -648,6 +652,10 @@ set sfr_disk_int		= 18
 set sfr					= 19
 set ssfr				= 46
 
+set cgf				= 48
+set Tcons			= 56
+set fbary			= 57
+
 set Mzgas_disk		= 20
 
 #only Galacticus and SAG
@@ -659,7 +667,9 @@ set Mzstar_disk		= 24
 set Mzstar			= 25
 set Mzhot_halo		= 26
 
+set MzgasvsMzstar 	= 58
 
+set zstar 			= 59
 
 #only SAGE
 set zgas_spheroid	= 99
@@ -671,7 +681,7 @@ set zstar_disk		= 99
 set zhot_halo		= 99
 
 set zcold			= 47
-set cgf				= 48
+set zcold_zstar		= 60
 
 #only SAG
 set OH_star_disk		= 99
@@ -887,7 +897,7 @@ set mAs_dA_total_cut_i_lt_dmesa	= 99
 
 #----------------------------------------
 
-if ($SOFTLINK_CODE == AA || $SOFTLINK_CODE == A2) then
+if ($SOFTLINK_CODE == AA || $SOFTLINK_CODE == A2a) then
 
 	set L_SDSS_dA_spheroid_u	= 63
 	set L_SDSS_dA_spheroid_g	= 64
@@ -986,9 +996,9 @@ set halo_col_array = ($halo_nhalos $halo_haloid $halo_hostid $halo_desIndex $hal
 
 #set tarsel_col_array = ($mAB_dA_total_cut_r_i $mAB_dA_total_cut_dmesa $mAB_dA_total_cut_g_r)
 
-set col_name_array = (ngalaxies haloid hostid satelliteNodeIndex parentIndex orphan mhalo vmax vpeak spinParameter NFW_con zgas_spheroid zgas_disk zstar_disk zstar_spheroid zhot_halo mcold_spheroid mcold_disk mcold mbh mstar_spheroid mstar_disk mstar mhot Mzgas_spheroid Mzgas_disk Mzgas Mzstar_spheroid Mzstar_disk Mzstar Mzhot_halo sfr_spheroid sfr_disk sfr x_pos y_pos z_pos x_vel y_vel z_vel L_SDSS_spheroid_u L_SDSS_spheroid_g L_SDSS_spheroid_r L_SDSS_spheroid_i L_SDSS_spheroid_z L_SDSS_dA_spheroid_u L_SDSS_dA_spheroid_g L_SDSS_dA_spheroid_r L_SDSS_dA_spheroid_i L_SDSS_dA_spheroid_z L_SDSS_disk_u L_SDSS_disk_g L_SDSS_disk_r L_SDSS_disk_i L_SDSS_disk_z L_SDSS_dA_disk_u L_SDSS_dA_disk_g L_SDSS_dA_disk_r L_SDSS_dA_disk_i L_SDSS_dA_disk_z L_SDSS_u L_SDSS_g L_SDSS_r L_SDSS_i L_SDSS_z L_SDSS_dA_u L_SDSS_dA_g L_SDSS_dA_r L_SDSS_dA_i L_SDSS_dA_z L_SDSS_dA_total_u L_SDSS_dA_total_g L_SDSS_dA_total_r L_SDSS_dA_total_i L_SDSS_dA_total_z mag_u mag_g mag_r mag_i mag_z mAB_u mAB_g mAB_r mAB_i mAB_z mAB_total_u mAB_total_g mAB_total_r mAB_total_i mAB_total_z mAB_dA_u mAB_dA_g mAB_dA_r mAB_dA_i mAB_dA_z mAB_dA_total_u mAB_dA_total_g mAB_dA_total_r mAB_dA_total_i mAB_dA_total_z MAB_dA_total_u MAB_dA_total_g MAB_dA_total_r MAB_dA_total_i MAB_dA_total_z MAB_total_u MAB_total_g MAB_total_r MAB_total_i MAB_total_z mAs_u mAs_g mAs_r mAs_i mAs_z mAs_dA_u mAs_dA_g mAs_dA_r mAs_dA_i mAs_dA_z mAs_dA_total_u mAs_dA_total_g mAs_dA_total_r mAs_dA_total_i mAs_dA_total_z mAB_total_cut_r_i mAB_total_cut_dmesa mAB_total_cut_g_r mAB_total_cut_i_lt_dmesa 'mAB_dA_total_cut_r_i' 'mAB_dA_total_cut_g_r' 'mAB_dA_total_cut_g_i' 'mAB_dA_total_cut_u_g' 'mAB_dA_total_cut_u_i' 'mAB_dA_total_cut_i_z' mAB_dA_total_cut_dmesa mAB_dA_total_cut_cmesa mAB_dA_total_cut_cpar mAB_dA_total_cut_i_lt_dmesa mAB_dA_total_cut_i_lt_dmesa_sparse mAB_dA_total_cut_r_lt_cpar mAs_dA_total_cut_r_i mAs_dA_total_cut_dmesa mAs_dA_total_cut_g_r mAs_dA_total_cut_i_lt_dmesa RA DEC Z age mhalo_sat OH_gas_disk OH_gas_bulge OH_gas_disk_bulge weight_tot nodeIndex satelliteIndex siblingIndex satelliteMergeTime isolated timeLastIsolated firstProgenitorID npros Mag_dA_total_B rhalf_bulge rhalf_disk rbulge rdisk rhalf_mass L_RGO_dA_spheroid_B L_RGO_dA_disk_B L_RGO_dA_total_B ssfr mhot_outflow mhalo_200c mbasic mbasic_200c mhalo_cents mbasic_cents mhalo_cents_200c mbasic_cents_200c zcold cgf env_512 env_1024 pop L_Galex_disk_NUV L_Galex_disk_FUV L_Galex_spheroid_NUV L_Galex_spheroid_FUV L_Galex_total_NUV L_Galex_total_FUV mAB_total_NUV mAB_total_FUV MAB_total_NUV MAB_total_FUV OH_star_disk OH_star_bulge OH_star_disk_bulge bh_acc_rate bh_rad_eff age_sfr_disk_int age_sfr_spheroid_int sfr_disk_int sfr_spheroid_int mean_age_stars L_SDSS_total_u L_SDSS_total_g L_SDSS_total_r L_SDSS_total_i L_SDSS_total_z vdisp L_OII_disk_3726 L_OII_spheroid_3726 L_OII_disk_3729 L_OII_spheroid_3729 L_OII_disk_cont L_OII_spheroid_cont L_OII_total_3726 L_OII_total_3729)
+set col_name_array = (ngalaxies haloid hostid satelliteNodeIndex parentIndex orphan mhalo vmax vpeak spinParameter NFW_con zgas_spheroid zgas_disk zstar_disk zstar_spheroid zhot_halo mcold_spheroid mcold_disk mcold mbh mstar_spheroid mstar_disk mstar mhot Mzgas_spheroid Mzgas_disk Mzgas Mzstar_spheroid Mzstar_disk Mzstar Mzhot_halo sfr_spheroid sfr_disk sfr x_pos y_pos z_pos x_vel y_vel z_vel L_SDSS_spheroid_u L_SDSS_spheroid_g L_SDSS_spheroid_r L_SDSS_spheroid_i L_SDSS_spheroid_z L_SDSS_dA_spheroid_u L_SDSS_dA_spheroid_g L_SDSS_dA_spheroid_r L_SDSS_dA_spheroid_i L_SDSS_dA_spheroid_z L_SDSS_disk_u L_SDSS_disk_g L_SDSS_disk_r L_SDSS_disk_i L_SDSS_disk_z L_SDSS_dA_disk_u L_SDSS_dA_disk_g L_SDSS_dA_disk_r L_SDSS_dA_disk_i L_SDSS_dA_disk_z L_SDSS_u L_SDSS_g L_SDSS_r L_SDSS_i L_SDSS_z L_SDSS_dA_u L_SDSS_dA_g L_SDSS_dA_r L_SDSS_dA_i L_SDSS_dA_z L_SDSS_dA_total_u L_SDSS_dA_total_g L_SDSS_dA_total_r L_SDSS_dA_total_i L_SDSS_dA_total_z mag_u mag_g mag_r mag_i mag_z mAB_u mAB_g mAB_r mAB_i mAB_z mAB_total_u mAB_total_g mAB_total_r mAB_total_i mAB_total_z mAB_dA_u mAB_dA_g mAB_dA_r mAB_dA_i mAB_dA_z mAB_dA_total_u mAB_dA_total_g mAB_dA_total_r mAB_dA_total_i mAB_dA_total_z MAB_dA_total_u MAB_dA_total_g MAB_dA_total_r MAB_dA_total_i MAB_dA_total_z MAB_total_u MAB_total_g MAB_total_r MAB_total_i MAB_total_z mAs_u mAs_g mAs_r mAs_i mAs_z mAs_dA_u mAs_dA_g mAs_dA_r mAs_dA_i mAs_dA_z mAs_dA_total_u mAs_dA_total_g mAs_dA_total_r mAs_dA_total_i mAs_dA_total_z mAB_total_cut_r_i mAB_total_cut_dmesa mAB_total_cut_g_r mAB_total_cut_i_lt_dmesa 'mAB_dA_total_cut_r_i' 'mAB_dA_total_cut_g_r' 'mAB_dA_total_cut_g_i' 'mAB_dA_total_cut_u_g' 'mAB_dA_total_cut_u_i' 'mAB_dA_total_cut_i_z' mAB_dA_total_cut_dmesa mAB_dA_total_cut_cmesa mAB_dA_total_cut_cpar mAB_dA_total_cut_i_lt_dmesa mAB_dA_total_cut_i_lt_dmesa_sparse mAB_dA_total_cut_r_lt_cpar mAs_dA_total_cut_r_i mAs_dA_total_cut_dmesa mAs_dA_total_cut_g_r mAs_dA_total_cut_i_lt_dmesa RA DEC Z age mhalo_sat OH_gas_disk OH_gas_bulge OH_gas_disk_bulge weight_tot nodeIndex satelliteIndex siblingIndex satelliteMergeTime isolated timeLastIsolated firstProgenitorID npros Mag_dA_total_B rhalf_bulge rhalf_disk rbulge rdisk rhalf_mass L_RGO_dA_spheroid_B L_RGO_dA_disk_B L_RGO_dA_total_B ssfr mhot_outflow mhalo_200c mbasic mbasic_200c mhalo_cents mbasic_cents mhalo_cents_200c mbasic_cents_200c zcold cgf env_512 env_1024 pop L_Galex_disk_NUV L_Galex_disk_FUV L_Galex_spheroid_NUV L_Galex_spheroid_FUV L_Galex_total_NUV L_Galex_total_FUV mAB_total_NUV mAB_total_FUV MAB_total_NUV MAB_total_FUV OH_star_disk OH_star_bulge OH_star_disk_bulge bh_acc_rate bh_rad_eff age_sfr_disk_int age_sfr_spheroid_int sfr_disk_int sfr_spheroid_int mean_age_stars L_SDSS_total_u L_SDSS_total_g L_SDSS_total_r L_SDSS_total_i L_SDSS_total_z vdisp L_OII_disk_3726 L_OII_spheroid_3726 L_OII_disk_3729 L_OII_spheroid_3729 L_OII_disk_cont L_OII_spheroid_cont L_OII_total_3726 L_OII_total_3729 MzgasvsMzstar rbulgevsrdisk BvsT fbary Tcons zcold_zstar zstar)
 
-set col_array = ($ngalaxies $haloid $hostid $satelliteNodeIndex $parentIndex $orphan $mhalo $vmax $vpeak $spinParameter $NFW_con $zgas_spheroid $zgas_disk $zstar_disk $zstar_spheroid $zhot_halo $mcold_spheroid $mcold_disk $mcold $mbh $mstar_spheroid $mstar_disk $mstar $mhot $Mzgas_spheroid $Mzgas_disk $Mzgas $Mzstar_spheroid $Mzstar_disk $Mzstar $Mzhot_halo $sfr_spheroid $sfr_disk $sfr $x_pos $y_pos $z_pos $x_vel $y_vel $z_vel $L_SDSS_spheroid_u $L_SDSS_spheroid_g $L_SDSS_spheroid_r $L_SDSS_spheroid_i $L_SDSS_spheroid_z $L_SDSS_dA_spheroid_u $L_SDSS_dA_spheroid_g $L_SDSS_dA_spheroid_r $L_SDSS_dA_spheroid_i $L_SDSS_dA_spheroid_z $L_SDSS_disk_u $L_SDSS_disk_g $L_SDSS_disk_r $L_SDSS_disk_i $L_SDSS_disk_z $L_SDSS_dA_disk_u $L_SDSS_dA_disk_g $L_SDSS_dA_disk_r $L_SDSS_dA_disk_i $L_SDSS_dA_disk_z $L_SDSS_u $L_SDSS_g $L_SDSS_r $L_SDSS_i $L_SDSS_z $L_SDSS_dA_u $L_SDSS_dA_g $L_SDSS_dA_r $L_SDSS_dA_i $L_SDSS_dA_z $L_SDSS_dA_total_u $L_SDSS_dA_total_g $L_SDSS_dA_total_r $L_SDSS_dA_total_i $L_SDSS_dA_total_z $mag_u $mag_g $mag_r $mag_i $mag_z $mAB_u $mAB_g $mAB_r $mAB_i $mAB_z $mAB_total_u $mAB_total_g $mAB_total_r $mAB_total_i $mAB_total_z $mAB_dA_u $mAB_dA_g $mAB_dA_r $mAB_dA_i $mAB_dA_z $mAB_dA_total_u $mAB_dA_total_g $mAB_dA_total_r $mAB_dA_total_i $mAB_dA_total_z $MAB_dA_total_u $MAB_dA_total_g $MAB_dA_total_r $MAB_dA_total_i $MAB_dA_total_z $MAB_total_u $MAB_total_g $MAB_total_r $MAB_total_i $MAB_total_z $mAs_u $mAs_g $mAs_r $mAs_i $mAs_z $mAs_dA_u $mAs_dA_g $mAs_dA_r $mAs_dA_i $mAs_dA_z $mAs_dA_total_u $mAs_dA_total_g $mAs_dA_total_r $mAs_dA_total_i $mAs_dA_total_z $mAB_total_cut_r_i $mAB_total_cut_dmesa $mAB_total_cut_g_r $mAB_total_cut_i_lt_dmesa $mAB_dA_total_cut_r_i $mAB_dA_total_cut_g_r $mAB_dA_total_cut_g_i $mAB_dA_total_cut_u_g $mAB_dA_total_cut_u_i $mAB_dA_total_cut_i_z $mAB_dA_total_cut_dmesa $mAB_dA_total_cut_cmesa $mAB_dA_total_cut_cpar $mAB_dA_total_cut_i_lt_dmesa $mAB_dA_total_cut_i_lt_dmesa_sparse $mAB_dA_total_cut_r_lt_cpar $mAs_dA_total_cut_r_i $mAs_dA_total_cut_dmesa $mAs_dA_total_cut_g_r $mAs_dA_total_cut_i_lt_dmesa $RA $DEC $Z $age $mhalo_sat $OH_gas_disk $OH_gas_bulge $OH_gas_disk_bulge $weight_tot $nodeIndex $satelliteIndex $siblingIndex $satelliteMergeTime $isolated $timeLastIsolated $firstProgenitorID $npros $Mag_dA_total_B $rhalf_bulge $rhalf_disk $rbulge $rdisk $rhalf_mass $L_RGO_dA_spheroid_B $L_RGO_dA_disk_B $L_RGO_dA_total_B $ssfr $mhot_outflow $mhalo_200c $mbasic $mbasic_200c $mhalo_cents $mbasic_cents $mhalo_cents_200c $mbasic_cents_200c $zcold $cgf $env_512 $env_1024 $pop $L_Galex_disk_NUV $L_Galex_disk_FUV $L_Galex_spheroid_NUV $L_Galex_spheroid_FUV $L_Galex_total_NUV $L_Galex_total_FUV $mAB_total_NUV $mAB_total_FUV $MAB_total_NUV $MAB_total_FUV $OH_star_disk $OH_star_bulge $OH_star_disk_bulge $bh_acc_rate $bh_rad_eff $age_sfr_disk_int $age_sfr_spheroid_int $sfr_disk_int $sfr_spheroid_int $mean_age_stars $L_SDSS_total_u $L_SDSS_total_g $L_SDSS_total_r $L_SDSS_total_i $L_SDSS_total_z $vdisp $L_OII_disk_3726 $L_OII_spheroid_3726 $L_OII_disk_3729 $L_OII_spheroid_3729 $L_OII_disk_cont $L_OII_spheroid_cont  $L_OII_total_3726 $L_OII_total_3729)
+set col_array = ($ngalaxies $haloid $hostid $satelliteNodeIndex $parentIndex $orphan $mhalo $vmax $vpeak $spinParameter $NFW_con $zgas_spheroid $zgas_disk $zstar_disk $zstar_spheroid $zhot_halo $mcold_spheroid $mcold_disk $mcold $mbh $mstar_spheroid $mstar_disk $mstar $mhot $Mzgas_spheroid $Mzgas_disk $Mzgas $Mzstar_spheroid $Mzstar_disk $Mzstar $Mzhot_halo $sfr_spheroid $sfr_disk $sfr $x_pos $y_pos $z_pos $x_vel $y_vel $z_vel $L_SDSS_spheroid_u $L_SDSS_spheroid_g $L_SDSS_spheroid_r $L_SDSS_spheroid_i $L_SDSS_spheroid_z $L_SDSS_dA_spheroid_u $L_SDSS_dA_spheroid_g $L_SDSS_dA_spheroid_r $L_SDSS_dA_spheroid_i $L_SDSS_dA_spheroid_z $L_SDSS_disk_u $L_SDSS_disk_g $L_SDSS_disk_r $L_SDSS_disk_i $L_SDSS_disk_z $L_SDSS_dA_disk_u $L_SDSS_dA_disk_g $L_SDSS_dA_disk_r $L_SDSS_dA_disk_i $L_SDSS_dA_disk_z $L_SDSS_u $L_SDSS_g $L_SDSS_r $L_SDSS_i $L_SDSS_z $L_SDSS_dA_u $L_SDSS_dA_g $L_SDSS_dA_r $L_SDSS_dA_i $L_SDSS_dA_z $L_SDSS_dA_total_u $L_SDSS_dA_total_g $L_SDSS_dA_total_r $L_SDSS_dA_total_i $L_SDSS_dA_total_z $mag_u $mag_g $mag_r $mag_i $mag_z $mAB_u $mAB_g $mAB_r $mAB_i $mAB_z $mAB_total_u $mAB_total_g $mAB_total_r $mAB_total_i $mAB_total_z $mAB_dA_u $mAB_dA_g $mAB_dA_r $mAB_dA_i $mAB_dA_z $mAB_dA_total_u $mAB_dA_total_g $mAB_dA_total_r $mAB_dA_total_i $mAB_dA_total_z $MAB_dA_total_u $MAB_dA_total_g $MAB_dA_total_r $MAB_dA_total_i $MAB_dA_total_z $MAB_total_u $MAB_total_g $MAB_total_r $MAB_total_i $MAB_total_z $mAs_u $mAs_g $mAs_r $mAs_i $mAs_z $mAs_dA_u $mAs_dA_g $mAs_dA_r $mAs_dA_i $mAs_dA_z $mAs_dA_total_u $mAs_dA_total_g $mAs_dA_total_r $mAs_dA_total_i $mAs_dA_total_z $mAB_total_cut_r_i $mAB_total_cut_dmesa $mAB_total_cut_g_r $mAB_total_cut_i_lt_dmesa $mAB_dA_total_cut_r_i $mAB_dA_total_cut_g_r $mAB_dA_total_cut_g_i $mAB_dA_total_cut_u_g $mAB_dA_total_cut_u_i $mAB_dA_total_cut_i_z $mAB_dA_total_cut_dmesa $mAB_dA_total_cut_cmesa $mAB_dA_total_cut_cpar $mAB_dA_total_cut_i_lt_dmesa $mAB_dA_total_cut_i_lt_dmesa_sparse $mAB_dA_total_cut_r_lt_cpar $mAs_dA_total_cut_r_i $mAs_dA_total_cut_dmesa $mAs_dA_total_cut_g_r $mAs_dA_total_cut_i_lt_dmesa $RA $DEC $Z $age $mhalo_sat $OH_gas_disk $OH_gas_bulge $OH_gas_disk_bulge $weight_tot $nodeIndex $satelliteIndex $siblingIndex $satelliteMergeTime $isolated $timeLastIsolated $firstProgenitorID $npros $Mag_dA_total_B $rhalf_bulge $rhalf_disk $rbulge $rdisk $rhalf_mass $L_RGO_dA_spheroid_B $L_RGO_dA_disk_B $L_RGO_dA_total_B $ssfr $mhot_outflow $mhalo_200c $mbasic $mbasic_200c $mhalo_cents $mbasic_cents $mhalo_cents_200c $mbasic_cents_200c $zcold $cgf $env_512 $env_1024 $pop $L_Galex_disk_NUV $L_Galex_disk_FUV $L_Galex_spheroid_NUV $L_Galex_spheroid_FUV $L_Galex_total_NUV $L_Galex_total_FUV $mAB_total_NUV $mAB_total_FUV $MAB_total_NUV $MAB_total_FUV $OH_star_disk $OH_star_bulge $OH_star_disk_bulge $bh_acc_rate $bh_rad_eff $age_sfr_disk_int $age_sfr_spheroid_int $sfr_disk_int $sfr_spheroid_int $mean_age_stars $L_SDSS_total_u $L_SDSS_total_g $L_SDSS_total_r $L_SDSS_total_i $L_SDSS_total_z $vdisp $L_OII_disk_3726 $L_OII_spheroid_3726 $L_OII_disk_3729 $L_OII_spheroid_3729 $L_OII_disk_cont $L_OII_spheroid_cont  $L_OII_total_3726 $L_OII_total_3729 $MzgasvsMzstar $rbulgevsrdisk $BvsT $fbary $Tcons $zcold_zstar $zstar)
 
 set total_col_name_array=()
 set total_col_array=()
@@ -1709,7 +1719,7 @@ foreach MODEL (`ls -d $PATH_TO_SOFTLINKS/*`)
 					echo 'nr_rows= 5000000'   >> $CONFIGFILE
 				else
 					echo 'nr_rows= 200000000'   >> $CONFIGFILE
-					#echo 'nr_rows= 4600000'   >> $CONFIGFILE
+					echo 'nr_rows= 4600000'   >> $CONFIGFILE
 				endif					
 				
 				#Unit correction specifics

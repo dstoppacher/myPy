@@ -21,6 +21,11 @@ echo ' '
 #Set the name of the simulation: e.g. MDPL, Bolshoi, etc.!
 #+++++++++++++++++++++++++++++++++++++++++++
 set simulation_name = 'MDPL2'
+#set simulation_name = 'Gadget3'
+
+#Set the number of particles as x for x^3 for total numbers of particles in simulation: e.g. 1504 for EAGLE 1504^3!
+#+++++++++++++++++++++++++++++++++++++++++++
+set resolution = '1504'
 
 #Set the name of the telescope: e.g. SDSS, etc.!
 #+++++++++++++++++++++++++++++++++++++++++++
@@ -28,12 +33,17 @@ set telescope_name = 'SDSS'
 
 #Set the name of the cosmology used in the simulation: e.g. Planck, etc.!
 #+++++++++++++++++++++++++++++++++++++++++++
-set cosmology = 'Planck16'
+set cosmology = 'Planck'
+
+#Set the name of the cosmology used in the simulation: e.g. Planck, etc.!
+#+++++++++++++++++++++++++++++++++++++++++++
+set IMF = 'Chabrier03'
 
 #Set any note to they output-file!
 #+++++++++++++++++++++++++++++++++++++++++++
-#set my_annotation = 'ssfr>1e-4_MAB-5log10h'
-set my_annotation = ''
+set my_annotation = 'catalog from Patricia crossmatch with them from Yetli'
+#set my_annotation = 'catalog from Yetli with envr'
+set my_annotation = 'CMASS keys for SFH-History I paper'
 
 #Select with unit system should be used
 #DS: the system standard units are chosen which are mass [Msun], sfr [Msun/yr], pos [comMpc], mean_age_stars [Gyr]
@@ -47,70 +57,31 @@ set plot_single = False
 set plot_single_mix = False
 set subplots = False
 
+#Should the header of an filtered ASCII-output file be written so that Topcat uses automatically the names to name the columns? name1(1) name2(2)
+set set_header_Topcat_format = 'yes'
 
 #Enter target selection code: e.g. 'CMASS', 'LRG', etc --> name of the subcat (hdf5 or ASCII) you will create with filterData method --> use the same tarsel_code if you want to filter an alrady selected catalog (subfilter)!
 #+++++++++++++++++++++++++++++++++++++++++++
-#set tarsel_code_default = 'BOSS_CMASS_Kroupa_0.5_z_0.6'
-set tarsel_code_default = 'Portsmouth_starforming_Salpeter'
-set tarsel_code_default = 'LOW_Z_Blanton+05'
-set tarsel_code_default = '0.6_spall_por_merged_DR12v4_compl_sample'
-set tarsel_code_default = 'mags_CMASS_down3_sample'
-set tarsel_code_default = 'CMASS_density_NFW_con'
-#set tarsel_code_default = 'CMASS_density_vmax_fixed_sats_rand'
-set tarsel_code_default = 'CMASS_density_sample_mhalo'
-#Galacticus
-set tarsel_code_default = 'HOD-SF_CUT3_ssfr'
-set tarsel_code_default = 'fewer_props'
+set tarsel_code_default = 'REF100_generaltable_z0-header'
+set tarsel_code_default = ''
 
-#TNG
-#set tarsel_code_default = 'HOD-SF_CUT3_ssfr'
+set tarsel_code_Galacticus = 'SFH_CMASS_down3_new_sample_keys'
+set tarsel_code_SAG = ''
+set tarsel_code_SAGE = ''
+
 #Choose different catalogues to read!
 #+++++++++++++++++++++++++++++++++++++++++++
 
-set add_tarsel_code = 'OII_eq_bins_ssfr_gt_3.547'
-set add_tarsel_code = '200c-corrected_centrals'
-set add_tarsel_code = 'centrals_mstar_st_3.16e9_mhalo_st_1e11'
-set add_tarsel_code = 'new_mags_CMASS_down_sample3_more_props_test_cents'
+set add_tarsel_code = ''
 
-if ($add_tarsel_code == '_CMASS_c_sample') then
-	set add_tarsel_code = ''
-endif
 
-if ($HOME == /home/doriss) then
-	set tarsel_code_Galacticus = 'new_mags_'$add_tarsel_code
-#'_haloid_crossed_mstar_gt_5e10'
-	set tarsel_code_Galacticus = 'Zgas_test'
-	set tarsel_code_SAG = 'mags'$add_tarsel_code
-	#set tarsel_code_Galacticus = 'new_mags'$add_tarsel_code'_highest_Mzstar'
-	#set tarsel_code_Galacticus = 'new_mags'$add_tarsel_code'_spin_st_0.5_rdisk'
-
-else
-	set tarsel_code_Galacticus = 'Mr_-22_-21_rand0.1'
-	set tarsel_code_Galacticus = 'CUT3_Contreras+13_mcold_all_mstar_gt_1e9_-22_Mr_-21'
-	set tarsel_code_Galacticus = 'CMASS_density_sample_mstar'
-	set tarsel_code_Galacticus = $add_tarsel_code
-	#set tarsel_code_Galacticus = 'CUT3_Contreras+13_mcold_SFH_method2_cents'
-	#set tarsel_code_Galacticus = 'new_mags_CMASS_down_sample3'
-	#set tarsel_code_Galacticus = 'new_mags_CMASS_down_sample3_SDSS2CMASS_highZcold-highMstar'
-	set tarsel_code_SAG = 'v3_new'
-endif
-
-set tarsel_code_SAGE = ''
-
-#test1 == without Mcold>0
-#test2 == without Mzgas>0
-#test3 == original Mzgas>10
-#test4 == without angy cuts int Mcold & Mzgas
-#test5 == use posCor file
-set output_filename_code_Galacticus = $tarsel_code_default
-set output_filename_code_SAG = $add_tarsel_code
-set output_filename_code_SAGE = $add_tarsel_code
-
-#set tarsel_code_SAGE = 'v2_mags_350Mpc_run_1182'
+set output_filename_code_Galacticus = ''
+set output_filename_code_SAG = ''
+set output_filename_code_SAGE = ''
 
 #NOTE standard: [plot_key]_[catname+boxsize]_z_[redshift(0.2f)].[fileformat]
-set output_filename_code_default = 'fixed_25bins_1e10_test2'
-set output_filename_code_default = $add_tarsel_code
+#set output_filename_code_default = 'SFH_300_main_cents'
+set output_filename_code_default = 'test'
 
 #CHANGE IMF:
 set change_IMF = 'Kroupa_Croton+16'
@@ -119,7 +90,6 @@ set change_IMF = 'False'
 #+++++++++++++++++++++++++++++++++++++++++++
 
 #name of the register you want to write/read data, if default register is not desired! Change 'default' to 'your name'
-set set_register_name = 'SkiesANDUniverses'
 set set_register_name = 'default'
 #++++++++++++++++++++++++++++++++++++++++++
 
@@ -132,7 +102,6 @@ set end_fileID 	= False
 #choose a selection name which describes the current selection you want to apply
 #+++++++++++++++++++++++++++++++++++++++++++
 set selection_name = ''
-#'CMASS 2PCF subcatalogue extraction for CUTE'
 
 set plot_custom_array = ('')
 
@@ -164,20 +133,14 @@ set set_home_mode = Truee
 set PLOT_CUSTOM_LOOP = 'False'
 set plot_custom_array = ()
 
+set MANUAL_REDSHIFT_INPUT_default = 0.0
 
 if ($HOME_MODE == $set_home_mode) then
-	set MANUAL_REDSHIFT_INPUT_default = 0.56
-	if ($add_tarsel_code =~ *'sampl'*) then
-		set SOFTLINK_CODE = A
-	else
-		set SOFTLINK_CODE = A2
-	endif
+	set SOFTLINK_CODE = A
 	set plot_all = 'True'			
 	set LOAD_FROM_FILE = 'True'
-	#set output_filename_code_default = 'tarsel'
 
 else
-	set MANUAL_REDSHIFT_INPUT_default = 0.0
 	set SOFTLINK_CODE = A
 	set plot_all = 'False'		
 	set LOAD_FROM_FILE = 'False'
@@ -186,58 +149,60 @@ endif
 #Choose the Snapshots/redshifts --> see list for the SAMS below OR enter a key which is representative for the catalog e.g. 'Gal' for 'Galacticus_1Gpc.hdf5'
 #+++++++++++++++++++++++++++++++++++++++++++
 set MYSNAPS_62    			= '0.000'
+set MYSNAPS_100Mpc			= '28'
 set MYSNAPS_125				= '107' 
-set MYSNAPS_400Mpc			= '96 92 61 28 18 11'
 set MYSNAPS_400Mpc			= '96'
-set MYSNAPS_205Mpc			= 'snapshot99_Subhalos snapshot91_Subhalos snapshot67_Subhalos snapshot50_Subhalos snapshot33_Subhalos snapshot25_Subhalos'
 set MYSNAPS_500Mpc			= 'Guo2013_MSI_sn45'
 
-#redshifts Galacticus
+#redshifts/snapnr Galacticus
 #set MYSNAPS_1Gpc			= '79 75 70 67 65 60 57 52 50 47 45 42 40 38 36 34 32 30 28 26 24 22 20 18 16 14 13 12 11 10 9 8 7 6 5 4 3 2 1'
 
-
-#redshifts SAGE
-#set MYSNAPS_1Gpc			= '0.000 0.093 0.142 0.490 0.592 0.740 0.901 1.220 2.095 3.037 4.038 5.017 6.022 7.026 8.372'
-
+#redshifts/snapnr SAG
 #set MYSNAPS_1Gpc			= '125 124 122 121 119 115 110 107 104 101 98 95 92 89 86 83 80 77 75 70 67 65 60 57 52 50 47 45 42 40 38 36 34 32 30 28 26 24 20'
+
+#redshifts/snapnr SAGE
+#set MYSNAPS_1Gpc			= '0.000 0.093 0.142 0.490 0.592 0.740 0.901 1.220 2.095 3.037 4.038 5.017 6.022 7.026 8.372'
 #set MYSNAPS_1Gpc			= '0.000 0.093 0.142 0.490 0.557 0.740 0.859 1.077 1.270 1.425 1.650 1.896 2.095 2.382 2.614 3.037 3.411 3.929 4.038 4.385 4.627 4.754 4.882 5.017 5.289 5.720 5.873 6.022 6.184 6.342 6.508 6.849 7.026 7.203 7.389 7.764 7.961 8.166 8.372'
-set MYSNAPS_default			= '59'
 
 
-#for sfr2mstar plot: 0.0 0.6 0.75 0.9 1.2
+set MYSNAPS_default			= '28'
 
-
-#Galacticus SMPL 400 Mpc/h: 96 z=0.0, 92 z=0.1, 85 z=0.14, 51 z=0.49 47 z=0.55, 28 z=1, 18 z=2.02, 17=2.14, 11 z=3.03
-#Galacticus MDPL2 1 Gpc: 79 z=0, 75 z=0.09, 73 z=0.14, 61 z=0.49, 59 z=0.56, 55=0.7, 52=.82, 50 =0.9, 49=0.94, 29 z=2.03, 24 z=2.38, min 1 z=8.0
-#SAG MDPL2 1 Gpc: 	125 z=0,  122 z=0.07, 119 z=0.14, 107=0.49, 104 z=0.59, 101=0.7, 95=0.94, min 75 z=2.03
-#SAG cal01 nifty 125: 	107 z=0,  98 z=0.15, min 4 z=7.73
+#redshifts of commonly used models!
+#Galacticus SMPL 400 Mpc/h: 96 z=0.0, 92 z=0.1, 85 z=0.14, 47 z=0.55'
+#Galacticus MDPL2 1 Gpc/h: 79 z=0, 75 z=0.09, 73 z=0.14, 61 z=0.49, 59 z=0.56, 55=0.7, 52=.82, 50 =0.9, 49=0.94, 29 z=2.03, 24 z=2.38, min 1 z=8.0
+#SAG MDPL2 1 Gpc/h: 	125 z=0,  122 z=0.07, 119 z=0.14, 107=0.49, 104 z=0.59, 101=0.7, 95=0.94, min 75 z=2.03
+#SAG cal01 nifty 125Mpc/h: 	107 z=0,  98 z=0.15, min 4 z=7.73
+#EAGLE 100 Mpc/h:     	28 z=0
 
 if ($HDF5_read_code == 'SAMHDF5' || $HDF5_read_code == 'BINARY_SAGE') then
 
-	if ($SOFTLINK_CODE == A || $SOFTLINK_CODE == A2) then 
+	if ($SOFTLINK_CODE == A || $SOFTLINK_CODE =~ A*) then 
 		#SFR_OII
-		set MYSNAPS_1Gpc	= '75'
+		set MYSNAPS_1Gpc	= '59'
 # 75 73 58 55 49 43 29'
 
-		#cSFRD OII-paper
-		#set MYSNAPS_1Gpc	= '79 75 70 67 65 62 60 57 54 52 50 47 45 42 40 38 36 34 32 30 29'
+		#cSFRF
+		#set MYSNAPS_1Gpc	= '79 75 70 67 65 60 57 52 50 47 45 42 40 38 36 34 32 30 28 26 24 22 20 18 16 14 13 12 11 10 9 8 7 6 5 4 3 2 1'
 
-		#set MYSNAPS_1Gpc	= '79 78 77 76 75 74 73 72 71 70 69 68 67 66 65 64 63 62 61 60 59 58 57 56 55 54 53 52 51 50 49 48 47 46 45 44 43 42 41 40 39 38 37 36 35 34 33 32 31 30'
-
-		#set MYSNAPS_1Gpc	= '79 78 77 79 75 74 73 72 71 70 69 68 67 66 65 64 63 62 61 60 59'
-		#all
-		#set MYSNAPS_1Gpc	= '59'
-# 57 56 55'
+		#SFH 300
+		set MYSNAPS_1Gpc	= '79 78 77 76 75 74 73 72 71 70 69 68 67 66 65 64 63 62 61 60 59 58 57 56 55 54 53 52 51 50 49 48 47 46 45 44 43 42 41 40 39 38 37 36 35 34 33 32 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5'
+		#all Galacticus
+		#set MYSNAPS_1Gpc	= '59 58 57 56 55'
 # 54 53 52 51 50 49 48 47 46 45 44 43 42 41 40 39 38 37 36 35 34 33 32 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5'
 		#set MYSNAPS_1Gpc	= '59 34 33 32 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1'
 
 		#Galacticus 400 Mpc/h snapshot list for sfr2z
 		#'96 94 92 90 87 85 84 80 75 70 65 50 47 45 42 40 38 36 30 28 26 24 22 20 18 16 14 12 10 8 6 5 4 3 2 1'
+
+	else if ($SOFTLINK_CODE == C) then
+		#Galacticus 400Mpc (SMDPL)
+		set MYSNAPS_400Mpc	= '47 46 45 44 43 42 42 40 39 38 37 36 35 34 33 32 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1'
+
 	else if ($SOFTLINK_CODE == B || $SOFTLINK_CODE == I) then
 		#set MYSNAPS_1Gpc	= '125 92 89 86 83 80 77 75'
 
 		#redshifts  SAGv2 
-		set MYSNAPS_1Gpc	= '125 122 119 116 113 110 108 107 104 101 98 95 92 89 86 83 80 77 75'
+		set MYSNAPS_1Gpc	= '125 122 119 116 113 110 107 104 101 98 95 92 89 86 83 80 77 75'
 
 		#redshifts  SAGv3
 		#set MYSNAPS_default	= '125 124 122 121 119 115 110 107 104 101 98 95 92 89 86 83 80 77 75 70 67 65 60 57 52 50 47 45 42 40 38 36 34 32 30 28 26 24 20'
@@ -245,33 +210,27 @@ if ($HDF5_read_code == 'SAMHDF5' || $HDF5_read_code == 'BINARY_SAGE') then
 		#SAG calibration01 nifty 125 Mpc/h snapshot list for sfr2z
 		#107 98 92 80 70 61 47 35 27 21 17 14 12 9 6 4
 
-
-		#cSFRD OII-paper
-		set MYSNAPS_1Gpc	= '125 121 116 113 111 108 106 103 100 98 96 93 91 88 86 84 82 80 78 76 75'
-
-
 	else
 
 		set MYSNAPS_1Gpc	= '0.557'
 		#set MYSNAPS_1Gpc	= '0.000 0.093 0.142 0.490 0.557 0.740 0.859 1.077 1.270 1.425 1.650 1.896 2.095 2.382 2.614 3.037 3.411 3.929 4.038 4.385 4.627 4.754 4.882 5.017 5.289 5.720 5.873 6.022 6.184 6.342 6.508 6.849 7.026 7.203 7.389 7.764 7.961 8.166 8.372'
 
-		#cSFRD OII-paper
-		set MYSNAPS_1Gpc	= '0.000 0.093 0.221 0.304 0.364 0.457 0.523 0.628 0.740 0.819 0.901 1.032 1.124 1.270 1.372 1.480 1.593 1.710 1.833 1.961 2.028'
-
 	endif
 else
 	if ($SOFTLINK_CODE == A) then 
 		set MYSNAPS_1Gpc	= '59'
-# 61 48 29 16 6 4'
 	else if ($SOFTLINK_CODE == B) then 
 		set MYSNAPS_1Gpc	= '121'
 	else if ($SOFTLINK_CODE == I) then 
 		set MYSNAPS_1Gpc	= '75'
 	else
-		set MYSNAPS_1Gpc	= '96'
+		set MYSNAPS_1Gpc	= '2.028'
 	endif	
 endif
 
+
+#For extracting properties from observational catalogs
+#+++++++++++++++++++++++++++++++++++++++++++
 #CMASS catalog
 #set fits_map_names	= 'DEC_1;RA_1;Z_1;LOGMASS;AGE;MAGSCALED'
 #set fits_map_names_mapping = 'DEC;RA;Z;mstar;age;mAB_dA_total_u;mAB_dA_total_g;mAB_dA_total_r;mAB_dA_total_i;mAB_dA_total_z;'
@@ -295,60 +254,49 @@ set zmax	= 0.6
 set sample_info	= 'full'
 
 #Select ngalaxies for random catalogue:
-set ngalaxies_random = 500000
+set ngalaxies_random = 'False'
+
+
 
 #Select 'skip_reading_data' if for example with 2PCF the hdf5 should not be read or is not exsiting!
 #+++++++++++++++++++++++++++++++++++++++++++
 set skip_reading_data = yess
-set use_store_register 	= yess
-set filter_density = 'False'
-#Contrears CUTS
-#set filter_density_ngal = 46750000,11770000,530000
-#set filter_density_cut_name = CUT1_Contreras+13,CUT2_Contreras+13,CUT3_Contreras+13
+set use_store_register 	= yees
 
-#HOD-SF CUTS
-#3.16e-2 h3Mpc-3, 1.0e-2 h3Mpc-3, 3.16e-3 h3Mpc-3
-set filter_density_ngal = 3.16e-2h3Mpc-3,1.0e-2h3Mpc-3,3.16e-3h3Mpc-3
-set filter_density_cut_name = HOD-SF_CUT1,HOD-SF_CUT2,HOD-SF_CUT3
+
+#Put if 'True', put number of galaxies to select e.g. 'filter_density_ngal = 340000' for number density of CMASS 3.4x10-4 Mpc-3 h3 most
+#+++++++++++++++++++++++++++++++++++++++++++
+set filter_density = 'False'
+set filter_density_ngal = 340000
+set filter_density_cut_name = densCut_CMASS
 
 set filter_density_select_highest = True
 set filter_density_write_coordinates = False
-set ASCII_TO_HDF5 = True
+
+
+#Any additional outputs?
+#+++++++++++++++++++++++++++++++++++++++++++
+set ASCII_TO_HDF5 = False
 set HDF5_TO_ASCII = True
 
+#Use k-corrections to correct luminosities and magnitudes: 'approx' is KCORRECT from Chiligarian
 set which_kcorrect = 'approx'
 
-#specify details for 'twoPCF'!
+#specify details for 'twoPCF' using CORRFUNC (Manodeep Sinha)!
 #+++++++++++++++++++++++++++++++++++++++++++
 #set twoPCF_path_to_data	 = '/store/erebos/doris/'
 set twoPCF_path_to_data	 = '/z/doris/anaconda/pro/data/LGALAXIES/'
 set twoPCF_which	 = 'BOX'
-set twoPCF_calculate	 = 'wp'
+set twoPCF_calculate	 = 'xi'
 set twoPCF_pimax 	 = '60'
 set twoPCF_nthreads 	 = '8'
-
-set BAO = 'Truee'
-
-if ($BAO == 'True') then
-	set output_filename_code_Galacticus = 'BAO_peak'
-	set output_filename_code_SAG = 'BAO_peak'
-	set output_filename_code_SAGE = 'BAO_peak'
-	set twoPCF_rmin 	 = '100'
-	set twoPCF_rmax		 = '200'
-	set twoPCF_nbins	 = '20'
-
-else
-	set twoPCF_rmin 	 = '0.1'
-	set twoPCF_rmax		 = '200'
-	set twoPCF_nbins	 = '16'
-endif
-
-
+set twoPCF_rmin 	 = '0.5'
+set twoPCF_rmax		 = '200'
+set twoPCF_nbins	 = '25'
 
 set twoPCF_ngal_random_sample = 'False'
-set filter_halomass_Sergio = 'False'
 
-#specify details for 'selectRegion'!
+#specify details for 'selectRegion' (e.g. TheThreeHundred Cluster Project)!
 #+++++++++++++++++++++++++++++++++++++++++++
 
 set selectRegion 		 = 'False'
@@ -389,13 +337,12 @@ endif
 #Choose the method you want to compute/plot:
 #+++++++++++++++++++++++++++++++++++++++++++
 
-set calc_fast_histo		= False
+set calc_fast_histo		= True
 
 set plotXY				= 0
 set plotOnly			= 0
-set filterData			= 0
-set matchHaloCat			= 0
-set analyseTargetSelection	= 1
+set filterData			= 1
+set analyseTargetSelection	= 0
 
 set SMF 				= 0
 set SFRF 				= 0
@@ -418,7 +365,6 @@ set zgas2mstar			= 0
 set zgas2mcold			= 0
 set mcold2mstar			= 0
 set mbh2mstarsph			= 0
-#CUTE files form Alexander doris@taurus:/home/aknebe/Projects/MultiDarkGalaxies/CUTE/2PCF/
 set twoPCF				= 0
 set HOD				= 0
 set mstar2rhalf			= 0
@@ -434,8 +380,8 @@ if ($HOME_MODE == $set_home_mode || $load_subcat == True) then
 	if ($SMF == 1 || $HMF == 1 || $HMF_no == 1) then
 		set SAG_REDSHIFT_INPUT = 0.09
 		set SAG_125_REDSHIFT_INPUT = 1.22
-		set GALACTICUS_1Gpc_REDSHIFT_INPUT = 3.04
-		set GALACTICUS_400Mpc_REDSHIFT_INPUT = 3.03
+		set GALACTICUS_1Gpc_REDSHIFT_INPUT = 0.56
+		set GALACTICUS_400Mpc_REDSHIFT_INPUT = 0.1
 		set SAGE_REDSHIFT_INPUT = 0.56
 		set SAG_v2_REDSHIFT_INPUT = 0.59
 
@@ -443,15 +389,15 @@ if ($HOME_MODE == $set_home_mode || $load_subcat == True) then
 		set SAG_125_REDSHIFT_INPUT = 0.15
 		set SAG_REDSHIFT_INPUT = 0.14
 		set SAG_v2_REDSHIFT_INPUT = 0.07
-		set GALACTICUS_1Gpc_REDSHIFT_INPUT = 3.04
-		set GALACTICUS_400Mpc_REDSHIFT_INPUT = 3.03
+		set GALACTICUS_1Gpc_REDSHIFT_INPUT = 0.14
+		set GALACTICUS_400Mpc_REDSHIFT_INPUT = 0.14
 		set SAGE_REDSHIFT_INPUT = 0.14
 
 	else if ($sSFRF == 1) then
 		set SAG_125_REDSHIFT_INPUT = 0.0
 		set SAG_REDSHIFT_INPUT = 0.0
-		set GALACTICUS_1Gpc_REDSHIFT_INPUT = 3.04
-		set GALACTICUS_400Mpc_REDSHIFT_INPUT = 3.03
+		set GALACTICUS_1Gpc_REDSHIFT_INPUT = 0.0
+		set GALACTICUS_400Mpc_REDSHIFT_INPUT = 0.0
 		set SAGE_REDSHIFT_INPUT = 0.0
 
 	else if ($sfr2z == 1) then
@@ -477,16 +423,16 @@ if ($HOME_MODE == $set_home_mode || $load_subcat == True) then
 	else if ($oh2mstar == 1) then
 		set SAG_125_REDSHIFT_INPUT = 0.0
 		set SAG_REDSHIFT_INPUT = 0.09
-		set GALACTICUS_1Gpc_REDSHIFT_INPUT = 0.99
-		set GALACTICUS_400Mpc_REDSHIFT_INPUT = 0.49
-		set SAGE_REDSHIFT_INPUT = 0.0
+		set GALACTICUS_1Gpc_REDSHIFT_INPUT = 0.09
+		set GALACTICUS_400Mpc_REDSHIFT_INPUT = 0.0
+		set SAGE_REDSHIFT_INPUT = 0.09
 
 	else if ($zgas2mstar == 1 || $zgas2mcold == 1) then
 		set SAG_125_REDSHIFT_INPUT = 0.0
 		set SAG_REDSHIFT_INPUT = 0.09
-		set GALACTICUS_1Gpc_REDSHIFT_INPUT = 0.0
-		set GALACTICUS_400Mpc_REDSHIFT_INPUT = 5.7
-		set SAGE_REDSHIFT_INPUT = 0.0
+		set GALACTICUS_1Gpc_REDSHIFT_INPUT = 0.09
+		set GALACTICUS_400Mpc_REDSHIFT_INPUT = 0.0
+		set SAGE_REDSHIFT_INPUT = 0.09
 
 	else if ($mcold2mstar == 1) then
 		set SAG_125_REDSHIFT_INPUT = 0.0
@@ -505,26 +451,25 @@ if ($HOME_MODE == $set_home_mode || $load_subcat == True) then
 	else if ($mstar2mhalo == 1 || $mstar2mhalo_no == 1 || $mstar2mhalovsSFR == 1 ) then
 		set SAG_REDSHIFT_INPUT = 0.09
 		set SAG_125_REDSHIFT_INPUT = 0.51
-		set GALACTICUS_1Gpc_REDSHIFT_INPUT = 0.0
-		set GALACTICUS_400Mpc_REDSHIFT_INPUT = 0.0
+		set GALACTICUS_1Gpc_REDSHIFT_INPUT = 0.56
+		set GALACTICUS_400Mpc_REDSHIFT_INPUT = 0.55
 		set SAGE_REDSHIFT_INPUT = 0.09
 
 	else if ($filterData == 1 ) then
 		set SAG_125_REDSHIFT_INPUT = 0.0
 		set SAG_REDSHIFT_INPUT = 0.09
 		set GALACTICUS_1Gpc_REDSHIFT_INPUT = 0.09
-		set GALACTICUS_400Mpc_REDSHIFT_INPUT = 0.09
 		set SAGE_REDSHIFT_INPUT = 0.56
 
 
 	
 	else if ($analyseTargetSelection == 1 ) then
 		#OII-sfr paper: 0.0, 0.07, 0.59, 0.7, 0.94, 1.22
-		set SAG_REDSHIFT_INPUT = 0.09
-		set SAG_125_REDSHIFT_INPUT = 0.09
+		set SAG_REDSHIFT_INPUT = 0.56
+		set SAG_125_REDSHIFT_INPUT = 0.0
 		#OII-sfr paper: 0.0, 0.09, 0.59, 0.74, 0.9, 1.22
 		set GALACTICUS_1Gpc_REDSHIFT_INPUT = 0.56
-		set SAGE_REDSHIFT_INPUT = 0.09
+		set SAGE_REDSHIFT_INPUT = 0.0
 
 
 	else if ($plotOnly == 1 ) then
@@ -534,8 +479,7 @@ if ($HOME_MODE == $set_home_mode || $load_subcat == True) then
 	
 	else if ($twoPCF == 1 ) then
 		set SAG_REDSHIFT_INPUT = 0.0
-		set GALACTICUS_1Gpc_REDSHIFT_INPUT = 0.56
-		set GALACTICUS_400Mpc_REDSHIFT_INPUT = 0.55
+		set GALACTICUS_1Gpc_REDSHIFT_INPUT = 0.09
 		set SAGE_REDSHIFT_INPUT = 0.00
 
 	else
@@ -543,8 +487,8 @@ if ($HOME_MODE == $set_home_mode || $load_subcat == True) then
 		set SAG_125_REDSHIFT_INPUT = False
 		set SAG_REDSHIFT_INPUT = 0.0
 		set SAGE_REDSHIFT_INPUT = 0.56
-		set GALACTICUS_1Gpc_REDSHIFT_INPUT = 3.04
-		set GALACTICUS_400Mpc_REDSHIFT_INPUT = 0.49
+		set GALACTICUS_1Gpc_REDSHIFT_INPUT = 0.09
+		set GALACTICUS_400Mpc_REDSHIFT_INPUT = False
 
 
 	endif
@@ -553,7 +497,7 @@ else
 	set SAG_125_REDSHIFT_INPUT = False
 	set SAG_REDSHIFT_INPUT = False
 	set SAGE_REDSHIFT_INPUT = 0.56
-	set GALACTICUS_1Gpc_REDSHIFT_INPUT = 0.0
+	set GALACTICUS_1Gpc_REDSHIFT_INPUT = False
 	set GALACTICUS_400Mpc_REDSHIFT_INPUT = False
 
 endif
@@ -564,17 +508,6 @@ endif
 if ($filterData == 1) then
 	set create_subcat = True
 endif
-
-
-#2PCF:
-#choose '_box' for CUTE_box or default for normal CUTE!
-set choose_CUTE = _box
-set CF_NR_bins = 128
-#unit = MPC/h
-set CF_R_max = 200
-set corr_estimator = monopol
-set param_file_CUTE = 'myparams'$choose_CUTE'.txt'
-set CF_box_size = 1475.58
 
 #analyseTargetSelection: Specify the plot you want to make
 if ($analyseTargetSelection == 1) then
@@ -628,7 +561,6 @@ set analyse_tarsel_uminr_r	= 0
 
 set analyse_tarsel_gminr_uming	= 0
 set analyse_tarsel_rmini_gminr	= 0
-set analyse_tarsel_gmini_mhalo	= 1
 
 set analyse_tarsel_rdisk_rbulge	= 0
 set analyse_tarsel_rhalfmass_mstar	= 0
@@ -683,43 +615,102 @@ set halo_x_vel_disp	= 99
 set halo_y_vel_disp	= 99
 set halo_z_vel_disp	= 99
 
+
+###############################################################################
+#	HALOS
+###############################################################################
+
 #Standard properties
 set ngalaxies		= 99
-set haloid		= 99			
-set hostid		= 99				
-set orphan		= 19		
-set mhalo		= 0
+set haloid		= 0				
+set hostid		= 1				
+set orphan		= 3				
+set mhalo		= 5
 set mhalo_200c		= 99
 set mhalo_cents		= 99
 set mhalo_cents_200c	= 99
 set mbasic		= 99
 set mbasic_200c		= 99
-set env_512		= 99
-set env_1024		= 1
-set pop			= 2
+
+#Environment
+set env_512		= 2
+set env_1024		= 9
+set envr		= 99
+
+#flags
+set pop 				= 6
+set CMASS_sample_key 	= 7
+
+set nr_sample_keys	 	= 8
+set flag_CMASS_l		= 36
+set flag_CMASS_h		= 37
+set flag_CMASS_p		= 38
+set flag_CMASS_a		= 39
+set flag_CMASS_r		= 40
+set flag_CMASS_b		= 41
+set flag_CMASS_lz		= 42
+set flag_CMASS_hz		= 43
+set flag_CMASS_lzr		= 44
+set flag_CMASS_hzr		= 45
+
+#control samples
+set flag_CMASS_lsm		= 49
+set flag_CMASS_hsm		= 50
+set flag_CMASS_lhm		= 51
+set flag_CMASS_hhm		= 52
+
+set flag_sample		 	= 99
 
 #only for Galacticus
 set mhalo_sat		= 99
 set nodeIndex		= 99
-set parentIndex		= 99
+set parentIndex		= 4
 set satelliteNodeIndex	= 99
 set satelliteIndex	= 99
 set siblingIndex	= 99
 set satelliteMergeTime	= 99
 set isolated		= 99
-set timeLastIsolated	= 99
+set timeLastIsolated	= 48
 set firstProgenitorID	= 99
 set lastProID		= 99
 set npros		= 99
 set fofID		= 99
 set mainLeafID		= 99
 
+#only for hydros
+#number of particles
+set np_disk		= 99
+set np_gas		= 99
+set np_stars		= 99
+
+set lastMinorM		= 99
+set lastMajorM		= 99
+
+
 #only for SAG and SAGE
 set vmax		= 99
 
+set vbulge		= 60
+set vdisk		= 99
+
 #only for SAG
 set vpeak		= 99
-set NFW_con		= 12
+set NFW_con		= 35
+
+#only Galacticus and SAGE		
+set spinParameter	= 59
+
+#posistion & velocities
+set x_pos		= 10
+set y_pos		= 11
+set z_pos		= 12
+set x_vel		= 56
+set y_vel		= 57
+set z_vel		= 58
+
+###############################################################################
+#	RADII
+###############################################################################
 
 #only SAG
 set rhalf_bulge		= 99
@@ -730,110 +721,173 @@ set rdisk		= 99
 
 #only Galacticus
 set rbulge		= 99
+set rhalf_mass		= 99
 
-set rbulgevsrdisk		= 99
+set ropt		= 99
+set r200c		= 99
+set rhalf_stars		= 99
+set rhalf_gas		= 99
 
-set rhalf_mass		= 3
+
+###############################################################################
+#	AGES
+###############################################################################
 
 #only SAG and SAGE
 set mean_age_stars	= 99
 
 #only Galacticus
 set mean_age_stars_disk	= 99
-set age_sfr_int_disk = 99
-set sfr_int_disk	= 99
+set age_sfr_int_disk 	= 99
+
 set mean_age_stars_spheroid	= 99
 set age_sfr_int_spheroid = 99
-set sfr_int_spheroid	= 99
 
-#only Galacticus and SAGE		
-set spinParameter	= 99
 
-set mbh			= 4
+###############################################################################
+#	ANGULAR MOMENTA
+###############################################################################
 
-set mstar_spheroid	= 99
+set angM_disk		= 53
+set angM_spheroid	= 54
+
+set jbar	= 55
+set jdisk	= 99
+set jbulge	= 61
+
+
+###############################################################################
+#	BLACK HOLES
+###############################################################################
+
+set mbh			= 13
+set bhcount		= 99
+set bheff		= 14
+set bh_acc_rate		= 99
+
+###############################################################################
+#	STELLAR
+###############################################################################
+
+set mstar_spheroid	= 62
 set mstar_disk		= 99
-set mstar		= 5
+set mstar		= 15
+set mstar_alt		= 99
 
-set BvsT		= 99
+set BvT			= 16
+set DvT_stars		= 99
+set DvT_stars_alt	= 99
+set DvT_gas		= 99
+
 set mstar_IC		= 99
 set mstarPlusIC		= 99
+
+set SHMR			= 17
+
+###############################################################################
+#	MASSES OF GAS
+###############################################################################
+
 set mcold_disk		= 99
 
 #only Galacitcus and SAG
 set mcold_spheroid	= 99
-set mcold		= 6
+set mcold		= 18
 
-set mhot		= 99
+set mhot		= 19
+
+
+###############################################################################
+#	STAR FORMATION
+###############################################################################
 
 set sfr_spheroid	= 99
 set sfr_disk		= 99
-set sfr			= 7
-set ssfr		= 8
+set sfr			= 20
+set ssfr		= 21
 
-#only SAG
-set sfr_spheroid_inst	= 99
-set sfr_quies_inst	= 99
+set sfr_int_disk	= 99
+set sfr_int_spheroid	= 99
+
+set sfr_int_quies	= 99
+set sfr_int_gas		= 99
 
 
+###############################################################################
+#	METALLICITIES & MASSES OF METALS
+###############################################################################
+
+#Masses of metals
+#----------------------------------------
 set Mzgas_disk		= 99
 
 #only SAG and Galacticus
 set Mzgas_spheroid	= 99
-set Mzgas		= 99
+set Mzgas		= 22
 
+#only hydros
+set Mzgas_HI		= 99
+set Mzgas_HII		= 99
 
 #only SAG and SAGE
 set Mzstar_spheroid	= 99
 set Mzstar_disk		= 99
-set Mzstar		= 99
-set Mzhot_halo		= 99
-
-set MzgasvsMzstar	= 99
-
-#only Galacticus
-set zgas_spheroid	= 99
-
-#only Galacticus and SAGE
-set zgas_disk		= 99
-set zcold		= 11
-set zstar		= 99
-
-set zcold_zstar	= 99
-
-set cgf			= 9
-set Tcons		= 10
-
-set fbary		= 99
-
-#only Galacticus			 
-set zstar_spheroid	= 99
-set zstar_disk		= 99
-set zhot_halo		= 99
+set Mzstar			= 23
+set Mzhot_halo		= 34
 
 #only SAG
 set OH_gas_disk		= 99
 set OH_gas_bulge	= 99
 set OH_gas_disk_bulge	= 99
 
-set x_pos		= 99
-set y_pos		= 99
-set z_pos		= 99
-set x_vel		= 99
-set y_vel		= 99
-set z_vel		= 99
+#metallicities / abundances
+#----------------------------------------
+#only Galacticus
+set zgas_spheroid	= 99
 
-set vbulge		= 99
-set vdisk		= 99
+#only Galacticus and SAGE
+set zgas_disk		= 99
+set zcold			= 24
+
+#only Galacticus			 
+set zstar_spheroid	= 99
+set zstar_disk		= 99
+set zstar			= 46
+
+set zhot_halo		= 99
+
+set zcold_zstar		= 47
+
+###############################################################################
+#	OBSERVATIONS
+###############################################################################
 
 set DEC			= 99
 set RA			= 99
 set Z			= 99
 set age			= 99
-set weight_tot		= 15
-#----------------------------------------
+set weight_tot		= 99
+
+###############################################################################
+#	OTHER PROPERTIES
+###############################################################################
+
+#Gas depletion time mcold/sfr
+set Tcons		= 25
+
+#cold gas fraction mcold/mstar
+set cgf			= 26
+
+#total mass of the baryon: mstar+mcold
+set fbar		= 27
+
+
+###############################################################################
+#	LUMINOSITIES, FLUXES & MAGNITUDES
+###############################################################################
 
 #Luminosities
+#----------------------------------------
 set L_SDSS_spheroid_u	= 99
 set L_SDSS_spheroid_g	= 99
 set L_SDSS_spheroid_r	= 99
@@ -858,11 +912,11 @@ set L_SDSS_dA_disk_r	= 99
 set L_SDSS_dA_disk_i	= 99
 set L_SDSS_dA_disk_z	= 99
 
-set L_SDSS_total_u	= 99
-set L_SDSS_total_g	= 99
-set L_SDSS_total_r	= 99
-set L_SDSS_total_i	= 99
-set L_SDSS_total_z	= 99
+set L_SDSS_u	= 99
+set L_SDSS_g	= 99
+set L_SDSS_r	= 99
+set L_SDSS_i	= 99
+set L_SDSS_z	= 99
 
 set L_SDSS_dA_u	= 99
 set L_SDSS_dA_g	= 99
@@ -878,28 +932,30 @@ set L_SDSS_dA_total_z	= 99
 #----------------------------------------
 
 #Magnitudes Standard
-set mAB_dA_total_u	= 16
-set mAB_dA_total_g	= 13
-set mAB_dA_total_r	= 17
-set mAB_dA_total_i	= 14
-set mAB_dA_total_z	= 18
+#----------------------------------------
+set mAB_dA_total_u	= 99
+set mAB_dA_total_g	= 99
+set mAB_dA_total_r	= 99
+set mAB_dA_total_i	= 99
+set mAB_dA_total_z	= 99
 
 set MAB_dA_total_u	= 99
-set MAB_dA_total_g	= 99
-set MAB_dA_total_r	= 99
-set MAB_dA_total_i	= 99
+set MAB_dA_total_g	= 28
+set MAB_dA_total_r	= 29
+set MAB_dA_total_i	= 30
 set MAB_dA_total_z	= 99
 
 set Mag_dA_total_B	= 99
 
-set MAB_total_u	= 99
-set MAB_total_g	= 99
-set MAB_total_r	= 99
-set MAB_total_i	= 99
-set MAB_total_z	= 99
+set MAB_total_u		= 99
+set MAB_total_g		= 99
+set MAB_total_r		= 99
+set MAB_total_i		= 99
+set MAB_total_z		= 99
 #----------------------------------------
 
 #Further Magnitudes
+#----------------------------------------
 set mag_u		= 99
 set mag_g		= 99
 set mag_r		= 99
@@ -950,14 +1006,16 @@ set mAs_dA_total_z		= 99
 #----------------------------------------
 
 #Target selection cuts
+#----------------------------------------
 set mAB_total_cut_r_i	= 99
-set mAB_total_cut_dmesa	= 99
 set mAB_total_cut_g_r	= 99
+set mAB_total_cut_g_i	= 99
+set mAB_total_cut_dmesa	= 99
 set mAB_total_cut_i_lt_dmesa	= 99
 
-set mAB_dA_total_cut_r_i	= 99
-set mAB_dA_total_cut_g_r	= 99
-set mAB_dA_total_cut_g_i	= 99
+set mAB_dA_total_cut_r_i	= 31
+set mAB_dA_total_cut_g_r	= 32
+set mAB_dA_total_cut_g_i	= 33
 set mAB_dA_total_cut_u_g	= 99
 set mAB_dA_total_cut_u_i	= 99
 set mAB_dA_total_cut_i_z	= 99
@@ -977,6 +1035,7 @@ set mAs_dA_total_cut_i_lt_dmesa	= 99
 #----------------------------------------
 
 #Emission lines
+#----------------------------------------
 set OII_3727_ext	= 99
 set OII_3727		= 99
 set OII_3729_ext	= 99
@@ -984,60 +1043,11 @@ set OII_3729		= 99
 #----------------------------------------
 
 #Continuum Emission lines
+#----------------------------------------
 set OII_cont_3727_ext	= 99
 set OII_cont_3727	= 99
 set OII_cont_3729_ext	= 99
 set OII_cont_3729	= 99
-
-if ($SOFTLINK_CODE == Aa) then
-
-	set L_SDSS_dA_total_u	= 15
-	set L_SDSS_dA_total_g	= 16
-	set L_SDSS_dA_total_r	= 17
-	set L_SDSS_dA_total_i	= 18
-	set L_SDSS_dA_total_z	= 19
-
-	set MAB_dA_total_u	= 20
-	set MAB_dA_total_g	= 21
-	set MAB_dA_total_r	= 22
-	set MAB_dA_total_i	= 23
-	set MAB_dA_total_z	= 24
-
-	set MAB_total_u	= 99
-	set MAB_total_g	= 99
-	set MAB_total_r	= 99
-	set MAB_total_i	= 99
-	set MAB_total_z	= 99
-
-	set mAB_dA_total_u		= 25
-	set mAB_dA_total_g		= 26
-	set mAB_dA_total_r		= 27
-	set mAB_dA_total_i		= 28
-	set mAB_dA_total_z		= 29
-
-else if ($SOFTLINK_CODE == Bb) then
-
-	set MAB_dA_total_u	= 15
-	set MAB_dA_total_g	= 16
-	set MAB_dA_total_r	= 17
-	set MAB_dA_total_i	= 18
-	set MAB_dA_total_z	= 19
-
-	set MAB_total_u	= 99
-	set MAB_total_g	= 99
-	set MAB_total_r	= 99
-	set MAB_total_i	= 99
-	set MAB_total_z	= 99
-
-	set OII_3727_ext	= 99
-	set OII_3727		= 99
-	set OII_3729_ext	= 99
-	set OII_3729		= 99
-
-endif
-
-
-
 
 
 #DON'T TOUCH BEYOND THIS LINE!!!!!
@@ -1080,9 +1090,9 @@ echo 'plot_custom_loop= '$PLOT_CUSTOM_LOOP	>> $MY_PHYSICS_SPECS
 
 echo 'MY_PHYSICS_SPECS' $MY_PHYSICS_SPECS	 		>> $MY_PATH_HANDLER_FILE
 
-set method_name_array = (plotXY plotOnly filterData matchHaloCat analyseTargetSelection SMF SFRF sSFRF cSFRD sfr2z sfr2mstar ssfr2mstar oh2mstar HMF mstar2mhalo mstar2mhalofunc ngal2mhalo HMF_no mstar2mhalo_no mstar2mhalofunc_no ngal2mhalo_no zgas2mstar zgas2mcold mcold2mstar mbh2mstarsph twoPCF HOD mstar2mhalovsSFR mstar2rhalf)
+set method_name_array = (plotXY plotOnly filterData analyseTargetSelection SMF SFRF sSFRF cSFRD sfr2z sfr2mstar ssfr2mstar oh2mstar HMF mstar2mhalo mstar2mhalofunc ngal2mhalo HMF_no mstar2mhalo_no mstar2mhalofunc_no ngal2mhalo_no zgas2mstar zgas2mcold mcold2mstar mbh2mstarsph twoPCF HOD mstar2mhalovsSFR mstar2rhalf)
 
-set method_array = ($plotXY $plotOnly $filterData $matchHaloCat $analyseTargetSelection $SMF $SFRF $sSFRF $cSFRD $sfr2z $sfr2mstar $ssfr2mstar $oh2mstar $HMF $mstar2mhalo $mstar2mhalofunc $ngal2mhalo $HMF_no $mstar2mhalo_no $mstar2mhalofunc_no $ngal2mhalo_no $zgas2mstar $zgas2mcold $mcold2mstar $mbh2mstarsph $twoPCF $HOD $mstar2mhalovsSFR $mstar2rhalf)
+set method_array = ($plotXY $plotOnly $filterData $analyseTargetSelection $SMF $SFRF $sSFRF $cSFRD $sfr2z $sfr2mstar $ssfr2mstar $oh2mstar $HMF $mstar2mhalo $mstar2mhalofunc $ngal2mhalo $HMF_no $mstar2mhalo_no $mstar2mhalofunc_no $ngal2mhalo_no $zgas2mstar $zgas2mcold $mcold2mstar $mbh2mstarsph $twoPCF $HOD $mstar2mhalovsSFR $mstar2rhalf)
 
 #echo 559 method_name_array $method_array
 
@@ -1094,14 +1104,9 @@ set halo_col_name_array = (halo_nhalos halo_haloid halo_hostid halo_desIndex hal
 
 set halo_col_array = ($halo_nhalos $halo_haloid $halo_hostid $halo_desIndex $halo_nodemass $halo_vmax $halo_rsca $halo_angmom $halo_spin $halo_redshift $halo_x_pos $halo_y_pos $halo_z_pos $halo_x_vel $halo_y_vel $halo_z_vel $halo_x_vel_disp $halo_y_vel_disp $halo_z_vel_disp)
 
-#set tarsel_col_name_array = (mAB_dA_total_cut_r_i mAB_dA_total_cut_dmesa mAB_dA_total_cut_g_r)
+set col_name_array = (ngalaxies haloid hostid satelliteNodeIndex parentIndex orphan mhalo vmax vpeak spinParameter NFW_con zgas_spheroid zgas_disk zstar_disk zstar_spheroid zhot_halo mcold_spheroid mcold_disk mcold mbh mstar_spheroid mstar_disk mstar mhot Mzgas_spheroid Mzgas_disk Mzgas Mzstar_spheroid Mzstar_disk Mzstar Mzhot_halo sfr_spheroid sfr_disk sfr x_pos y_pos z_pos x_vel y_vel z_vel L_SDSS_spheroid_u L_SDSS_spheroid_g L_SDSS_spheroid_r L_SDSS_spheroid_i L_SDSS_spheroid_z L_SDSS_dA_spheroid_u L_SDSS_dA_spheroid_g L_SDSS_dA_spheroid_r L_SDSS_dA_spheroid_i L_SDSS_dA_spheroid_z L_SDSS_disk_u L_SDSS_disk_g L_SDSS_disk_r L_SDSS_disk_i L_SDSS_disk_z L_SDSS_dA_disk_u L_SDSS_dA_disk_g L_SDSS_dA_disk_r L_SDSS_dA_disk_i L_SDSS_dA_disk_z L_SDSS_u L_SDSS_g L_SDSS_r L_SDSS_i L_SDSS_z L_SDSS_dA_u L_SDSS_dA_g L_SDSS_dA_r L_SDSS_dA_i L_SDSS_dA_z L_SDSS_dA_total_u L_SDSS_dA_total_g L_SDSS_dA_total_r L_SDSS_dA_total_i L_SDSS_dA_total_z mag_u mag_g mag_r mag_i mag_z mAB_u mAB_g mAB_r mAB_i mAB_z mAB_total_u mAB_total_g mAB_total_r mAB_total_i mAB_total_z mAB_dA_u mAB_dA_g mAB_dA_r mAB_dA_i mAB_dA_z mAB_dA_total_u mAB_dA_total_g mAB_dA_total_r mAB_dA_total_i mAB_dA_total_z MAB_dA_total_u MAB_dA_total_g MAB_dA_total_r MAB_dA_total_i MAB_dA_total_z MAB_total_u MAB_total_g MAB_total_r MAB_total_i MAB_total_z mAs_u mAs_g mAs_r mAs_i mAs_z mAs_dA_u mAs_dA_g mAs_dA_r mAs_dA_i mAs_dA_z mAs_dA_total_u mAs_dA_total_g mAs_dA_total_r mAs_dA_total_i mAs_dA_total_z mAB_total_cut_r_i mAB_total_cut_dmesa mAB_total_cut_g_r mAB_total_cut_i_lt_dmesa 'mAB_dA_total_cut_r_i' 'mAB_dA_total_cut_g_r' 'mAB_dA_total_cut_g_i' 'mAB_dA_total_cut_u_g' 'mAB_dA_total_cut_u_i' 'mAB_dA_total_cut_i_z' mAB_dA_total_cut_dmesa mAB_dA_total_cut_cmesa mAB_dA_total_cut_cpar mAB_dA_total_cut_i_lt_dmesa mAB_dA_total_cut_i_lt_dmesa_sparse mAB_dA_total_cut_r_lt_cpar mAs_dA_total_cut_r_i mAs_dA_total_cut_dmesa mAs_dA_total_cut_g_r mAs_dA_total_cut_i_lt_dmesa RA DEC Z age mean_age_stars mhalo_sat OH_gas_disk OH_gas_bulge OH_gas_disk_bulge weight_tot OII_3727_ext OII_3727 OII_3729_ext OII_3729 nodeIndex satelliteIndex siblingIndex satelliteMergeTime isolated timeLastIsolated firstProgenitorID npros Mag_dA_total_B rhalf_bulge rhalf_disk rbulge rdisk rhalf_mass mstar_IC OII_cont_3727_ext OII_cont_3727 OII_cont_3729_ext OII_cont_3729 sfr_int_spheroid sfr_quies_int mhalo_200c mbasic mbasic_200c mhalo_cents_200c mhalo_cents 'mstar+IC' ssfr env_512 env_1024 zcold lastProID mainLeafID fofID bhcount vbulge vdisk age_sfr_int_disk sfr_int_disk sfr_int_spheroid age_sfr_int_spheroid sfr_int_spheroid mean_age_stars_disk mean_age_stars_spheroid cgf angM_spheroid angM_disk Tcons fbar bheff BvT Mzgas_HI Mzgas_HII envr lastMinorM lastMajorM DvT_stars DvT_stars_alt DvT_gas np_stars np_gas np_disk ropt rhalf_stars r200c sfr_int_gas bh_acc_rate mstar_alt mAB_total_cut_g_i rhalf_gas pop CMASS_sample_key SHMR nr_sample_keys flag_CMASS_l flag_CMASS_h flag_CMASS_p flag_CMASS_a flag_CMASS_r flag_CMASS_b flag_CMASS_lz flag_CMASS_hz flag_CMASS_lzr flag_CMASS_hzr zcold_zstar zstar flag_sample flag_CMASS_lsm flag_CMASS_hsm flag_CMASS_lhm flag_CMASS_hhm jbar jdisk jbulge)
 
-#set tarsel_col_array = ($mAB_dA_total_cut_r_i $mAB_dA_total_cut_dmesa $mAB_dA_total_cut_g_r)
-
-
-set col_name_array = (ngalaxies haloid hostid satelliteNodeIndex parentIndex orphan mhalo vmax vpeak spinParameter NFW_con zgas_spheroid zgas_disk zstar_disk zstar_spheroid zhot_halo mcold_spheroid mcold_disk mcold mbh mstar_spheroid mstar_disk mstar mhot Mzgas_spheroid Mzgas_disk Mzgas Mzstar_spheroid Mzstar_disk Mzstar Mzhot_halo sfr_spheroid sfr_disk sfr x_pos y_pos z_pos x_vel y_vel z_vel L_SDSS_spheroid_u L_SDSS_spheroid_g L_SDSS_spheroid_r L_SDSS_spheroid_i L_SDSS_spheroid_z L_SDSS_dA_spheroid_u L_SDSS_dA_spheroid_g L_SDSS_dA_spheroid_r L_SDSS_dA_spheroid_i L_SDSS_dA_spheroid_z L_SDSS_disk_u L_SDSS_disk_g L_SDSS_disk_r L_SDSS_disk_i L_SDSS_disk_z L_SDSS_dA_disk_u L_SDSS_dA_disk_g L_SDSS_dA_disk_r L_SDSS_dA_disk_i L_SDSS_dA_disk_z L_SDSS_total_u L_SDSS_total_g L_SDSS_total_r L_SDSS_total_i L_SDSS_total_z L_SDSS_dA_u L_SDSS_dA_g L_SDSS_dA_r L_SDSS_dA_i L_SDSS_dA_z L_SDSS_dA_total_u L_SDSS_dA_total_g L_SDSS_dA_total_r L_SDSS_dA_total_i L_SDSS_dA_total_z mag_u mag_g mag_r mag_i mag_z mAB_u mAB_g mAB_r mAB_i mAB_z mAB_total_u mAB_total_g mAB_total_r mAB_total_i mAB_total_z mAB_dA_u mAB_dA_g mAB_dA_r mAB_dA_i mAB_dA_z mAB_dA_total_u mAB_dA_total_g mAB_dA_total_r mAB_dA_total_i mAB_dA_total_z MAB_dA_total_u MAB_dA_total_g MAB_dA_total_r MAB_dA_total_i MAB_dA_total_z MAB_total_u MAB_total_g MAB_total_r MAB_total_i MAB_total_z mAs_u mAs_g mAs_r mAs_i mAs_z mAs_dA_u mAs_dA_g mAs_dA_r mAs_dA_i mAs_dA_z mAs_dA_total_u mAs_dA_total_g mAs_dA_total_r mAs_dA_total_i mAs_dA_total_z mAB_total_cut_r_i mAB_total_cut_dmesa mAB_total_cut_g_r mAB_total_cut_i_lt_dmesa 'mAB_dA_total_cut_r_i' 'mAB_dA_total_cut_g_r' 'mAB_dA_total_cut_g_i' 'mAB_dA_total_cut_u_g' 'mAB_dA_total_cut_u_i' 'mAB_dA_total_cut_i_z' mAB_dA_total_cut_dmesa mAB_dA_total_cut_cmesa mAB_dA_total_cut_cpar mAB_dA_total_cut_i_lt_dmesa mAB_dA_total_cut_i_lt_dmesa_sparse mAB_dA_total_cut_r_lt_cpar mAs_dA_total_cut_r_i mAs_dA_total_cut_dmesa mAs_dA_total_cut_g_r mAs_dA_total_cut_i_lt_dmesa RA DEC Z age mean_age_stars mhalo_sat OH_gas_disk OH_gas_bulge OH_gas_disk_bulge weight_tot OII_3727_ext OII_3727 OII_3729_ext OII_3729 nodeIndex satelliteIndex siblingIndex satelliteMergeTime isolated timeLastIsolated firstProgenitorID npros Mag_dA_total_B rhalf_bulge rhalf_disk rbulge rdisk rhalf_mass mstar_IC OII_cont_3727_ext OII_cont_3727 OII_cont_3729_ext OII_cont_3729 sfr_spheroid_inst sfr_quies_inst mhalo_200c mbasic mbasic_200c mhalo_cents_200c mhalo_cents 'mstar+IC' ssfr env_512 env_1024 zcold lastProID mainLeafID fofID cgf pop vbulge vdisk age_sfr_int_disk sfr_int_disk age_sfr_int_spheroid sfr_int_spheroid mean_age_stars_disk mean_age_stars_spheroid MzgasvsMzstar BvsT Tcons fbary rbulgevsrdisk zstar zcold_zstar)
-
-set col_array = ($ngalaxies $haloid $hostid $satelliteNodeIndex $parentIndex $orphan $mhalo $vmax $vpeak $spinParameter $NFW_con $zgas_spheroid $zgas_disk $zstar_disk $zstar_spheroid $zhot_halo $mcold_spheroid $mcold_disk $mcold $mbh $mstar_spheroid $mstar_disk $mstar $mhot $Mzgas_spheroid $Mzgas_disk $Mzgas $Mzstar_spheroid $Mzstar_disk $Mzstar $Mzhot_halo $sfr_spheroid $sfr_disk $sfr $x_pos $y_pos $z_pos $x_vel $y_vel $z_vel $L_SDSS_spheroid_u $L_SDSS_spheroid_g $L_SDSS_spheroid_r $L_SDSS_spheroid_i $L_SDSS_spheroid_z $L_SDSS_dA_spheroid_u $L_SDSS_dA_spheroid_g $L_SDSS_dA_spheroid_r $L_SDSS_dA_spheroid_i $L_SDSS_dA_spheroid_z $L_SDSS_disk_u $L_SDSS_disk_g $L_SDSS_disk_r $L_SDSS_disk_i $L_SDSS_disk_z $L_SDSS_dA_disk_u $L_SDSS_dA_disk_g $L_SDSS_dA_disk_r $L_SDSS_dA_disk_i $L_SDSS_dA_disk_z $L_SDSS_total_u $L_SDSS_total_g $L_SDSS_total_r $L_SDSS_total_i $L_SDSS_total_z $L_SDSS_dA_u $L_SDSS_dA_g $L_SDSS_dA_r $L_SDSS_dA_i $L_SDSS_dA_z $L_SDSS_dA_total_u $L_SDSS_dA_total_g $L_SDSS_dA_total_r $L_SDSS_dA_total_i $L_SDSS_dA_total_z $mag_u $mag_g $mag_r $mag_i $mag_z $mAB_u $mAB_g $mAB_r $mAB_i $mAB_z $mAB_total_u $mAB_total_g $mAB_total_r $mAB_total_i $mAB_total_z $mAB_dA_u $mAB_dA_g $mAB_dA_r $mAB_dA_i $mAB_dA_z $mAB_dA_total_u $mAB_dA_total_g $mAB_dA_total_r $mAB_dA_total_i $mAB_dA_total_z $MAB_dA_total_u $MAB_dA_total_g $MAB_dA_total_r $MAB_dA_total_i $MAB_dA_total_z $MAB_total_u $MAB_total_g $MAB_total_r $MAB_total_i $MAB_total_z $mAs_u $mAs_g $mAs_r $mAs_i $mAs_z $mAs_dA_u $mAs_dA_g $mAs_dA_r $mAs_dA_i $mAs_dA_z $mAs_dA_total_u $mAs_dA_total_g $mAs_dA_total_r $mAs_dA_total_i $mAs_dA_total_z $mAB_total_cut_r_i $mAB_total_cut_dmesa $mAB_total_cut_g_r $mAB_total_cut_i_lt_dmesa $mAB_dA_total_cut_r_i $mAB_dA_total_cut_g_r $mAB_dA_total_cut_g_i $mAB_dA_total_cut_u_g $mAB_dA_total_cut_u_i $mAB_dA_total_cut_i_z $mAB_dA_total_cut_dmesa $mAB_dA_total_cut_cmesa $mAB_dA_total_cut_cpar $mAB_dA_total_cut_i_lt_dmesa $mAB_dA_total_cut_i_lt_dmesa_sparse $mAB_dA_total_cut_r_lt_cpar $mAs_dA_total_cut_r_i $mAs_dA_total_cut_dmesa $mAs_dA_total_cut_g_r $mAs_dA_total_cut_i_lt_dmesa $RA $DEC $Z $age $mean_age_stars $mhalo_sat $OH_gas_disk $OH_gas_bulge $OH_gas_disk_bulge $weight_tot $OII_3727_ext $OII_3727 $OII_3729_ext $OII_3729 $nodeIndex $satelliteIndex $siblingIndex $satelliteMergeTime $isolated $timeLastIsolated $firstProgenitorID $npros $Mag_dA_total_B $rhalf_bulge $rhalf_disk $rbulge $rdisk $rhalf_mass $mstar_IC $OII_cont_3727_ext $OII_cont_3727 $OII_cont_3729_ext $OII_cont_3729 $sfr_spheroid_inst $sfr_quies_inst $mhalo_200c $mbasic $mbasic_200c $mhalo_cents_200c $mhalo_cents $mstarPlusIC $ssfr $env_512 $env_1024 $zcold $lastProID $mainLeafID $fofID $cgf $pop $vbulge $vdisk $age_sfr_int_disk $sfr_int_disk $age_sfr_int_spheroid $sfr_int_spheroid $mean_age_stars_disk $mean_age_stars_spheroid $MzgasvsMzstar $BvsT $Tcons $fbary $rbulgevsrdisk $zstar $zcold_zstar)
+set col_array = ($ngalaxies $haloid $hostid $satelliteNodeIndex $parentIndex $orphan $mhalo $vmax $vpeak $spinParameter $NFW_con $zgas_spheroid $zgas_disk $zstar_disk $zstar_spheroid $zhot_halo $mcold_spheroid $mcold_disk $mcold $mbh $mstar_spheroid $mstar_disk $mstar $mhot $Mzgas_spheroid $Mzgas_disk $Mzgas $Mzstar_spheroid $Mzstar_disk $Mzstar $Mzhot_halo $sfr_spheroid $sfr_disk $sfr $x_pos $y_pos $z_pos $x_vel $y_vel $z_vel $L_SDSS_spheroid_u $L_SDSS_spheroid_g $L_SDSS_spheroid_r $L_SDSS_spheroid_i $L_SDSS_spheroid_z $L_SDSS_dA_spheroid_u $L_SDSS_dA_spheroid_g $L_SDSS_dA_spheroid_r $L_SDSS_dA_spheroid_i $L_SDSS_dA_spheroid_z $L_SDSS_disk_u $L_SDSS_disk_g $L_SDSS_disk_r $L_SDSS_disk_i $L_SDSS_disk_z $L_SDSS_dA_disk_u $L_SDSS_dA_disk_g $L_SDSS_dA_disk_r $L_SDSS_dA_disk_i $L_SDSS_dA_disk_z $L_SDSS_u $L_SDSS_g $L_SDSS_r $L_SDSS_i $L_SDSS_z $L_SDSS_dA_u $L_SDSS_dA_g $L_SDSS_dA_r $L_SDSS_dA_i $L_SDSS_dA_z $L_SDSS_dA_total_u $L_SDSS_dA_total_g $L_SDSS_dA_total_r $L_SDSS_dA_total_i $L_SDSS_dA_total_z $mag_u $mag_g $mag_r $mag_i $mag_z $mAB_u $mAB_g $mAB_r $mAB_i $mAB_z $mAB_total_u $mAB_total_g $mAB_total_r $mAB_total_i $mAB_total_z $mAB_dA_u $mAB_dA_g $mAB_dA_r $mAB_dA_i $mAB_dA_z $mAB_dA_total_u $mAB_dA_total_g $mAB_dA_total_r $mAB_dA_total_i $mAB_dA_total_z $MAB_dA_total_u $MAB_dA_total_g $MAB_dA_total_r $MAB_dA_total_i $MAB_dA_total_z $MAB_total_u $MAB_total_g $MAB_total_r $MAB_total_i $MAB_total_z $mAs_u $mAs_g $mAs_r $mAs_i $mAs_z $mAs_dA_u $mAs_dA_g $mAs_dA_r $mAs_dA_i $mAs_dA_z $mAs_dA_total_u $mAs_dA_total_g $mAs_dA_total_r $mAs_dA_total_i $mAs_dA_total_z $mAB_total_cut_r_i $mAB_total_cut_dmesa $mAB_total_cut_g_r $mAB_total_cut_i_lt_dmesa $mAB_dA_total_cut_r_i $mAB_dA_total_cut_g_r $mAB_dA_total_cut_g_i $mAB_dA_total_cut_u_g $mAB_dA_total_cut_u_i $mAB_dA_total_cut_i_z $mAB_dA_total_cut_dmesa $mAB_dA_total_cut_cmesa $mAB_dA_total_cut_cpar $mAB_dA_total_cut_i_lt_dmesa $mAB_dA_total_cut_i_lt_dmesa_sparse $mAB_dA_total_cut_r_lt_cpar $mAs_dA_total_cut_r_i $mAs_dA_total_cut_dmesa $mAs_dA_total_cut_g_r $mAs_dA_total_cut_i_lt_dmesa $RA $DEC $Z $age $mean_age_stars $mhalo_sat $OH_gas_disk $OH_gas_bulge $OH_gas_disk_bulge $weight_tot $OII_3727_ext $OII_3727 $OII_3729_ext $OII_3729 $nodeIndex $satelliteIndex $siblingIndex $satelliteMergeTime $isolated $timeLastIsolated $firstProgenitorID $npros $Mag_dA_total_B $rhalf_bulge $rhalf_disk $rbulge $rdisk $rhalf_mass $mstar_IC $OII_cont_3727_ext $OII_cont_3727 $OII_cont_3729_ext $OII_cont_3729 $sfr_int_spheroid $sfr_int_quies $mhalo_200c $mbasic $mbasic_200c $mhalo_cents_200c $mhalo_cents $mstarPlusIC $ssfr $env_512 $env_1024 $zcold $lastProID $mainLeafID $fofID $bhcount $vbulge $vdisk $age_sfr_int_disk $sfr_int_disk $sfr_int_spheroid $age_sfr_int_spheroid $sfr_int_spheroid $mean_age_stars_disk $mean_age_stars_spheroid $cgf $angM_spheroid $angM_disk $Tcons $fbar $bheff $BvT $Mzgas_HI $Mzgas_HII $envr $lastMinorM $lastMajorM $DvT_stars $DvT_stars_alt $DvT_gas $np_stars $np_gas $np_disk $ropt $rhalf_stars $r200c $sfr_int_gas $bh_acc_rate $mstar_alt $mAB_total_cut_g_i $rhalf_gas $pop $CMASS_sample_key $SHMR $nr_sample_keys $flag_CMASS_l $flag_CMASS_h $flag_CMASS_p $flag_CMASS_a $flag_CMASS_r $flag_CMASS_b $flag_CMASS_lz $flag_CMASS_hz $flag_CMASS_lzr $flag_CMASS_hzr $zcold_zstar $zstar $flag_sample $flag_CMASS_lsm $flag_CMASS_hsm $flag_CMASS_lhm $flag_CMASS_hhm $jbar $jdisk $jbulge)
 
 set total_col_name_array=()
 set total_col_array=()
@@ -1120,30 +1125,15 @@ foreach item ($col_array)
 	set total_col_array = ($total_col_array $item)
 end
 
-set analyse_tarsel_name_array = (analyse_tarsel_dmesa_i analyse_tarsel_g-r_mstar analyse_tarsel_r-i_mstar analyse_tarsel_g-i_mstar analyse_tarsel_u-r_mstar analyse_tarsel_g-z_mstar analyse_tarsel_r-i_i analyse_tarsel_i_mstar analyse_tarsel_r_mstar analyse_tarsel_g_mstar analyse_tarsel_Ii_i analyse_tarsel_Ii_mstar analyse_tarsel_Ir_r analyse_tarsel_Ir_mstar analyse_tarsel_Ig_g analyse_tarsel_Ig_mstar analyse_tarsel_histo analyse_tarsel_sfr_mstar analyse_tarsel_g-r_r analyse_tarsel_u-r_r analyse_tarsel_mbh_mstar_spheroid analyse_tarsel_mcold_mstar 'analyse_tarsel_g-r_u-g' analyse_tarsel_Mzgas_mstar analyse_tarsel_Mzgas_mcold 'analyse_tarsel_r-i_g-r' 'analyse_tarsel_g-i_i' analyse_tarsel_dmesa_mstar analyse_tarsel_rdisk_rbulge analyse_tarsel_rhalfmass_mstar analyse_tarsel_rhalfmass_rbulge analyse_tarsel_rhalfmass_rdisk analyse_tarsel_rdisk_mstar analyse_tarsel_rhalfdisk_mstar analyse_tarsel_rhalfbulge_mstar analyse_tarsel_spinParameter_mstar analyse_tarsel_spinParameter_Mzstar analyse_tarsel_Mzstar_mstar analyse_tarsel_dmesa_ssfr analyse_tarsel_spinParameter_dmesa 'analyse_tarsel_g-r_ssfr' analyse_tarsel_ssfr_mstar analyse_tarsel_ssfr_sfr analyse_tarsel_ssfr_mhalo analyse_tarsel_zcold_mhalo analyse_tarsel_zcold_sfr analyse_tarsel_mstar_mhalo analyse_tarsel_ssfr_zcold analyse_tarsel_ssfr_mcold analyse_tarsel_ssfr_i analyse_tarsel_ssfr_r analyse_tarsel_g-i_mhalo)
+set analyse_tarsel_name_array = (analyse_tarsel_dmesa_i analyse_tarsel_g-r_mstar analyse_tarsel_r-i_mstar analyse_tarsel_g-i_mstar analyse_tarsel_u-r_mstar analyse_tarsel_g-z_mstar analyse_tarsel_r-i_i analyse_tarsel_i_mstar analyse_tarsel_r_mstar analyse_tarsel_g_mstar analyse_tarsel_Ii_i analyse_tarsel_Ii_mstar analyse_tarsel_Ir_r analyse_tarsel_Ir_mstar analyse_tarsel_Ig_g analyse_tarsel_Ig_mstar analyse_tarsel_histo analyse_tarsel_sfr_mstar analyse_tarsel_g-r_r analyse_tarsel_u-r_r analyse_tarsel_mbh_mstar_spheroid analyse_tarsel_mcold_mstar 'analyse_tarsel_g-r_u-g' analyse_tarsel_Mzgas_mstar analyse_tarsel_Mzgas_mcold 'analyse_tarsel_r-i_g-r' 'analyse_tarsel_g-i_i' analyse_tarsel_dmesa_mstar analyse_tarsel_rdisk_rbulge analyse_tarsel_rhalfmass_mstar analyse_tarsel_rhalfmass_rbulge analyse_tarsel_rhalfmass_rdisk analyse_tarsel_rdisk_mstar analyse_tarsel_rhalfdisk_mstar analyse_tarsel_rhalfbulge_mstar analyse_tarsel_spinParameter_mstar analyse_tarsel_spinParameter_Mzstar analyse_tarsel_Mzstar_mstar analyse_tarsel_dmesa_ssfr analyse_tarsel_spinParameter_dmesa 'analyse_tarsel_g-r_ssfr' analyse_tarsel_ssfr_mstar analyse_tarsel_ssfr_sfr analyse_tarsel_ssfr_mhalo analyse_tarsel_zcold_mhalo analyse_tarsel_zcold_sfr analyse_tarsel_mstar_mhalo analyse_tarsel_ssfr_zcold analyse_tarsel_ssfr_mcold analyse_tarsel_ssfr_i analyse_tarsel_ssfr_r)
 
-set analyse_tarsel_array = ($analyse_tarsel_dmesa_i $analyse_tarsel_gminr_mstar $analyse_tarsel_rmini_mstar $analyse_tarsel_gmini_mstar $analyse_tarsel_uminr_mstar $analyse_tarsel_gminz_mstar $analyse_tarsel_rmini_i $analyse_tarsel_i_mstar $analyse_tarsel_r_mstar $analyse_tarsel_g_mstar $analyse_tarsel_Ii_i $analyse_tarsel_Ii_mstar $analyse_tarsel_Ir_r $analyse_tarsel_Ir_mstar $analyse_tarsel_Ig_g $analyse_tarsel_Ig_mstar $analyse_tarsel_histo $analyse_tarsel_sfr_mstar $analyse_tarsel_gminr_r $analyse_tarsel_uminr_r $analyse_tarsel_mbh_mstar_spheroid $analyse_tarsel_mcold_mstar $analyse_tarsel_gminr_uming $analyse_tarsel_Mzgas_mstar $analyse_tarsel_Mzgas_mcold $analyse_tarsel_rmini_gminr $analyse_tarsel_gmini_i $analyse_tarsel_dmesa_mstar $analyse_tarsel_rdisk_rbulge $analyse_tarsel_rhalfmass_mstar $analyse_tarsel_rhalfmass_rbulge $analyse_tarsel_rhalfmass_rdisk $analyse_tarsel_rdisk_mstar $analyse_tarsel_rhalfdisk_mstar $analyse_tarsel_rhalfbulge_mstar $analyse_tarsel_spinParameter_mstar $analyse_tarsel_spinParameter_Mzstar $analyse_tarsel_Mzstar_mstar $analyse_tarsel_dmesa_ssfr $analyse_tarsel_spinParameter_dmesa $analyse_tarsel_gminr_ssfr $analyse_tarsel_ssfr_mstar $analyse_tarsel_ssfr_sfr $analyse_tarsel_ssfr_mhalo $analyse_tarsel_zcold_mhalo $analyse_tarsel_zcold_sfr $analyse_tarsel_mstar_mhalo $analyse_tarsel_ssfr_zcold $analyse_tarsel_ssfr_mcold $analyse_tarsel_ssfr_i $analyse_tarsel_ssfr_r $analyse_tarsel_gmini_mhalo)
+set analyse_tarsel_array = ($analyse_tarsel_dmesa_i $analyse_tarsel_gminr_mstar $analyse_tarsel_rmini_mstar $analyse_tarsel_gmini_mstar $analyse_tarsel_uminr_mstar $analyse_tarsel_gminz_mstar $analyse_tarsel_rmini_i $analyse_tarsel_i_mstar $analyse_tarsel_r_mstar $analyse_tarsel_g_mstar $analyse_tarsel_Ii_i $analyse_tarsel_Ii_mstar $analyse_tarsel_Ir_r $analyse_tarsel_Ir_mstar $analyse_tarsel_Ig_g $analyse_tarsel_Ig_mstar $analyse_tarsel_histo $analyse_tarsel_sfr_mstar $analyse_tarsel_gminr_r $analyse_tarsel_uminr_r $analyse_tarsel_mbh_mstar_spheroid $analyse_tarsel_mcold_mstar $analyse_tarsel_gminr_uming $analyse_tarsel_Mzgas_mstar $analyse_tarsel_Mzgas_mcold $analyse_tarsel_rmini_gminr $analyse_tarsel_gmini_i $analyse_tarsel_dmesa_mstar $analyse_tarsel_rdisk_rbulge $analyse_tarsel_rhalfmass_mstar $analyse_tarsel_rhalfmass_rbulge $analyse_tarsel_rhalfmass_rdisk $analyse_tarsel_rdisk_mstar $analyse_tarsel_rhalfdisk_mstar $analyse_tarsel_rhalfbulge_mstar $analyse_tarsel_spinParameter_mstar $analyse_tarsel_spinParameter_Mzstar $analyse_tarsel_Mzstar_mstar $analyse_tarsel_dmesa_ssfr $analyse_tarsel_spinParameter_dmesa $analyse_tarsel_gminr_ssfr $analyse_tarsel_ssfr_mstar $analyse_tarsel_ssfr_sfr $analyse_tarsel_ssfr_mhalo $analyse_tarsel_zcold_mhalo $analyse_tarsel_zcold_sfr $analyse_tarsel_mstar_mhalo $analyse_tarsel_ssfr_zcold $analyse_tarsel_ssfr_mcold $analyse_tarsel_ssfr_i $analyse_tarsel_ssfr_r)
 
-#echo $analyse_tarsel_name_array 
-#echo $analyse_tarsel_array
-
-#echo "$total_col_array"
-#echo "$total_col_name_array"
 
 if ($output_filename_code_default =~ CMAS*) then
 	echo 'set cut values --> CMASS'
 	set set_cut_values=(`$MAIN_PATH'myRun/set_cut_values_config_CMASS.sh' $MAIN_PATH "$total_col_name_array" "$total_col_array" $SOFTLINK_CODE $UNIT_CODE`)
-else if ($output_filename_code_default =~ LOW*) then
-	echo 'set cut values --> LOWZ'
-	set set_cut_values=(`$MAIN_PATH'myRun/set_cut_values_config_LOWZ.sh' $MAIN_PATH "$total_col_name_array" "$total_col_array" $SOFTLINK_CODE $UNIT_CODE`)
-else if ($output_filename_code_default == 'LRG') then
-	echo 'set cut values --> LRG'
-	set set_cut_values=(`$MAIN_PATH'myRun/set_cut_values_config_LRG.sh' $MAIN_PATH "$total_col_name_array" "$total_col_array" $SOFTLINK_CODE $UNIT_CODE`)
-else if ($output_filename_code_default =~ *EW) then
-	echo 'set cut values --> filter'
-	set set_cut_values=(`$MAIN_PATH'myRun/set_cut_values_config_filter.sh' $MAIN_PATH "$total_col_name_array" "$total_col_array" $SOFTLINK_CODE $UNIT_CODE`)
 else
-	echo 'set cut values --> default'
 	set set_cut_values=(`$MAIN_PATH'myRun/set_cut_values_config.sh' $MAIN_PATH "$total_col_name_array" "$total_col_array" $SOFTLINK_CODE $UNIT_CODE`)
 endif
 
@@ -1242,19 +1232,6 @@ touch $RUNFILE
 echo 'RUNFILE' $RUNFILE					>> $MY_PATH_HANDLER_FILE
 
 #########################################################################
-#	GENERATE CUTE IMPUT FILES 	"CUTE_INPUT_FILES"		#
-#########################################################################
-
-#set MYCUTE_PARAMFILE   		=  $mycomp'anaconda/CUTE/'$param_file_CUTE
-
-#rm -f MYCUTE_PARAMFILE
-#touch MYCUTE_PARAMFILE  
-
-#$MAIN_PATH'myRun/set_CUTE_config.sh' $MYCUTE_PARAMFILE 
-#echo 'MYCUTE_PARAMFILE' $MYCUTE_PARAMFILE	>> $MY_PATH_HANDLER_FILE
-
-
-#########################################################################
 #	LINESTYLE AND MARKER COMPLIATION	"MATPLOT_STYLE"		#
 #########################################################################
 
@@ -1346,7 +1323,6 @@ set CALI_COUNT_uc 	= 0
 set CALI_COUNT 		= 0
 set BOX_COUNT_62 	= 0
 set BOX_COUNT_125 	= 0
-set BOX_COUNT_205 	= 0
 set BOX_COUNT_400 	= 0
 
 set i=0
@@ -1417,11 +1393,11 @@ foreach MODEL (`ls -d $PATH_TO_SOFTLINKS/*`)
 		set YLIM 		= '-5'
 		set BOX_COUNT_125 	= 1
 
-	else if ($NAME =~ *TNG30*) 	then
-		set MYSNAPS 		= `echo $MYSNAPS_205Mpc`
-		set BOX_SIZE 		= '205Mpc/h'
+	else if ($NAME =~ *100*) 	then
+		set MYSNAPS 		= `echo $MYSNAPS_100Mpc`
+		set BOX_SIZE 		= '100Mpc/h'
 		set YLIM 		= '-5'
-		set BOX_COUNT_205Mpc 	= 1
+		set BOX_COUNT_100Mpc 	= 1
 
 	else if ($NAME =~ *400*) 	then
 		set MYSNAPS 		= `echo $MYSNAPS_400Mpc`
@@ -1533,6 +1509,10 @@ foreach MODEL (`ls -d $PATH_TO_SOFTLINKS/*`)
 	
 	else if ($HDF5_read_code =~ HDF* || $HDF5_read_code =~ SAMHDF*) then
 		set HDF5_CODE = 'True'
+
+	else if ($HDF5_read_code == False || $NAME =~ EAGLE*) then
+		set HDF5_CODE = 'False'
+
 	else
 		if (`ls $SOFTLINK_TO_DATA/* | grep "hdf5"` =~ *hdf5) 		set HDF5_CODE = 'True'
 		if (`ls $SOFTLINK_TO_DATA/* | grep "h5"` =~ *h5) 		set HDF5_CODE = 'H5'
@@ -1565,10 +1545,14 @@ foreach MODEL (`ls -d $PATH_TO_SOFTLINKS/*`)
 		echo '--> ASCII'
 		set CUSTOM_SNAPNAME			= 'txt'
 		set SNAPIDZ_MAPPING 			= True
-		if ($NAME =~ *sample* || $NAME =~ *DR*) then
+		if ($NAME =~ *sample* || $NAME =~ *DR* || $NAME =~ EAGLE*) then
 			set MANUAL_REDSHIFT_INPUT	= $MANUAL_REDSHIFT_INPUT_default
 			set SNAPIDZ_MAPPING 		= False
 		endif
+		if ($NAME =~ EAGLE*) then
+			set CUSTOM_SNAPNAME			= 'EAGLE_ASCII'
+		endif
+
 	endif
 
 
@@ -1599,7 +1583,7 @@ foreach MODEL (`ls -d $PATH_TO_SOFTLINKS/*`)
 	# SET CONFIG-FILE AND SNAPSHOT INPUTS					#
 	#########################################################################
 
-	if ($NAME =~ SAG* || $NAME =~ suss* || $NAME =~ LGAL* || $NAME =~ *TNG30*) then
+	if ($NAME =~ SAG* || $NAME =~ suss* || $NAME =~ LGAL* || $NAME =~ EAGLE*) then
 		set FILENAME_LIST = `echo $PATH_TO_CATALOG$NAME'/'$NAME"_file_names.txt"`
 		echo $FILENAME_LIST
 
@@ -1614,7 +1598,7 @@ foreach MODEL (`ls -d $PATH_TO_SOFTLINKS/*`)
 
 		if ($NAME =~ *1Gpc* || $NAME =~ *400* && $NAME !~ SAG_* || $NAME =~ suss*) then
 			set SNAPID 		= `echo $ISNAP`
-		else if ($NAME =~ *DR* || $NAME =~ *sample* || $NAME =~ CMAS* || $NAME =~ *TNG30*) then
+		else if ($NAME =~ *DR* || $NAME =~ *sample* || $NAME =~ CMAS*) then
 			set SNAPID 		= $ISNAP
 		else
 			set SNAPID 		= `echo $ISNAP | awk '{printf ("%03d\n",$1)}'`
@@ -1694,7 +1678,7 @@ foreach MODEL (`ls -d $PATH_TO_SOFTLINKS/*`)
 					set PATH_TO_SNAPSHOT = `basename $SOFTLINK_TO_DATA*$SNAPID | awk '{print $1}'`'/'
 
 					foreach File (`ls -d $SOFTLINK_TO_DATA$PATH_TO_SNAPSHOT*`)
-						#echo 'File:' $File
+						echo 'File:' $File
 						echo `basename $File` >> $FILENAME_LIST
 					end
 				else
@@ -1717,18 +1701,22 @@ foreach MODEL (`ls -d $PATH_TO_SOFTLINKS/*`)
 						end
 					endif
 				endif
+
+			else if ($NAME =~ EAGL*) then
+				echo 'EAGLE: $SOFTLINK_TO_DATA ~$SNAPID' $SOFTLINK_TO_DATA $NAME $SNAPID
+				foreach File (`ls -d $SOFTLINK_TO_DATA/*$SNAPID*`)
+					echo 'File:' $File
+					echo $File >> $FILENAME_LIST
+				end
+
+
 			else if ($NAME =~ suss*) then
 				#echo '$SOFTLINK_TO_DATA ~$SNAPID' $SOFTLINK_TO_DATA $NAME $SNAPID
 				foreach File (`ls -d $SOFTLINK_TO_DATA*suss*`)
 					echo 'File:' `basename $File`
 					echo `basename $File` >> $FILENAME_LIST
 				end						
-			else if ($NAME =~ *TNG*) then
-				#echo '$SOFTLINK_TO_DATA ~$SNAPID' $SOFTLINK_TO_DATA $NAME $SNAPID
-				foreach File (`ls -d $SOFTLINK_TO_DATA'/'*$SNAPID*`)
-					echo 'HERE TNG File:' `basename $File`
-					echo `basename $File` >> $FILENAME_LIST
-				end	
+
 			endif
 
 			#create a snapshot list from which the python-routines read the different redshifts
@@ -1789,6 +1777,11 @@ foreach MODEL (`ls -d $PATH_TO_SOFTLINKS/*`)
 					echo 'format_info= choose_all'     		>> $CONFIGFILE
 					echo 'delimiter= \t'		     	 	>> $CONFIGFILE
 					echo 'fileformat= '				>> $CONFIGFILE
+				else if ($NAME =~ EAGLE* && $CUSTOM_SNAPNAME == 'EAGLE_ASCII') then
+					echo 'data_format= '$CUSTOM_SNAPNAME  		>> $CONFIGFILE
+					echo 'format_info= choose_all'     		>> $CONFIGFILE
+					echo 'delimiter= '		     	 	>> $CONFIGFILE
+					echo 'fileformat= dat'				>> $CONFIGFILE
 				else if ($CUSTOM_SNAPNAME =~ *its) then
 					echo 'data_format= '$HDF5_read_code  		>> $CONFIGFILE
 					echo 'format_info= choose_all'     		>> $CONFIGFILE
@@ -1833,19 +1826,15 @@ foreach MODEL (`ls -d $PATH_TO_SOFTLINKS/*`)
 				echo 'nr_col= 55'              	 		>> $CONFIGFILE
 
 				#Take care of proper NR OF ROWS TO BE READ:
-				if ($NAME =~ *125*) then
+				if ($NAME =~ *125* || $NAME =~ *100*) then
 					echo 'nr_rows= 550000'		>> $CONFIGFILE
-				else if ($NAME =~ *300) then
-					echo 'nr_rows= 5000000'   	>> $CONFIGFILE
-				else if ($NAME =~ *400* && $HOME !~ /home/*) then
+				else if ($NAME =~ *400*) then
 					echo 'nr_rows= 200000000'   	>> $CONFIGFILE
-				else if ($NAME =~ *62*) then
+				else if ($NAME =~ *62* || $HOME_MODE == True || $HOME =~ /home/*) then
 					echo 'nr_rows= 5000000'   >> $CONFIGFILE
-				else if ($HOME_MODE == True && $HOME =~ /home/*) then
-					echo 'nr_rows= 500000'   >> $CONFIGFILE
 				else
 					echo 'nr_rows= 200000000'   >> $CONFIGFILE
-					echo 'nr_rows= 500000'   >> $CONFIGFILE
+					echo 'nr_rows= 460000'   >> $CONFIGFILE
 				endif					
 				
 				#Unit correction specifics
@@ -1891,11 +1880,10 @@ foreach MODEL (`ls -d $PATH_TO_SOFTLINKS/*`)
 					#@ i++
 				#end
 				#Take care of proper BOXSIZE:
-		
-				if ($NAME =~ *62*) 			echo 'box_size= 62.5'  	>> $CONFIGFILE
-				if ($NAME =~ *sub) 			echo 'box_size= 112.0' 	>> $CONFIGFILE
+				if ($NAME =~ *62*) 		echo 'box_size= 62.5'  	>> $CONFIGFILE
+				if ($NAME =~ *100*) 		echo 'box_size= 100.0'  >> $CONFIGFILE
+				if ($NAME =~ *sub) 		echo 'box_size= 112.0' 	>> $CONFIGFILE
 				if ($NAME =~ *125*) 		echo 'box_size= 125.0'  >> $CONFIGFILE
-				if ($NAME =~ *300*) 		echo 'box_size= 205.0' 	>> $CONFIGFILE
 				if ($NAME =~ *400*) 		echo 'box_size= 400.0' 	>> $CONFIGFILE
 				if ($NAME =~ *500*) 		echo 'box_size= 500.0' 	>> $CONFIGFILE
 				if ($NAME =~ *1Gpc*) 		echo 'box_size= 1000.0' >> $CONFIGFILE
@@ -1978,7 +1966,9 @@ foreach MODEL (`ls -d $PATH_TO_SOFTLINKS/*`)
 				echo 'fits_map_names= '$fits_map_names			>> $CONFIGFILE
 				echo 'fits_map_names_mapping= '$fits_map_names_mapping	>> $CONFIGFILE
 				echo 'UNIT_CODE= '$UNIT_CODE		   	 	>> $CONFIGFILE
+				echo 'resolution= '$resolution		   	 	>> $CONFIGFILE
 				echo 'cosmology= '$cosmology		   	 	>> $CONFIGFILE
+				echo 'IMF= '$IMF			   	 	>> $CONFIGFILE
 				echo 'my_annotation= '$my_annotation	   	 	>> $CONFIGFILE
 
 				echo 'filter_density= '$filter_density	>> $CONFIGFILE
@@ -2030,6 +2020,9 @@ foreach MODEL (`ls -d $PATH_TO_SOFTLINKS/*`)
 					set output_filename_code = $output_filename_code_default
 				endif
 
+
+				echo 'set_header_Topcat_format= '$set_header_Topcat_format			 	>> $CONFIGFILE
+
 				echo 'change_IMF= '$change_IMF			 	>> $CONFIGFILE
 				echo 'which_kcorrect= '$which_kcorrect			>> $CONFIGFILE
 				echo 'calc_fast_histo= '$calc_fast_histo 	 	>> $CONFIGFILE
@@ -2049,19 +2042,13 @@ foreach MODEL (`ls -d $PATH_TO_SOFTLINKS/*`)
 				echo 'nr_files_snapshot= '$nr_files_snapshot		>> $CONFIGFILE
 				echo 'end_fileID= '$end_fileID				>> $CONFIGFILE
 				echo 'skip_reading_data= '$skip_reading_data		>> $CONFIGFILE	
-				#twoPCF specifics
-				echo 'CF_NR_bins= '$CF_NR_bins				>> $CONFIGFILE
-				echo 'CF_R_max= '$CF_R_max				>> $CONFIGFILE
-				echo 'choose_CUTE= '$choose_CUTE			>> $CONFIGFILE
-				echo 'corr_estimator= '$corr_estimator			>> $CONFIGFILE
-				echo 'CF_box_size= '$CF_box_size			>> $CONFIGFILE
+
 				#analyseTargetSelection specifics
 				echo 'filterSample= '$filterSample 			>> $CONFIGFILE
 				echo 'calcHistoSample= '$calcHistoSample		>> $CONFIGFILE
 				echo 'plotSample= '$plotSample				>> $CONFIGFILE
 
 				echo 'OUTPUT_ASCII= '$HDF5_TO_ASCII				>> $CONFIGFILE
-				echo 'filter_halomass_Sergio= '$filter_halomass_Sergio		>> $CONFIGFILE
 
 				echo 'twoPCF_path_to_data= '$twoPCF_path_to_data		>> $CONFIGFILE
 				echo 'twoPCF_which= '$twoPCF_which				>> $CONFIGFILE

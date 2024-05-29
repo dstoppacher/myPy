@@ -28,7 +28,13 @@ foreach item ($2)
 		#if False: DS code will be used
 		#if not False, this name will be used to store in the output-files
 		set output_col_name = $item
-		if ($5 == 'MD') then
+		if ($item == Mzgas_HI) set output_col_name	= 'Mgas_HI'
+		if ($item == Mzgas_HII) set output_col_name	= 'Mgas_H2'
+		if ($item == Mgas_HII_30kpc_GK11) set output_col_name	= 'Mgas_H2_30kpc_GK11'
+		if ($item == Mgas_HII_60kpc_GK11) set output_col_name	= 'Mgas_H2_60kpc_GK11'
+		if ($item == Mgas_HII_30kpc_K13) set output_col_name	= 'Mgas_H2_30kpc_K13'
+		if ($item == Mgas_HII_60kpc_K13) set output_col_name	= 'Mgas_H2_60kpc_K13'
+		if ($5 == 'MD' || $5 =~ MD*) then
 			if ($item == hostid) set output_col_name	= 'HostHaloID'			
 			if ($item == haloid) set output_col_name	= 'MainHaloID'		
 			if ($item == orphan) set output_col_name	= 'GalaxyType'
@@ -148,12 +154,12 @@ foreach item ($2)
 
 			if ($4 == A || $4 =~ A* || $4 == C) then
 			#Galacticus: wrong name in the columns for z~, those are actually masses of metals!!!
-				if ($item == zstar_spheroid) set output_col_name = 'MZstar_spheroid'
-				if ($item == zstar_disk) set output_col_name	 = 'MZstar_disk'
-				if ($item == zgas_spheroid) set output_col_name  = 'MZgas_spheroid'
-				if ($item == zgas_disk) set output_col_name	 = 'MZgas_disk'
-				if ($item == zhot_halo) set output_col_name	 = 'MZhot_halo'
-			endif	
+				if ($item == zstar_spheroid) set output_col_name = 'Mzstar_spheroid'
+				if ($item == zstar_disk) set output_col_name	 = 'Mzstar_disk'
+				if ($item == zgas_spheroid) set output_col_name  = 'Mzgas_spheroid'
+				if ($item == zgas_disk) set output_col_name	 = 'Mzgas_disk'
+				if ($item == zhot_halo) set output_col_name	 = 'Mzhot_halo'
+			endif
 		endif
 
 
@@ -166,7 +172,7 @@ foreach item ($2)
 		set cut_value_min		= 'min'
 		#echo 'i:' $i $item "$array[$i]"
 		 		 
-		#if ($item == mhalo) set cut_value_min		= 1e3
+		if ($item == mhalo) set cut_value_min		= 5e10
 		#if ($item == hostid) set cut_value_min		= -2
 
 		#if ($item == mstar) set cut_value_min	 	= 5e7
@@ -222,47 +228,67 @@ foreach item ($2)
 
 		#default values:
 		set unit			= '-'
-		#if ($item =~ *n) set unit			= 'idnumber'
-		if ($item =~ *ngal*) set unit			= 'idnumber'
-		if ($item =~ *nhalo*) set unit			= 'idnumber'
 		if ($item =~ *aloi*) set unit			= 'idnumber'
 		if ($item =~ *Index) set unit			= 'idnumber'
 		if ($item =~ *osti*) set unit			= 'idnumber'
-		if ($item =~ *ID) set unit				= 'idnumber'		 					 
+		if ($item =~ *ID) set unit			= 'idnumber'
+		if ($item == jsub) set unit			= 'idnumber'		 					 
 		if ($item =~ *rpha*) set unit			= '0=cent,1=sat,2=orph'
 		if ($item == isolated) set unit			= '0=non-iso,1=iso'
 		if ($item =~ *targe*) set unit			= 'flag'
+		if ($item =~ *Name) set unit			= 'name'
 		if ($item == debugR) set unit			= 'debugQuant'
 
 
-		if ($5 == 'DS') then
-		#units without any little-h according to Doris datapipline mass [Msun], sfr [Msun/yr], pos [comMpc], mean_age_stars [Gyr]			 		 
+		if ($5 == 'DS' || $5 =~ MD*) then
+		#units without any little-h according to Doris datapipline mass [Msun], sfr [Msun/yr], pos [comMpc], mean_age_stars [Gyr], radii [kpc]
+			if ($item =~ *_a) set unit			= 'Mpc'
+			if ($item =~ *_a*) set unit			= 'Mpc'		 		 
 			if ($item =~ mhal*) set unit			= 'Msun'
 			if ($item =~ mpseud*) set unit			= 'Msun'
 			if ($item =~ mbasi*) set unit			= 'Msun'
-			if ($item =~ Mz*) set unit			= 'Msun'				 		
+			if ($item =~ mPart*) set unit			= 'Msun'
+			if ($item =~ Mz*) set unit			= 'Msun'
+			if ($item =~ Mga*) set unit			= 'Msun'	
+			if ($item =~ mga*) set unit			= 'Msun'				 		
 			if ($item =~ mcol*) set unit			= 'Msun'
 			if ($item =~ mhot*) set unit			= 'Msun'		
 			if ($item == mbh) set unit			= 'Msun'			
 			if ($item =~ msta*) set unit	 		= 'Msun'
 			if ($item == mbasic) set unit	 		= 'Msun'
-			if ($item == delta_mhalo) set unit	= 'Msun'		 
+			if ($item == delta_mhalo) set unit		= 'Msun'		 
 			if ($item =~ sf*) set unit			= 'Msunyr-1'
-			if ($item =~ bh_*) set unit			= 'Msunyr-1'
 			if ($item =~ ssf*) set unit			= 'yr-1'
-			if ($item =~ age_*) set unit			= '-'
-			if ($item =~ mean_age_*) set unit		= 'Gyr'			
+			if ($item =~ sfe*) set unit			= 'yr-1'
+			if ($item =~ age_*) set unit			= 'Gyr'
+			if ($item =~ mean_age_*) set unit		= 'Gyr'
+			if ($item =~ t50*) set unit				= 'Gyr'
+			if ($item =~ t70*) set unit				= 'Gyr'
+			if ($item =~ delta_t*) set unit			= 'Gyr'
+			if ($item =~ t*) set unit			= 'Gyr'					
 			if ($item =~ *pos) set unit			= 'comvMpc'
-			if ($item =~ r*) set unit			= 'Mpc'
-			if ($item =~ *_a) set unit			= 'Mpc'
-			if ($item =~ *_a*) set unit			= 'Mpc'
+			if ($item =~ *pos_subhalo) set unit			= 'comvMpc'
+			if ($item =~ r*) set unit			= 'kpc'
+			if ($item =~ sDens*) set unit			= 'Mpc-2'
 			if ($item == xoff) set unit			= 'Mpc'
-			if ($item == delta_rvir) set unit	= 'Mpc'
+			if ($item == delta_rvir) set unit		= 'Mpc'
 			if ($item =~ OII*) set unit			= '1e40ergs-1'
 			if ($item =~ OII_cont*) set unit		= '1e40ergs-1A-1'
+			if ($item =~ bh_*) set unit			= 'Msunyr-1'
 
-			if ($item =~ ang*) set unit			= 'MsunMpckms-1'
-			if ($item =~ *_ang) set unit		= 'MsunMpckms-1'
+			if ($item =~ j*) set unit			= 'kpckms-1'
+			if ($item =~ ang*) set unit			= 'Msunkpckms-1'
+			if ($item =~ *_ang) set unit			= 'Msunkpckms-1'
+			if ($item =~ angM_norm*) set unit			= 'kpckms-1'
+			if ($item =~ spinGas*) set unit			= 'kpckms-1'
+			if ($item =~ E*) set unit			= 'Msunkm2s-2'
+			if ($item =~ Sigma*) set unit			= 'Msunpc-2'
+			if ($item =~ Sigma_st*) set unit			= 'Msunkpc-2'
+			if ($item =~ Sigma_sf*) set unit			= 'Msunyr-1kpc-2'
+			if ($item =~ SB_nu*) set unit			= 'magpc-2'
+			if ($item =~ F_*) set unit			= 'Jy'
+			if ($item =~ mag*) set unit			= 'mag'
+
 
 			if ($4 == A || $4 =~ A* || $4 == C) then
 			#Galacticus: wrong name in the columns for z~, those are actually masses of metals!!!
@@ -304,28 +330,69 @@ foreach item ($2)
 			endif
 		endif
 
-		if ($item =~ env_*) set unit		= '0=vo,1=sh,2=fi,3=no'
-		if ($item == pop) set unit			= '-'
-		if ($item =~ zga*) set unit			= 'abFrac'
+		if ($item =~ env_*) set unit		= '0=vo,1=sh,2=fi,3=ko'
+		#Envrionment specification by Paillas+17 (MNRAS, 470, 4434), IV=inner void (underdense), OV=outer void, W=walls (as filaments), S=skeleton (dense as knots)
+		#definition used for EAGLE data from Yetli (see their paper Rosas-Guevara+22 (arXiv:2204.04565v2)
+		if ($item == envr) set unit		= '-99=None,1=V,2=W,3=S'
+		if ($item == CMASS_sample_key) set unit		= 'string_flag'
+
+		if ($item =~ *Name) set unit	= 'name'
+		if ($item == pop) set unit		= 'flag'
+		if ($item =~ flag*) set unit	= 'flag'
+		if ($item == flag_SB_envr) set unit	= '0=S,1=W,2=V'
+		if ($item == flag_mass_bin) set unit		= 'string_flag'
+		if ($item == flag_age_bin) set unit		= 'string_flag'
+		if ($item == flag_mstar_bin) set unit		= 'string_flag'
+		if ($item == flag_mhalo_bin) set unit		= 'string_flag'
+		if ($item == flag_sfe_bin) set unit		= 'string_flag'
+		if ($item == flag_SHMR_bin) set unit		= 'string_flag'
+		if ($item == flag_t50_st2ha) set unit	= '1=mhalo1st,0=mstar1st'
+		if ($item == flag_t50_bh2ha) set unit	= '1=mhalo1st,0=mbh1st'
+		if ($item == flag_majorM) set unit	= '1=majorM,0=minorM'
+		if ($item =~ flag_std_fit*) set unit	= '-99=Error,0=int,1=fit'
+		if ($item =~ flag_use_*) set unit	= '0=False,1=True'
+		if ($item == flag_SB_B) set unit	= '-99=None,0=HSB,1=LSB'
+		if ($item == flag_SB_r) set unit	= '-99=None,0=HSB,1=LSB'
+		if ($item =~ flag_tform_*) set unit	= '0=early,1=late'
+		if ($item =~ flag_den*) set unit	= '0=False,1=True'
+		if ($item =~ zga*) set unit		= 'abFrac'
 		if ($item =~ zsta*) set unit		= 'abFrac'
-		if ($item =~ zho*) set unit			= 'abFrac'
-		if ($item == cgf) set unit			= '-'
-		if ($item == fbary) set unit		= '-'
-		if ($item =~ *vs*) set unit			= '-'
+		if ($item =~ zho*) set unit		= 'abFrac'
+		if ($item == cgf) set unit		= '-'
+		if ($item == fbar) set unit		= '-'
+		if ($item == bheff) set unit		= '-'
+		if ($item =~ *vs*) set unit		= 'frac'
+		if ($item == BvT) set unit		= 'frac'
+		if ($item =~ DvT*) set unit		= 'frac'
+		if ($item =~ VvS*) set unit		= 'frac'
 		if ($item =~ zcol*) set unit		= '-'
 		if ($item == zstar) set unit		= '-'
 		if ($item == bh_rad_eff) set unit	= 'frac'
 
-		if ($item =~ *sca) set unit			= 'Mpc'					 
-		if ($item == RA) set unit			= 'deg'
-		if ($item == DEC) set unit			= 'deg'
+		if ($item =~ ngal*) set unit		= 'count'
+		if ($item =~ nsa*) set unit		= 'count'
+		if ($item =~ nhal*) set unit		= 'count'
+		if ($item =~ np_*) set unit		= 'count'
+		if ($item =~ nr_*) set unit		= 'count'
+
+		if ($item =~ *sca) set unit		= 'Mpc'					 
+		if ($item == RA) set unit		= 'deg'
+		if ($item == DEC) set unit		= 'deg'
+		if ($item =~ lastM*) set unit		= 'Gyr'
 		if ($item =~ time*) set unit		= 'Gyr'
 		if ($item =~ *MergeTime) set unit	= 'Gyr'
+		if ($item =~ T*) set unit			= 'Gyr'
 		if ($item == Tcons) set unit		= 'Gyr'
-		if ($item =~ v*) set unit			= 'kms-1'
-		if ($item =~ *vel) set unit			= 'kms-1'
-		if ($item =~ *cut_i_lt_dmesa) set unit		= '0=False,1=True'
-		if ($item =~ *cut_r_lt_cpar) set unit		= '0=False,1=True'
+		if ($item =~ v*) set unit		= 'kms-1'
+		if ($item =~ *vel) set unit		= 'kms-1'
+		if ($item =~ vdis*) set unit		= 'kms-1'
+		if ($item == vpec_norm) set unit		= 'kms-1Msun-1'
+		if ($item =~ *cut_i_lt_dmesa) set unit	= '0=False,1=True'
+		if ($item =~ *cut_r_lt_cpar) set unit	= '0=False,1=True'
+		if ($item == SHMR) set unit		= '-'
+		if ($item == rcenter2r200c) set unit	= '-'
+		if ($item == Sercic_n) set unit	= '-'
+		if ($item =~ lambda*) set unit	= '-'
 
 		if ($4 == I) then
 			if ($item == orphan) set unit			= '1=cents,0=sats'
@@ -335,15 +402,30 @@ foreach item ($2)
 		#default values:
 		set format			= '%0.10E'
 		if ($item == pop) set format			= '%i'
+		if ($item == CMASS_sample_key) set format = '%s'
+
 		if ($item =~ env_*) set format			= '%i'
+		if ($item == envr) set format			= '%i'
 		if ($item =~ *ngal*) set format			= '%i'
+		if ($item == nsats) set format			= '%i'
+		if ($item == nSubhalos) set format		= '%i'
+		if ($item =~ np_*) set format			= '%i'
 		if ($item =~ npr*) set format			= '%i'
+		if ($item =~ nr_*) set format			= '%i'
+		if ($item =~ flag*) set format			= '%i'
+		if ($item == flag_mass_bin) set format = '%s'
+		if ($item == flag_mstar_bin) set format = '%s'
+		if ($item == flag_mhalo_bin) set format = '%s'
+		if ($item == flag_age_bin) set format = '%s'
+		if ($item == flag_sfe_bin) set format = '%s'
+		if ($item == flag_SHMR_bin) set format = '%s'
 		if ($item =~ *nhalo*) set format		= '%i'
 		if ($item =~ *aloi*) set format			= '%i'
 		if ($item =~ *osti*) set format			= '%i'
 		if ($item =~ *Index) set format			= '%i'
 		if ($item =~ *rpha*) set format			= '%i'
 		if ($item =~ *ID) set format			= '%i'
+		if ($item == jsub) set format			= '%i'
 		if ($item == isolated) set format		= '%i'
 		if ($item =~ *targe*) set format		= '%i'
 		if ($item =~ *arning*) set format		= '%i'
@@ -365,7 +447,19 @@ foreach item ($2)
 		if ($item == vdisk) set format			= '%0.10e'
 		if ($item =~ zcol*) set format			= '%0.10f'
 		if ($item == zstar) set format			= '%0.10f'
+		if ($item =~ t50*) set format			= '%0.6f'
+		if ($item =~ t70*) set format			= '%0.6f'
+		if ($item =~ delta_t*) set format		= '%0.6f'
+		if ($item =~ T*) set format				= '%0.10f'
 		if ($item == Tcons) set format			= '%0.10f'
+		if ($item == Zgrad) set format			= '%0.10f'
+		if ($item =~ OH*) set format			= '%0.10f'
+		if ($item =~ FeH*) set format			= '%0.10f'
+		if ($item =~ SB_nu*) set format			= '%0.6f'
+
+		if ($item =~ z50*) set format			= '%0.4f'
+		if ($item == Delta_z50) set format		= '%0.4f'
+		if ($item == regionName) set format			= '%s'
 
 		#default values:
 		if ($4 == F || $4 == B || $4 == Ff || $4 == Bb || $4 == I || $4 == R || $4 == C256 || $4 == C512) then
@@ -375,6 +469,7 @@ foreach item ($2)
 		endif 				 		 
 
 		if ($item =~ n*) set data_type			= 'int32'
+		if ($item =~ np_*) set data_type		= 'int64'
 		if ($item =~ *nhal*) set data_type		= 'int32'
 		if ($item =~ npr*) set data_type		= 'int32'
 		if ($item =~ *ngal*) set data_type		= 'int32'
@@ -382,19 +477,34 @@ foreach item ($2)
 		if ($item =~ *osti*) set data_type		= 'int64'
 		if ($item =~ *Index) set data_type		= 'int64'
 		if ($item =~ *ID) set data_type			= 'int64'
+		if ($item == jsub) set data_type		= 'int64'
 		if ($item == bhcount) set data_type		= 'int8'
 		if ($item =~ *rpha*) set data_type		= 'int8'
 		if ($item == isolated) set data_type	= 'int8'
 		if ($item =~ *targe*) set data_type		= 'int8'
-
+		if ($item == pop) set data_type		= 'int8'
+		if ($item =~ flag*) set data_type		= 'int8'
+		if ($item == envr) set data_type		= 'int8'
+		if ($item == CMASS_sample_key) set data_type = 'S30'
+		if ($item == flag_mass_bin) set data_type = 'S10'
+		if ($item == flag_mstar_bin) set data_type = 'S10'
+		if ($item == flag_mhalo_bin) set data_type = 'S10'
+		if ($item == flag_age_bin) set data_type = 'S10'
+		if ($item == flag_sfe_bin) set data_type = 'S10'
+		if ($item == flag_SHMR_bin) set data_type = 'S10'
+		if ($item == regionName) set data_type = 'S10'
 
 
 		set corr_type		= 'no_corr'
 		if ($item =~ n*) set corr_type			= 'int_num'
+		if ($item =~ np_*) set corr_type		= 'int_num'
 		if ($item =~ *nhal*) set corr_type		= 'int_num'
 		if ($item =~ npr*) set corr_type		= 'int_num'
+		if ($item =~ nr_*) set corr_type		= 'int_num'
+		if ($item =~ flag*) set corr_type		= 'int_num'
 		if ($item =~ *ngal*) set corr_type		= 'int_num'
 		if ($item =~ *targe*) set corr_type		= 'int_num'
+		if ($item ==  jsub) set corr_type		= 'id_num'
 		if ($item =~ *aloi*) set corr_type		= 'id_num'
 		if ($item =~ *Index) set corr_type		= 'id_num'
 		if ($item =~ *ID) set corr_type			= 'id_num'			 
@@ -403,16 +513,23 @@ foreach item ($2)
 		if ($item == isolated) set corr_type		= 'id_num'
 
 		if ($5 == 'DS') then
-		#units without any little-h according to Doris datapipline mass [Msun], sfr [Msun yr-1], pos [comMpc], mean_age_stars [Gyr], radius [Mpc], angular momentum [Msun Mpc km s-1]
+		#units without any little-h according to Doris datapipline mass [Msun], sfr [Msun yr-1], pos [comMpc], mean_age_stars [Gyr], radius [kpc], angular momentum [Msun kpc km s-1]
 			
 			if ($4 == A || $4 =~ A* || $4 == C) then
 			#Galacticus 				 		 
 				if ($item =~ sf*) set corr_type			= 'Gyr-1'
 				if ($item =~ bh_acc*) set corr_type		= 'Gyr-1'		
 				if ($item =~ *pos) set corr_type		= 'COMV'
-				if ($item =~ ang*) set corr_type		= 'Mpc'		
+				if ($item =~ ang*) set corr_type		= 'Mpc'
+				if ($item =~ r*) set corr_type			= 'Mpc'
+
+			#else if ($4 == E) then
+			#EAGLE 				 		 
+				#if ($item =~ r*) set corr_type			 	= 'Mpc'
+				#if ($item =~ angM*) set corr_type		= 'Mpc'
+				#if ($item == bh_acc_rate) set corr_type		= 'Gyr-1'			
 		
-			else if ($4 == B || $4 == E) then
+			else if ($4 == B) then
 			#SAG
 				if ($item =~ mhal*) set corr_type		= 'h'
 				if ($item =~ Mz*) set corr_type 		= 'h'	 		
@@ -448,6 +565,7 @@ foreach item ($2)
 				if ($item =~ *pos) set corr_type 		= 'h'
 				if ($item =~ r*) set corr_type 			= 'h'
 
+
 			else if ($4 == I) then
 			#IllustrisTNG300-1 205 Mpc
 				if ($item =~ mhal*) set corr_type		= 'h'				
@@ -467,11 +585,25 @@ foreach item ($2)
 				if ($item =~ _a) set corr_type 			= 'h,Mpc'
 				if ($item == xoff) set corr_type 		= 'h,Mpc'
 				if ($item =~ *_ang) set corr_type 		= 'h-2'
-			else
-					
-				if ($item =~ msta*) set corr_type 		= 'mass,h'
 
 			endif
+
+		else if ($5 == 'MD2DS') then
+		#Convert a catalog with was written with MD name and unit convention to DS
+
+			#Galacticus 				 		 
+			if ($item =~ mhal*) set corr_type		= 'h'
+			if ($item =~ Mz*) set corr_type 		= 'h'	 		
+			if ($item =~ mcol*) set corr_type		= 'h'			
+			if ($item == mbh) set corr_type			= 'h'			
+			if ($item =~ msta*) set corr_type 		= 'h'
+			if ($item =~ mho*) set corr_type 		= 'h'
+
+			if ($item =~ sf*) set corr_type			= 'h,Gyr'			
+			if ($item =~ *pos) set corr_type		= 'h'
+			if ($item =~ r* ) set corr_type			= 'h,Mpc'
+
+			#if ($item =~ L* ) set corr_type			= 'lum'
 
 		else
 		#MD: units according to Multidark data base mass [Msun/h], sfr [Msun/Gyr/h], pos [comMpc/h], mean_age_stars [Gyr], L_* (luminosities) [4.4659e13WHz-1]
@@ -482,7 +614,7 @@ foreach item ($2)
 				if ($item =~ mbasi*) set corr_type		= 'h'
 				if ($item =~ Mz*) set corr_type 		= 'h'	 		
 				if ($item =~ mcol*) set corr_type		= 'h'			
-				if ($item == mbh) set corr_type		= 'h'			
+				if ($item == mbh) set corr_type			= 'h'			
 				if ($item =~ msta*) set corr_type 		= 'h'
 				if ($item =~ mho*) set corr_type 		= 'h'
 				if ($item == mbasic) set corr_type 		= 'h'
@@ -493,13 +625,13 @@ foreach item ($2)
 				if ($item =~ zho*) set corr_type		= 'h'
 
 				if ($item =~ sf*) set corr_type			= 'h'
-				if ($item =~ bh_acc*) set corr_type			= 'h'			
+				if ($item =~ bh_acc*) set corr_type		= 'h'			
 				if ($item =~ *pos) set corr_type		= 'COMV,h'
 				if ($item =~ r* ) set corr_type			= 'h'
 				if ($item =~ ang* ) set corr_type		= 'h'
 
 		
-			else if ($4 == B || $4 == E) then
+			else if ($4 == B) then
 			#SAG
 				if ($5 == 'MD') then
 					if ($item =~ sf*) set corr_type		= 'Gyr-1'
@@ -532,6 +664,8 @@ foreach item ($2)
 		if ($item == halo_x_pos) set corr_type		= 'h'
 		if ($item == halo_y_pos) set corr_type		= 'h'	
 		if ($item == halo_z_pos) set corr_type		= 'h'
+
+		if ($item =~ *Name) set corr_type			= 'no_corr'
 
 		if ($item =~ *dmesa) then
 			set name_in_plot			= '$d_{\perp}$'
@@ -590,9 +724,10 @@ foreach item ($2)
 		endif
 	
 
-		#if ($item == 'mhalo_sat' || $item == mbasic || $item =~ *Index || $item =~ L_SDSS_*_sph* || $item =~ L_SDSS_*_disk* ) then
+		if ($item == 'mhalo_sat' | $item =~ satellite* ) then
+# || $item == mbasic || $item =~ L_SDSS_*_sph* || $item =~ L_SDSS_* || $item =~ M*_disk || $item =~ M*_spheroid || $item =~ m*_disk || $item =~ m*_spheroid || $item =~ s*_disk || $item =~ s*_spheroid || $item =~ satell* || $item =~ angMd*) then
 		#if ( $item == 'mhalo_sat' || $item == mbasic || $item =~ *Index || $item == sfr || $item == mstar || $item == 'Mzstar' || $item == 'Mzgas') then
-		if ($item =~ L_SDSS_dA_sph* || $item =~ L_SDSS_dA_disk*) then
+		#if ($item =~ spin* || $item =~ *_vel) then
 			set exclude		= 'yes'
 		else
 			set exclude		= 'no'
