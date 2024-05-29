@@ -119,8 +119,7 @@ class OutputData:
             
             else:
                 latex_code_times=''
-            
-            #print 'here: 123', latex_code_times
+
             return latex_code_times
 
 
@@ -136,25 +135,13 @@ class OutputData:
                                          
                 key_sub1 = myax.twinx()
                 key_sub2 = 'axis' + str(i)
-                key_sub1.set_zorder(25)             
+                key_sub1.set_zorder(25+i)             
                 plt.setp(key_sub1.get_yticklabels(), visible=False)
 
                 mymarker_code, mycolor_code, mylinestyle, mycolor_map, mymarkerfacecolor, mydashes, colorbar, myalpha, myplotlegend = get_styles(i,i) 
-    
-                #print add_subplot, legend_added_subplots[str(j)]
-                if legend_added_subplots[str(j)].find('MD')!=-1:
-                    #print 'here', legend_added_subplots[str(j)]
-                    myConfig.plot_config_array['error_bars_y_sub']='yes'
-                    myConfig.plot_config_array['subplot_errorbars']='True'
-                    myConfig.plot_config_array['filled_between_subplot'] = 'False'
-#                else:                 
-#                    myConfig.plot_config_array['subplot_errorbars']='True'
-#                    myConfig.plot_config_array['filled_between_subplot'] = 'False'
-                    
+                        
 #                if i==9:# or i==6 or i==3:
 #                    myConfig.plot_config_array['lw_offset']=float(myConfig.plot_config_array['lw_offset'])-1.5                    
-                    
-                if legend_added_subplots[str(j)].startswith('Shan'): myConfig.plot_config_array['lw_offset']=4
                
                 key_sub2, = key_sub1.plot(add_subplot[:,0], 
                                           add_subplot[:,1], 
@@ -162,10 +149,6 @@ class OutputData:
                                           ls=mylinestyle, 
                                           lw=float(myConfig.plot_config_array['mylw'])+float(myConfig.plot_config_array['lw_offset']))
                 
-                                
-#                if i==8:
-#                    myConfig.plot_config_array['mymarkeredgewidth']=float(myConfig.plot_config_array['mymarkeredgewidth'])-1.0
-#                    myConfig.plot_config_array['markersize'] = float(myConfig.plot_config_array['markersize'])-3.0 
                 
                 if mymarker_code!=' ' or mymarker_code!='no':
                     key_sub2 = add_marker(key_sub2, 
@@ -180,48 +163,6 @@ class OutputData:
                                           size=float(myConfig.plot_config_array['markersize']),
                                           width=float(myConfig.plot_config_array['mymarkeredgewidth']))
     
-#                if legend_added_subplots[str(j)].startswith('Kormendy') or legend_added_subplots[str(j)].startswith('McC') or legend_added_subplots[str(j)].startswith('Bower') or legend_added_subplots[str(j)].startswith('Maraston') or legend_added_subplots[str(j)].find('BigMD')!=-1:
-#                    myConfig.plot_config_array['error_bars_y_sub']='no'
-#                else:
-#                    myConfig.plot_config_array['error_bars_y_sub']='yes'                    
-
-
-                if legend_added_subplots[str(j)].startswith('Mad'):
-                    myConfig.plot_config_array['error_bars_x_sub']='yes'
-                else:
-                    myConfig.plot_config_array['error_bars_x_sub']='no'                    
-
-                if legend_added_subplots[str(j)].startswith('Sridhar'):
-                    myConfig.plot_config_array['error_bars_y_sub']='yes'
-                    
-                if myConfig.plot_config_array['subplot_use_cat_colors']=='True':
-                    if myConfig.plot_config_array['subplot_is_obs']=='True':
-                        mymarker_code = 'o'
-                        mycolor_code = self.obs_color 
-                        mylinestyle = ' '
-
-                if legend_added_subplots[str(j)].find('g-i')!=-1:
-                    myConfig.plot_config_array['subplot_errorbars']='True'
-                    myConfig.plot_config_array['filled_between_subplot'] = 'False'  
-
-                if legend_added_subplots[str(j)].startswith('Guo') or \
-                    legend_added_subplots[str(j)].startswith('Beh') or \
-                    legend_added_subplots[str(j)].startswith('Shan') or \
-                    legend_added_subplots[str(j)].startswith('Montero'):
-                    #myConfig.plot_config_array['subplot_errorbars']='no'
-                    #myConfig.plot_config_array['filled_between_subplot'] = 'True'
-                    myConfig.plot_config_array['error_bars_x_sub']='no'
-                    
-                elif legend_added_subplots[str(j)].startswith('Reid') or \
-                     legend_added_subplots[str(j)].startswith('Bigd'):
-                         
-                    myConfig.plot_config_array['error_bars_y_sub']='no'                         
-                else:
-                    myConfig.plot_config_array['subplot_errorbars']='True'
-                    myConfig.plot_config_array['filled_between_subplot'] = 'False'                
-                        
-#                if legend_added_subplots[str(j)]=='best fit':
-#                    myConfig.plot_config_array['error_bars_y_sub']='no'
                 #Errorbars
                 add_errorbars(key_sub1,
                               myConfig.plot_config_array['subplot_errorbars'],
@@ -546,9 +487,9 @@ class OutputData:
                               yerr_data2=[], 
                               color='k', 
                               fcolor='k', 
-                              alpha=0.3,
+                              alpha=0.1,
                               ls='-'):               
-                print 'add_errorbars():', errorbars, 'x_bar:', x_bar, 'y_bar:', y_bar, 'filled_between:', filled_between
+                print 'add_errorbars():', errorbars.ljust(6), 'x_bar:', x_bar.ljust(4), 'y_bar:', y_bar.ljust(4), 'filled_between:', filled_between.ljust(6)
 
                 if x_bar=='yes':
                     if errorbars=='True':
@@ -1048,15 +989,15 @@ class OutputData:
 
                 N=int(myConfig.plot_config_array['contour_histo_nbins']) 
                 if len(mydata['name'+str(j)+'_data'][mydata['col_name_x']])<5e6:
-                    N=40
+                    N=25
   
                 print 'CONTOUR-PLOT!'               
                 print 'j:', j, 'i:', i, 'marker:', mymarker_code, 'mylw:', float(myConfig.plot_config_array['mylw'])+float(myConfig.plot_config_array['lw_offset']), \
                       'fcol:', mymarkerfacecolor, 'myls:', mylinestyle, 'size:', myConfig.plot_config_array['markersize_subplot'], \
                       'errorbars:', myConfig.plot_config_array['subplot_errorbars'], 'filled:', myConfig.plot_config_array['filled_between_subplot'], 'nbins:', N
 
-                #print mydata['col_name_x'], mydata['col_name_y']
-                #print mydata['name'+str(j)+'_data'][mydata['col_name_x']], mydata['name'+str(j)+'_data'][mydata['col_name_y']]
+                print mydata['col_name_x'], mydata['col_name_y']
+                print mydata['name'+str(j)+'_data'][mydata['col_name_x']], mydata['name'+str(j)+'_data'][mydata['col_name_y']]
                 #print mydata['name'+str(j)+'_data'][mydata['col_name_weights']]      
 
                 if j==2:
@@ -1114,7 +1055,7 @@ class OutputData:
                 print 'levels:', mylevels
                 #print xedges
                 #print yedges
-                  
+                print 'myls:', mylinestyle  
                 CS=key0.contour(X,Y,H, len(mylevels), linewidths=3.5, linestyles=mylinestyle, colors=mycolor_code, levels=mylevels)
                 #plt.clabel(CS, colors = 'k', fmt = '%0.1f', fontsize=12)
                 if mycolor_map!='no':
@@ -1256,6 +1197,18 @@ class OutputData:
                       'errorbars:', myConfig.plot_config_array['subplot_errorbars'], 'filled:', myConfig.plot_config_array['filled_between_subplot'], \
                       'nbins:', myConfig.plot_config_array['bins']
                       
+                # print mydata['name'+str(c)+'_data'][mydata['col_name_x']], mydata['name'+str(c)+'_data'][mydata['col_name_y']]
+                # print mydata['name'+str(c)+'_data'][mydata['col_name_weights']]
+                      
+                # histo_number_density(mydata['name'+str(c)+'_data'][mydata['col_name_x']],
+                #                      mydata['name'+str(c)+'_data'][mydata['col_name_y']],
+                #                      mydata['name'+str(c)+'_data'][mydata['col_name_weights']],                                     
+                #                      mycolor=mycolor_code,
+                #                      myfacecolor=mymarkerfacecolor,
+                #                      myls=mylinestyle,
+                #                      myalpha=myalpha,
+                #                      mycolor_map=mycolor_map)
+                #print mydata      
                 key0 = myax
                 hb = key0.hexbin(mydata['name'+str(c)+'_data'][mydata['col_name_x']],
                                  mydata['name'+str(c)+'_data'][mydata['col_name_y']],
@@ -1264,11 +1217,14 @@ class OutputData:
                                  bins=myConfig.plot_config_array['bins'],
                                  mincnt=float(myConfig.plot_config_array['min_count']),
                                  gridsize=int(myConfig.plot_config_array['gridsize']),
-                                 cmap='binary')
-
+                                 cmap='bone_r',
+                                 alpha=0.25,
+                                 zorder=0)
+                
+                myax.set_zorder(i)
                 if colorbar=='yes':
                     plot_colorbar(hb, j, int(myConfig.plot_config_array['cb_min']), int(myConfig.plot_config_array['cb_max']), int(myConfig.plot_config_array['cb_steps']))
-                    
+                
                 return key0, None, None, myplotlegend                
 
             def Default():
@@ -1284,7 +1240,7 @@ class OutputData:
                 #myax.set_zorder(20)
                 key0 = myax
                 #print mydata[0:5,[0,1,4,5]]
-                key0.set_zorder(100)
+                key0.set_zorder(0)
 
                 if myPlottypeTable[str(i)]=='default':                      
                     axis0, = key0.plot(mydata[:,0], 
@@ -1496,7 +1452,7 @@ class OutputData:
                                    ls=mylinestyle,
                                    hatch=mymarker_code)                                             
 
-                myax.set_zorder(50)
+                #myax.set_zorder(50)
                             
                 return key0, axis0, None, myplotlegend           
             #END DEFAULT LOOP END DEFAULT LOOP END DEFAULT LOOP END DEFAULT LOOP END DEFAULT LOOP END DEFAULT LOOP END DEFAULT LOOP END DEFAULT LOOP END DEFAULT LOOP END
@@ -1593,9 +1549,8 @@ class OutputData:
                     legend= [mylegend]  
 
             else:
-
                 
-                if myConfig.plot_config_array['x_title']!='False': 
+                if myConfig.plot_config_array['x_title']!='False':
                     myConfig.plot_config_array['x_title']=mydata['name_x']
                 if myConfig.plot_config_array['y_title']!='False':                     
                     myConfig.plot_config_array['y_title']=mydata['name_y']
@@ -1724,22 +1679,25 @@ class OutputData:
 #SUBPLOT LOOP
             while i<loops:
                 mymarker_code, mycolor_code, mylinestyle, mycolor_map, mymarkerfacecolor, mydashes, colorbar, myalpha, myplotlegend = get_styles(i,i) 
-                print 'LOOP plot: i:', i, 'c:', c, 'myls:', mylinestyle, 'marker:', mymarker_code, 'mylw:', float(myConfig.plot_config_array['mylw']), \
-                       'mycolor_code:', mycolor_code, 'fill between:', myConfig.plot_config_array['filled_between'], 'alpha:', myalpha                       
+                print 'LOOP plot: i:', i, 'c:', c,\
+                      'myls:', str(mylinestyle).ljust(20), 'marker:', mymarker_code.ljust(2), 'mylw:', str(myConfig.plot_config_array['mylw']).ljust(2),\
+                      'mycolor_code:', mycolor_code.ljust(8), 'fill between:', myConfig.plot_config_array['filled_between'].ljust(6),\
+                      'alpha:', str(myalpha).ljust(4)                       
 
 
                 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                #WARNING! using key1=myax or key1=myax.twin(x) make a lot of a different,
-                #change it carefully!
+                #WARNING! using key1=myax or key1=myax.twinx() make a lot of a different,
+                #change it carefully! Twin axes sharing only if two different y-axes or 
+                #x-axes are used (e.g. z in the bottom axis and a in the top axis!)
                 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!                    
 
                 #use                    
-                #key1 = myax
+                key1 = myax
                 #or
-                key1 = myax.twinx()                
+                #key1 = myax.twinx()                
                 
                 key2 = 'axis' + str(i)           
-                key1.set_zorder(10)
+                key1.set_zorder(100+i)
                 if i==int(myConfig.plot_config_array['set_thin_line']):
                     myConfig.plot_config_array['mylw']=float(myConfig.plot_config_array['mylw'])-int(myConfig.plot_config_array['thin_line'])
                 elif i==int(myConfig.plot_config_array['set_thin_line2']):
@@ -1766,22 +1724,22 @@ class OutputData:
                     try:
                         #WARNING!
                         #only for SFH-paper when plotting the reduced sample!
-                        if i==3 or i==5 or i==7 or i==8:
-                            add_errorbars(key1,
-                                          myConfig.plot_config_array['errorbars'],                              
-                                          myConfig.plot_config_array['error_bars_x'], 
-                                          myConfig.plot_config_array['error_bars_y'], 
-                                          myConfig.plot_config_array['filled_between'],
-                                          mydata[:,i*data_block_offset],
-                                          mydata[:,i*data_block_offset+1],
-                                          mydata[:,i*data_block_offset+2],                             
-                                          mydata[:,i*data_block_offset+4],
-                                          xerr_data2=mydata[:,i*data_block_offset+3],
-                                          yerr_data2=mydata[:,i*data_block_offset+5],
-                                          color=mycolor_code,
-                                          fcolor=mycolor_code,
-                                          alpha=float(myConfig.plot_config_array['alpha']),
-                                          ls=mylinestyle)
+                        #if i==3 or i==5 or i==7 or i==8:
+                        add_errorbars(key1,
+                                      myConfig.plot_config_array['errorbars'],                              
+                                      myConfig.plot_config_array['error_bars_x'], 
+                                      myConfig.plot_config_array['error_bars_y'], 
+                                      myConfig.plot_config_array['filled_between'],
+                                      mydata[:,i*data_block_offset],
+                                      mydata[:,i*data_block_offset+1],
+                                      mydata[:,i*data_block_offset+2],                             
+                                      mydata[:,i*data_block_offset+4],
+                                      xerr_data2=mydata[:,i*data_block_offset+3],
+                                      yerr_data2=mydata[:,i*data_block_offset+5],
+                                      color=mycolor_code,
+                                      fcolor=mycolor_code,
+                                      alpha=float(myConfig.plot_config_array['alpha']),
+                                      ls=mylinestyle)
                     except:
                         pass
 
@@ -1979,25 +1937,26 @@ class OutputData:
                 my_hlines=mL.multicolTestAlgorithm(myConfig.plot_config_array[prefix+'hline_ypos'])
                 a=0
                 while a<len(my_hlines):
-                    myax.axhline(y=float(my_hlines[a]), xmin=-100, xmax=100, color='r', ls='-', lw=3.0, zorder=100)
+                    myax.axhline(y=float(my_hlines[a]), xmin=-100, xmax=100, color='r', ls='-', lw=2.5, zorder=100)
                     a+=1                
 
             if myConfig.plot_config_array[prefix+'vline_xpos']!='False':
                 my_vlines=mL.multicolTestAlgorithm(myConfig.plot_config_array[prefix+'vline_xpos'])
                 a=0
                 while a<len(my_vlines):
+                    myls='--'
                     mycol='k'
-#                    if a>2:
-#                        mycol='k'
-#                        
-#                    if a==1 or a==4:
-#                        myls='-'
-#                        mylw=4.0                        
-#                    else:
-#                        myls='--'
-#                        mylw=3.0                      
+                    
+                    #SFR-History paper colours: #AA4499 low-Zcold-red, #117733 high-Zcold-red           
+                    if a==0:
+                        mycol='#AA4499'
+                        myls='-'
+                    if a==1:
+                        myls='-'
+                        mycol='#117733'
+                    
 
-                    myax.axvline(x=float(my_vlines[a]), ymin=-100, ymax=100, color=mycol, ls='--', lw=2.0, zorder=100) 
+                    myax.axvline(x=float(my_vlines[a]), ymin=-100, ymax=100, color=mycol, ls=myls, lw=2.5, zorder=100) 
                     a+=1                  
 
             #For SF-history paper
@@ -2006,7 +1965,7 @@ class OutputData:
 
             #SET TICKS                   
             yticks=[]
-            if myConfig.plot_config_array['yticks']!='default':
+            if myConfig.plot_config_array['yticks']!='':
                 my_yticks=mL.multicolTestAlgorithm(myConfig.plot_config_array['yticks'])
                 a=0
                 while a<len(my_yticks):
@@ -2025,7 +1984,7 @@ class OutputData:
                                  width=float(myConfig.plot_config_array['myframe_lw']), 
                                  zorder=20)          
                 
-                if myConfig.plot_config_array['yticks_minor']=='default':
+                if myConfig.plot_config_array['yticks_minor']=='':
                      myax.tick_params(axis='y', 
                                       which='minor', 
                                       top='on', 
@@ -2042,7 +2001,7 @@ class OutputData:
 
 
             xticks=[]
-            if myConfig.plot_config_array['xticks']!='default':
+            if myConfig.plot_config_array['xticks']!='':
                 my_xticks=mL.multicolTestAlgorithm(myConfig.plot_config_array['xticks'])
                 a=0
                 while a<len(my_xticks):
@@ -2060,7 +2019,7 @@ class OutputData:
                                  direction='in', width=float(myConfig.plot_config_array['myframe_lw']),
                                  zorder=20)          
                 
-                if myConfig.plot_config_array['xticks_minor']=='default':
+                if myConfig.plot_config_array['xticks_minor']=='':
                      myax.tick_params(axis='x',
                                       which='minor',
                                       top='on', 
@@ -2124,7 +2083,7 @@ class OutputData:
                 
                 minor_x = MultipleLocator(float(myConfig.plot_config_array['minor_ticks_x_space']))
                 myax.xaxis.set_minor_locator(minor_x)
-                myax.set_zorder(50)
+                #myax.set_zorder(50)
                 
             if myConfig.plot_config_array['minor_ticks_y_space']!='no':
                 myax.tick_params(axis='y',
@@ -2138,7 +2097,7 @@ class OutputData:
                                  direction='in', zorder=20) 
                 minor_y = MultipleLocator(float(myConfig.plot_config_array['minor_ticks_y_space']))
                 myax.yaxis.set_minor_locator(minor_y)
-                myax.set_zorder(50)
+                #myax.set_zorder(50)
                             
 
             
@@ -2176,7 +2135,7 @@ class OutputData:
                            columnspacing=0.95,
                            handletextpad=0.5)#float(myConfig.plot_config_array['legend_handletextpad']))
 
-                mylegend.set_zorder(30)
+                mylegend.set_zorder(100)
 
             if legend_sep!=[]:
                 #print myConfig.plot_config_array['print_redshift_sep']
@@ -2290,13 +2249,13 @@ class OutputData:
 
             #ajust x- or y-title if there are special symbols found
             latex_code_times=find_latex_code_times('')
-                
+           
             if myConfig.plot_config_array['subtitle']!='False':        
-                fig.suptitle(myConfig.plot_config_array['title'], fontsize=float(myConfig.plot_config_array['axis_label_fontsize']), color='k', y=0.94, fontname='Bitstream Vera Sans Mono')
+                fig.suptitle(myConfig.plot_config_array['title'], fontsize=float(myConfig.plot_config_array['axis_label_fontsize_x']), color='k', y=0.94, fontname='Bitstream Vera Sans Mono')
             if myConfig.plot_config_array['x_title']!='False' and plot_key.find('tarsel')==-1:                   
-                fig.text(fig_x_pos, x_pos, myConfig.plot_config_array['x_title'], ha='center', fontsize=float(myConfig.plot_config_array['axis_label_fontsize']))
+                fig.text(fig_x_pos, x_pos, myConfig.plot_config_array['x_title'], ha='center', fontsize=float(myConfig.plot_config_array['axis_label_fontsize_x']))
             if myConfig.plot_config_array['y_title']!='False' and plot_key.find('tarsel')==-1:             
-                fig.text(y_pos, fig_y_pos, myConfig.plot_config_array['y_title'], va='center', rotation='vertical', fontsize=float(myConfig.plot_config_array['axis_label_fontsize']))
+                fig.text(y_pos, fig_y_pos, myConfig.plot_config_array['y_title'], va='center', rotation='vertical', fontsize=float(myConfig.plot_config_array['axis_label_fontsize_y']))
             if print_redshift==False:
                 print_redshift=myConfig.plot_config_array['print_redshift']
             if print_redshift2==False:
@@ -2310,14 +2269,13 @@ class OutputData:
             if myConfig.plot_config_array['print_redshift3']!='False':  
                 fig.text(float(myConfig.plot_config_array['z_print_position_x3']), float(myConfig.plot_config_array['z_print_position_y3']), print_redshift3, fontsize=float(myConfig.plot_config_array['text_fontsize'])-5) #+r'$\times 10^{-3}$ $h^3$ $Mpc^{-3}$'      
  
-
-             
             plot(ax0, 
                  mydata, 
                  prefix='',
                  add_obs=my_add_subplot,                
                  loops=loops)
           
+            
             #plot user defined axis ticks                
             plt.setp(ax0.get_xticklabels(), visible=True)
             plt.setp(ax0.get_yticklabels(), visible=True)
@@ -2367,7 +2325,7 @@ class OutputData:
                     latex_code_times=find_latex_code_times(mydata[k]['name'])                    
                     if k==0 and l==0:
                         plt.setp(key.get_xticklabels(), visible=False)    
-                    #print 'HERE: 998',  str(mydata[l]['print_redshift'])
+
                     labelpad_xaxis=6
                     if k==0: 
                         labelpad=18
@@ -2391,44 +2349,7 @@ class OutputData:
                         plot_axis_ticks(key)
                         if k==nr_plots_y-1:
                             key.set_xlabel(myConfig.plot_config_array[mydata[k]['name']+'x_title'], color='k', fontsize=int(myConfig.plot_config_array['axis_label_fontsize']), labelpad=labelpad_xaxis)        
-
-#                    if str(mydata[l]['print_redshift']).find('M_r')!=-1: 
-#                        if str(mydata[l]['print_redshift']).find('(a)')!=-1:
-#                            key.set_ylabel(myConfig.plot_config_array[mydata[k]['name']+'y_title']+myConfig.plot_config_array[mydata[k]['name']+'cut_part1']+latex_code_times+myConfig.plot_config_array[mydata[k]['name']+'cut_part2'], color='k', fontsize=int(myConfig.plot_config_array['axis_label_fontsize']), labelpad=labelpad)                                                                                                                                
-#                            if l==0 and k>0:
-#                                plt.setp(key.get_xticklabels(), visible=False) 
-#                                plt.setp(key.get_yticklabels(), visible=True)
-#        
-#                            else:
-#                                plt.setp(key.get_xticklabels(), visible=False)                        
-#                                plt.setp(key.get_yticklabels(), visible=True)
-#                                
-#                        elif str(mydata[l]['print_redshift']).find('(b)')!=-1:                                                                 
-#                            plt.setp(key.get_xticklabels(), visible=False)                        
-#                            plt.setp(key.get_yticklabels(), visible=False)
-#    
-#                        elif str(mydata[l]['print_redshift']).find('(c)')!=-1:
-#                            key.set_ylabel(myConfig.plot_config_array[mydata[k]['name']+'y_title']+myConfig.plot_config_array[mydata[k]['name']+'cut_part1']+latex_code_times+myConfig.plot_config_array[mydata[k]['name']+'cut_part2'], color='k', fontsize=int(myConfig.plot_config_array['axis_label_fontsize']), labelpad=labelpad)                                                                
-#                            if l==0 and k>0:
-#                                key.set_xlabel(myConfig.plot_config_array[mydata[k]['name']+'x_title'], color='k', fontsize=int(myConfig.plot_config_array['axis_label_fontsize']))        
-#                                
-#                                plt.setp(key.get_xticklabels(), visible=True)
-#                                plt.setp(key.get_yticklabels(), visible=True)
-#        
-#                            else:
-#                                plt.setp(key.get_xticklabels(), visible=False)                        
-#                                plt.setp(key.get_yticklabels(), visible=True)
-#    
-#                        elif str(mydata[l]['print_redshift']).find('(d)')!=-1:
-#                            if l==0 and k>0:
-#                                key.set_xlabel(myConfig.plot_config_array[mydata[k]['name']+'x_title'], color='k', fontsize=int(myConfig.plot_config_array['axis_label_fontsize']), labelpad=labelpad)        
-#                                
-#                                plt.setp(key.get_xticklabels(), visible=True)
-#                                plt.setp(key.get_yticklabels(), visible=False)
-#        
-#                            else:
-#                                plt.setp(key.get_xticklabels(), visible=False)                        
-#                                plt.setp(key.get_yticklabels(), visible=False)                       
+                 
 
                     try: 
                         key.axhline(y=float(myConfig.plot_config_array[mydata[k]['name']+'hline_ypos']), xmin=-100, xmax=100, color='r', ls='-', lw=3.0, zorder=30)
@@ -2478,7 +2399,7 @@ class OutputData:
             elif myConfig.plot_config_array['float_format_y']=='3ef':
                 ax0.get_yaxis().set_major_formatter(mpl.ticker.FuncFormatter(lambda x, p: "{0:.3f}".format(x)))
             elif myConfig.plot_config_array['float_format_y']=='4f':
-                ax0.get_yaxis().set_major_formatter(mpl.ticker.FuncFormatter(lambda x, p: "{0:.5f}".format(x)))
+                ax0.get_yaxis().set_major_formatter(mpl.ticker.FuncFormatter(lambda x, p: "{0:.4f}".format(x)))
         except:
             pass
 
@@ -2558,6 +2479,8 @@ class OutputData:
                     hf.attrs['scaleFactor'] = scale_factor
                     hf.attrs['boxSize'] = myconfig_array[catname+'_box_size']
                     hf.attrs['boxSizeUnit'] = 'h-1Mpc'
+                    hf.attrs['Nparticles'] = myconfig_array[catname+'_Nparticles']
+                    hf.attrs['IMF'] = myconfig_array[catname+'_IMF']
                     #hf.attrs['physcVolume'] = volume
                     #hf.attrs['physcVolumeUnit'] = 'Mpc3'
                     #hf.attrs['comvVolume'] = float(myconfig_array[catname+'_box_size'])**3

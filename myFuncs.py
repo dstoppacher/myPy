@@ -1,9 +1,9 @@
 # Load packages
-import config as conf
-myConfig = conf.Configuration()
+#import config as conf
+#myConfig = conf.Configuration()
 import scipy as scipy
 import arangeData as aD
-myData = aD.ArangeData()
+#myData = aD.ArangeData()
 
 import myLib as mL
 import numpy as np
@@ -17,15 +17,28 @@ start = system_info.find('anaconda')
 mycomp = system_info[:start]
 
 import outputData as oD
-
-myOutput = oD.OutputData(config=False)
-
 from time import time
 
 
 
 class MyFunctions:
-                        
+    
+    def __init__(self):
+        
+        myOutput = oD.OutputData(config=False)
+        
+        import matplotlib as mpl
+        import matplotlib.pyplot as plt
+        from matplotlib.backends.backend_pdf import PdfPages
+        from matplotlib.ticker import MultipleLocator
+        from matplotlib.ticker import NullFormatter
+        nullfmt = NullFormatter()
+        mpl.style.use('classic')            
+        mpl.mathtext.use_cm = False
+        mpl.rcParams['mathtext.fontset'] = 'custom'
+        mpl.rcParams['mathtext.tt'] = 'Typewriter'
+        mpl.mathtext.fallback_to_cm = True
+        
     def normaliseHisto(
             self,
             histo,
@@ -217,18 +230,18 @@ class MyFunctions:
                             #print 'sum:', np.sum(data2bin['y'+str(i)]), '/nhalos:', np.sum(data2bin['y'+str(i)])/len(data2bin['y'+str(i)])#, '+/-', np.percentile(data2bin['y'+str(i)], 95)/len(data2bin['y'+str(i)]), '/', np.percentile(data2bin['y'+str(i)], 5)/len(data2bin['y'+str(i)])
                             binned_array[i,1] = np.sum(data2bin['y'+str(i)])/len(data2bin['y'+str(i)])
     
-                            binned_array[i,3] = np.percentile(data2bin['y'+str(i)], 95)/binned_array[i,6]
-                            binned_array[i,4] = np.percentile(data2bin['y'+str(i)], 5)/binned_array[i,6]                         
+                            binned_array[i,3] = np.nanpercentile(data2bin['y'+str(i)], 95)/binned_array[i,6]
+                            binned_array[i,4] = np.nanpercentile(data2bin['y'+str(i)], 5)/binned_array[i,6]                         
                         try:
                             if len(data2bin['x_add_axis'+str(i)])>0:
                                 binned_array[i,7] = np.sum(data2bin['x_add_axis'+str(i)])
-                                binned_array[i,8] = np.percentile(data2bin['x_add_axis'+str(i)], 95)/binned_array[i,6]
-                                binned_array[i,9] = np.percentile(data2bin['x_add_axis'+str(i)], 5)/binned_array[i,6]                              
+                                binned_array[i,8] = np.nanpercentile(data2bin['x_add_axis'+str(i)], 95)/binned_array[i,6]
+                                binned_array[i,9] = np.nanpercentile(data2bin['x_add_axis'+str(i)], 5)/binned_array[i,6]                              
                         except:
                             pass
                 else:
                     if use_MAD==True:
-                        print 'USE MEDIAN AND MAD!'
+                        #print 'USE MEDIAN AND MAD!'
                         if len(data2bin['x'+str(i)])>0: 
                             binned_array[i,0] = np.nanmedian(data2bin['x'+str(i)])
                             #MAD is 75% percentile!
@@ -434,60 +447,6 @@ class MyFunctions:
         #print binned_array
 
         return binned_array, binsize
-
-#def calc_buckets_new(data,
-#                     col1,
-#                     col2,
-#                     col3):
-#    
-#    
-#    data=data[np.where(data[col1]>data_min)[:][0]]
-#    data=data[np.where(data[col1]<=data_max)[:][0]]
-#    
-#    if weights!=False: 
-#        data_weight=data[col2]
-#        
-#    else:
-#        data_weight=np.ones((data[col1].size,), dtype=np.int8)
-#
-#    data_sorted = data[np.argsort(data[name])]
-#                    
-#    for i in binned_array[:,0].size:
-#                        
-#        if log10bin==True:
-#            bucket = np.floor((data1[i]-data_min)/binsize)
-#        elif linbin==True:
-#            bucket = np.floor((data1[i]+data_min)/binsize)
-#        else:
-#            bucket = np.floor(np.log10(data1[i]/data_min)/binsize)
-#        
-#        bucket = np.int_(bucket)
-#        #print 'i:', i, 'bucket:', bucket, 'data[i]:', "{0:.10e}".format(10**data1[i]), "{0:.10e}".format(10**data_weight[i])
-#
-#        if data1[i]==data_max:
-#            #print 'data_max:', data_max,#, data[i,0]
-#            bucket=nbins-1
-#            #print bucket
-##                    elif data1[i]==data_min:
-##                        print 'data_min:', data_min, data[i,0]
-##                        bucket=0 
-##                        print bucket
-#            
-#
-#        if log10bin==True:
-#            data1[i]=10**data1[i]
-#            data2[i]=10**data2[i]
-#            data3[i]=10**data3[i]
-#                 
-#            data2bin['x'+str(bucket)].append(data1[i])
-#            data2bin['y'+str(bucket)].append(data2[i])
-#            data2bin['x_add_axis'+str(bucket)].append(data3[i])                              
-#        
-#        #bucket number count n
-#        binned_array[bucket,6]+=1*data_weight[i] 
-
-
-
     def fit_HOD(data):
 
         from scipy.special import erf as erf
@@ -863,4 +822,215 @@ class MyFunctions:
                                myheader= '2PCF LS \n(1) r [Mpc]\t(2) Xi(r)',
                                data_format='%0.3f\t%0.4f')
         
-        return TwoPCF_CAM      
+        return TwoPCF_CAM
+
+    def ttest(self, 
+              data1,
+              data2,
+              prop):
+        
+        from scipy import stats
+        len_data1 = data1.size
+        len_data2 = data2.size
+        
+        if len_data1!=len_data2:
+            print 'len_data1:', len_data1, 'len_data2:', len_data2,
+            if len_data1>len_data2:
+                data1 = mL.choose_random_sample(data1, len_data2)
+            else:
+                data2 = mL.choose_random_sample(data2, len_data1)
+            
+            print 'set len to equal --> len_data1',  data1.size, 'len_data2:', data2.size
+            
+        print 'calculating:', prop
+            
+        return stats.ttest_ind(data1[prop], data2[prop], nan_policy='omit')
+    
+
+    def Ftest(self, 
+              data_dict,
+              nr_tests=100):
+
+        """
+        input
+        -----------------
+            data_dict:        list of means of various samples (mean for 'red', 'low-Zcold', 'high-Zcold' etc.)
+            subgroups:           list of sub-groups the samples are ordered (knot and filaments)
+            
+            
+            calculate:
+            ==========
+            
+            sum of squares between samples
+            
+            
+            Table Example
+            ===========================
+            
+            Measurments| Group 1   | Group 2    | Group i
+            -----------------------------------------------
+                1      |    G11   |  G21      |   Gi1
+                2      |    G12   |  G22      |   Gi2
+                3      |    G13   |  G23      |   Gi3
+                ...
+                n      |    G1n   |  G2n      |   Gin
+                
+                
+            i = number of groups (horizontal)
+            n = number of measurments per group (vertical)
+        
+        
+        """ 
+        
+        import pandas as pd
+        data1 = pd.read_csv(mycomp+'anaconda/pro/myRun/test_data_stats.txt', skiprows=1, names=['A', 'B', 'C', 'D'], sep='\t')
+        data1 = mL.df_to_sarray(data1)
+        
+        #rint data1
+        
+        data_dict={}
+        for item in ['A','B','C','D']:
+            data_dict.update({item: data1[item]})
+                             
+        #print data_dict
+        
+ 
+        from scipy import stats
+        print data_dict.keys()
+        
+        nr_groups   = len(data_dict.keys())        
+        
+        nr_tests     = 5
+        
+        #1) Mean within each group
+        mean_samples=[]
+        for item in data_dict.keys():
+            print 'group', item
+            mean_samples.append(np.mean(data_dict[item]))
+            
+        #2) Overall mean, mean of all means
+        overall_mean = np.mean(mean_samples)
+
+        #3) "between-group" sum of square difference
+        SB = np.sum([nr_tests * (mean_samples[i] - overall_mean)**2 for i in range(nr_groups)])
+            
+        #4) "between-group" degree of freedom        
+        df_B = nr_groups-1
+        
+        #5) "between-group"  mean square value
+        M_SB = SB / df_B
+        
+        #6) "within-group" sum of squares        
+        SW = 0
+        for i, item in enumerate(data_dict.keys()):
+            print 'i:', i, 'item:', item, mean_samples[i]
+            group = data_dict[item]          
+            SW += np.sum((group - mean_samples[i])**2)
+
+        #7) "within-group" degree of freedom
+        df_W = nr_tests*(nr_groups-1)
+
+        #8) "within-group" mean square value
+        M_SW = SW / df_W 
+
+        #9) F-ratio
+        F_value = M_SB / M_SW
+        
+        #10) create F-distribution
+        
+        alpha = 0.05 #confidence level is 95%
+        # Calculate the F-value using Percent point function (inverse of cdf)
+        f_critical = stats.f.ppf(1 - alpha, df_B, df_W)
+        
+        print '\nResults\n============\nnr_groups:', nr_groups, 'nr_tests in each group:', nr_tests
+        print '\nbetween the samples:\n----------------\nSB:', "{0:.2f}".format(SB), 'df_B:', df_B, 'M_SB:', "{0:.2f}".format(M_SB)
+        print '\nwithin the samples:\n----------------\nSW:', "{0:.2f}".format(SW), 'df_W:', df_W, 'M_SW:', "{0:.2f}".format(M_SW) 
+        print 'F-value:', "{0:.2f}".format(F_value), 'f-critical:', "{0:.2f}".format(f_critical)
+        
+        
+        exit()
+        
+    def ANOVA(self,
+              data_dict,
+              prop):
+        
+        """
+        Generate a ANOVA Table
+        
+        test data set:
+            Test data
+            df = pd.read_csv("https://reneshbedre.github.io/assets/posts/anova/onewayanova.txt", sep="\t") 
+            
+        """
+        
+        from scipy import stats
+        import pandas as pd
+        
+        myprop_unit_map  = mL.get_prop_unit_map_latex()
+
+
+        nr_samples       = len(data_dict.keys())
+        print data_dict.keys()  
+        
+        df = pd.DataFrame.from_dict(data_dict)
+        #print df
+        
+        # myvalues = []
+        # for item in data_dict.keys():
+        #     myvalues.append(sample_name_dict[item]['name_Latex'])
+        
+        # reshape the d dataframe suitable for statsmodels package 
+        df_melt = pd.melt(df.reset_index(), id_vars=['index'], value_vars=data_dict.keys())
+        # replace column names
+        df_melt.columns = ['index', 'samples', 'values']
+        mL.generate_box_plot(df_melt,
+                               myprop_unit_map[prop][0],
+                               nr_samples)
+        
+        # stats f_oneway functions takes the groups as input and returns ANOVA F and p value
+        fvalue, pvalue = stats.f_oneway([df[item] for item in data_dict.keys()])
+        #print fvalue, pvalue
+        
+        # get ANOVA table as R like output
+        import statsmodels.api as sm
+        from statsmodels.formula.api import ols
+        
+        # Ordinary Least Squares (OLS) model
+        model = ols('values ~ C(samples)', data=df_melt).fit()
+        anova_table = sm.stats.anova_lm(model, typ=2)
+        print anova_table
+        
+        
+        
+    def bootstrap_error(self, 
+                        data,
+                       n_resamples=1000,
+                       confidence_level=0.95):
+        
+        num_samples = 1000
+         
+        bootstrap_means = np.zeros(num_samples)
+         
+        # Perform bootstrap sampling
+        for i in range(num_samples):
+         
+            bootstrap_sample = np.random.choice(data, size=10000, replace=True)
+            bootstrap_mean = np.mean(bootstrap_sample)
+            bootstrap_means[i] = bootstrap_mean
+         
+        estimated_mean = np.mean(bootstrap_means)
+        estimated_std = np.std(bootstrap_means, ddof=1)
+         
+         
+        print "MEAN", "{0:.2f}".format(estimated_mean), "STD", "{0:.3f}".format(estimated_std)
+        
+        return estimated_mean, estimated_std
+        
+
+        
+
+        
+
+    
+    
+    

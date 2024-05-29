@@ -535,22 +535,38 @@ def load_catalog(path,
                  name_add2=False,
                  name_add3=False,
                  name_add4=False,
-                 name_add5=False,):
+                 name_add5=False,
+                 name_add7=False,
+                 name_add8=False,
+                 name_add9=False,
+                 name_add10=False,
+                 name_add11=False,
+                 name_add12=False,
+                 name_add13=False,
+                 name_add14=False):
 
     if name_add==False: name_add=name_x
     if name_add2==False: name_add2=name_x    
     if name_add3==False: name_add3=name_x
     if name_add4==False: name_add4=name_x
     if name_add5==False: name_add5=name_x
+    if name_add7==False: name_add7=name_x
+    if name_add8==False: name_add8=name_x
+    if name_add9==False: name_add9=name_x
+    if name_add10==False: name_add10=name_x
+    if name_add11==False: name_add11=name_x
+    if name_add12==False: name_add12=name_x
+    if name_add13==False: name_add13=name_x 
+    if name_add14==False: name_add14=name_x       
+    system_info = os.getcwd()
+    start = system_info.find('anaconda')
+    if start==-1:
+        mycomp='/store/erebos/doris/'
+    else:
+        mycomp = system_info[:start]+'/anaconda/pro/data/'
     
-#    system_info = os.getcwd()
-#    start = system_info.find('anaconda')
-#    if start==-1:
-#        mycomp='/store/erebos/doris/'
-#    else:
-#        mycomp = system_info[:start]+'/anaconda/pro/data/'
-    
-    name_add6='weight_tot'
+    name_add6='weight'
+        
     data = myData.readAnyFormat(config=False, 
                                 mypath=path,
                                 myfilename=path,
@@ -566,6 +582,14 @@ def load_catalog(path,
                                               'name5': name_add4,
                                               'name6': name_add5,
                                               'name7': name_add6,
+                                              'name8': name_add7,
+                                              'name9': name_add8,
+                                              'name10': name_add9,
+                                              'name11': name_add10,
+                                              'name12': name_add11,
+                                              'name13': name_add12,
+                                              'name14': name_add13,
+                                              'name15': name_add14, 
                                               name_x+'_col_id': 0, 
                                               name_y+'_col_id': 1,
                                               name_add+'_col_id': 2,
@@ -573,7 +597,15 @@ def load_catalog(path,
                                               name_add3+'_col_id': 4,
                                               name_add4+'_col_id': 5,
                                               name_add5+'_col_id': 6,
-                                              name_add6+'_col_id': 7,                                                 
+                                              name_add6+'_col_id': 7,
+                                              name_add7+'_col_id': 8,
+                                              name_add8+'_col_id': 9, 
+                                              name_add9+'_col_id': 10,
+                                              name_add10+'_col_id': 11, 
+                                              name_add11+'_col_id': 12, 
+                                              name_add12+'_col_id': 13,
+                                              name_add13+'_col_id': 14,
+                                              name_add14+'_col_id': 15,                                                   
                                               'data_type0': np.float32, 
                                               'data_type1': np.float32,
                                               'data_type2': np.float32,
@@ -581,8 +613,18 @@ def load_catalog(path,
                                               'data_type4': np.float32,
                                               'data_type5': np.float32,
                                               'data_type6': np.float32,
-                                              'data_type7': np.float32,                                              
-                                              'nr_entries': 8})
+                                              'data_type7': np.float32,
+                                              'data_type8': np.float32, 
+                                              'data_type9': np.float32, 
+                                              'data_type10': np.float32,
+                                              'data_type11': np.float32,
+                                              'data_type12': np.float32,
+                                              'data_type13': np.float32,
+                                              'data_type14': np.float32,
+                                              'data_type15': np.float32,                                               
+                                              'nr_entries': 15})
+    
+
     print '\n############################################\nLOADING REFERENCES \ OBSERVATIONS!\n############################################\n'
     print 'name_x/y', name_x, '/', name_y, 'ngal:', data.shape, 'min/max x:', min(data[name_x]), '/', max(data[name_x]), 'min/max y:', min(data[name_y]), '/', max(data[name_y])
 
@@ -669,6 +711,16 @@ def adjust_data_for_plot(data,
         data['mstar']=np.log10(data['mstar'])
         return data
     
+    def g_r_g_i(data):
+        
+        try:
+            data['mAB_dA_total_i']=data['mAB_dA_total_g']-data['mAB_dA_total_i']
+            data['mAB_dA_total_g']-=data['mAB_dA_total_r'] 
+        except:
+            data['MAB_dA_total_i']=data['MAB_dA_total_g']-data['MAB_dA_total_i']
+            data['MAB_dA_total_g']-=data['MAB_dA_total_r']
+        return data
+
     def r_i_g_r(data):
         
         try:
@@ -678,6 +730,7 @@ def adjust_data_for_plot(data,
             data['MAB_dA_total_g']-=data['MAB_dA_total_r']
             data['MAB_dA_total_r']-=data['MAB_dA_total_i']
         return data
+
 
     def rdisk_rbulge(data):
 
@@ -905,6 +958,7 @@ def adjust_data_for_plot(data,
     def jbarcomp_mbar(data):
  
         try:
+            print 'jdisk vs mbar_disk'
             data=data[np.where(data['mcold_disk']>=0)[:][0]]
             data=data[np.where(data['mstar_disk']>=0)[:][0]]
             data['mstar']=np.log10(data['mstar_disk']+data['mcold_disk'])
@@ -912,6 +966,7 @@ def adjust_data_for_plot(data,
             mask=np.where(np.isfinite(data['angM_disk']))
             
         except:
+            print 'jbulge vs mbar_bulge'
             data=data[np.where(data['mcold_spheroid']>=0)[:][0]]
             data=data[np.where(data['mstar_spheroid']>=0)[:][0]]
             data['mstar']=np.log10(data['mstar_spheroid']+data['mcold_spheroid'])
@@ -922,16 +977,38 @@ def adjust_data_for_plot(data,
         mask=np.where(np.isfinite(data['mstar']))
 
         return data[mask[:][0]]
+
+    def j_mstar(data):
+        #print 'HERE 980'
+        data['angM_disk']=np.log10((data['angM_disk']+data['angM_spheroid'])/data['mstar'])
+        data['mstar']=np.log10(data['mstar'])
+        mask=np.where(np.isfinite(data['mstar']))                
+        return data[mask[:][0]]
+
+    def j_mdisk(data):
+ 
+        data=data[np.where(data['mstar_disk']>=0)[:][0]]
+        data['angM_disk']=np.log10(data['angM_disk']/data['mstar_disk'])
+        data['mstar']=np.log10(data['mstar_disk'])
+        data=data[np.where(np.isfinite(data['angM_disk']))[:][0]] 
+   
+        return data[np.where(np.isfinite(data['mstar']))[:][0]]
+            
+    def j_mbulge(data):
+        data=data[np.where(data['mstar_spheroid']>=0)[:][0]]
+        data['angM_spheroid']=np.log10(data['angM_spheroid']/data['mstar_spheroid'])
+        data['mstar']=np.log10(data['mstar_spheroid'])            
+        mask=np.where(np.isfinite(data['angM_spheroid']))
+        data=data[mask[:][0]]            
+
+        return data[np.where(np.isfinite(data['mstar']))[:][0]]
     
     def jbar_mbar(data):
- 
 
-        data['angM_disk']=np.log10((data['angM_disk']+data['angM_spheroid'])/(data['mstar']+data['mcold']))
-      
+        data['angM_disk']=np.log10((data['angM_disk']+data['angM_spheroid'])/(data['mstar']+data['mcold']))     
         data['mstar']=np.log10(data['mstar']+data['mcold'])
-        mask=np.where(np.isfinite(data['mstar']))
 
-        return data[mask[:][0]]
+        return data[np.where(np.isfinite(data['mstar']))[:][0]]
 
     def bdisk_bbulge(data):
         #data=data[np.where(data['orphan']>0)[:][0]]
@@ -946,8 +1023,8 @@ def adjust_data_for_plot(data,
 
     def default(data):
  
-        data['mstar']=np.log10(data['mstar'])
-        mask=np.where(np.isfinite(data['mstar']))
+        data['rdisk']=np.log10(data['rdisk']*1e3)
+        mask=np.where(np.isfinite(data['rdisk']))
         return data[mask[:][0]]
     
     def caseSwitcher(plot_type):
@@ -962,7 +1039,8 @@ def adjust_data_for_plot(data,
                 'g-i_mhalo': g_i_mhalo,                   
                 'dmesa_i': dmesa_i,
                 'dmesa_mstar': dmesa_mstar,
-                'r-i_g-r': r_i_g_r,
+                'g-r_g-i': g_r_g_i,
+                'r-i_g-r': r_i_g_r,                
                 'r': r,
                 'sfr_mstar': sfr_mstar,
                 'ssfr_mstar': ssfr_mstar,
@@ -987,6 +1065,7 @@ def adjust_data_for_plot(data,
                 'jbarcomp_mbar': jbarcomp_mbar,
                 'bdisk_bbulge': bdisk_bbulge,
                 'jbar_mbar': jbar_mbar,
+                'j_mstar': j_mstar,  
                 'default': default                
                 }
             
@@ -996,7 +1075,7 @@ def adjust_data_for_plot(data,
             print 'set weights to 1!'
             data['weight_tot']=np.ones((data.size,), dtype=np.int8)
    
-            print data['weight_tot']
+            #print data['weight_tot']
         
         
         return func(data)
@@ -1010,20 +1089,45 @@ def adjust_data_for_plot(data,
 #    x=np.log10(data['sfr'])
 #    prop=(y+11.16)/1.12-x
 #    data = data[np.where(prop<=0.0)[:][0]] 
-      
 
+       
     print '--> after selection: ngal:', data.shape, '\n'
        
     return data 
-    
-
-plot_type = 'g-i_mhalo'
-
-mycomp='/home/doris/anaconda/pro/data/'
-
+ 
 
 def myCatalog(load_from_file=False): 
-    return load_SAM_catalog(mycomp+'anaconda/pro/data/Galacticus_1Gpc_run2/Galacticus_1Gpc_run2_z_0.0_tarsel.hdf5', 'Gal2')
+    #return load_SAM_catalog(mycomp+'Galacticus_1Gpc/Galacticus_1Gpc_z_0.56_tarsel_new_mags_CMASS.hdf5', 'all')
+    return load_SAM_catalog(mycomp+'anaconda/pro/data/Galacticus_1Gpc/Galacticus_1Gpc_z_0.09_tarsel.hdf5', 'all')
+
+def myCatalog2(load_from_file=False): 
+    #return load_SAM_catalog(mycomp+'anaconda/pro/data/Galacticus_1Gpc_run2/Galacticus_1Gpc_run2_z_0.0_tarsel.hdf5', 'Gal2')   
+    return load_SAM_catalog(mycomp+'anaconda/pro/data/Galacticus_1Gpc/Galacticus_1Gpc_z_0.09_tarsel.hdf5', 'Greco+18')
+
+def myCatalog3(load_from_file=False): 
+    #return load_SAM_catalog(mycomp+'anaconda/pro/data/Galacticus_1Gpc_run2/Galacticus_1Gpc_run2_z_0.0_tarsel.hdf5', 'Gal2')   
+    return load_SAM_catalog(mycomp+'anaconda/pro/data/Galacticus_1Gpc/Galacticus_1Gpc_z_0.09_tarsel.hdf5', 'all $r_{bulge}$')
+
+def myCatalog4(load_from_file=False): 
+    #return load_SAM_catalog(mycomp+'anaconda/pro/data/Galacticus_1Gpc_run2/Galacticus_1Gpc_run2_z_0.0_tarsel.hdf5', 'Gal2')   
+    return load_SAM_catalog(mycomp+'anaconda/pro/data/Galacticus_1Gpc/Galacticus_1Gpc_z_0.09_tarsel.hdf5', '>>$j_{disk}$')
+
+def myCatalog5(load_from_file=False): 
+    #return load_SAM_catalog(mycomp+'anaconda/pro/data/Galacticus_1Gpc_run2/Galacticus_1Gpc_run2_z_0.0_tarsel.hdf5', 'Gal2')   
+    return load_SAM_catalog(mycomp+'anaconda/pro/data/Galacticus_1Gpc/Galacticus_1Gpc_z_0.09_tarsel.hdf5', '>>$j_{bulge}$')
+
+def myCatalog6(load_from_file=False): 
+    #return load_SAM_catalog(mycomp+'anaconda/pro/data/Galacticus_1Gpc_run2/Galacticus_1Gpc_run2_z_0.0_tarsel.hdf5', 'Gal2')   
+    return load_SAM_catalog(mycomp+'anaconda/pro/data/Galacticus_1Gpc/Galacticus_1Gpc_z_0.09_tarsel.hdf5', '<<$M_{*}/M_{vir}$')
+
+def myCatalog7(load_from_file=False): 
+    return load_SAM_catalog(mycomp+'anaconda/pro/data/Galacticus_1Gpc/Galacticus_1Gpc_z_0.09_tarsel.hdf5', 'e<0.7')
+
+def myCatalog8(load_from_file=False): 
+    return load_SAM_catalog(mycomp+'anaconda/pro/data/Galacticus_1Gpc/Galacticus_1Gpc_z_0.09_tarsel.hdf5', '>>$j$')
+
+def myCatalog9(load_from_file=False): 
+    return load_SAM_catalog(mycomp+'anaconda/pro/data/Galacticus_1Gpc/Galacticus_1Gpc_z_0.09_tarsel.hdf5', '>>$J$')
 
 def CMASS_Galacticus_color_catalog(load_from_file=False): 
     try:
@@ -1124,11 +1228,20 @@ def load_SAM_catalog(filename,
                      legend):
     
     data=load_catalog(filename,
-                     'mhalo',
-                     'mAB_dA_total_g',
-                     name_add2='mAB_dA_total_i',
-                     name_add3='mcold_spheroid',
-                     name_add4='mstar')
+                     'mstar',
+                     'ssfr',
+                     name_add='mAB_dA_total_i',
+                     name_add2='weight_tot',
+                     name_add3='mAB_dA_total_g')
+                     # name_add4='rbulge',
+                     # name_add5='mAB_dA_total_g',
+                     # name_add7='mstar',
+                     # name_add8='orphan',
+                     # name_add9='angM_disk',
+                     # name_add10='angM_spheroid',
+                     # name_add11='mcold',
+                     # name_add12='ecc',
+                     # name_add13='a')
 
     #r-i vs g-r tests
     #-----------------------------------------------------
@@ -1137,8 +1250,10 @@ def load_SAM_catalog(filename,
     
     #test2 --> sample2 to extract green butterfly
     #prop=-0.3+(y+0.7)/0.92857-x      
-    #z=data['mAB_dA_total_g']-data['mAB_dA_total_i']
-    #data = data[np.where(z>2.35)[:][0]]
+    z=data['mAB_dA_total_g']-data['mAB_dA_total_i']
+    data = data[np.where(z>2.35)[:][0]]
+    mask=np.where(np.isfinite(data['ssfr']))
+    data=data[mask[:][0]]  
     
     #test3
     #prop=(y+1.05)/1.3-x
@@ -1156,17 +1271,119 @@ def load_SAM_catalog(filename,
 #        print 'num: ', data_sorted.shape
 #        checknum+=data_sorted.size
 #        print 'total num:', checknum
-#
-#
-#
-#    data=data_sorted
-    print 'final shape:', data.shape
-#
-#    print data_sorted
+
+#    data = myData.selectData2Compute(data, 
+#                                     selected_col='mstar', 
+#                                     operator='>', 
+#                                     condition=5e10)
+
+    print 'legend:', legend,
+    if legend.find('$r_{bulge}$')!=-1:
+            data['rdisk']=np.log10(data['rbulge']*1e3)
+            data=data[np.where(np.isfinite(data['rdisk']))[:][0]]
     
+    
+    if legend.find('all')!=-1:
+        
+        data=data[np.where((data['mAB_dA_total_g']-data['mAB_dA_total_i'])<1.4)[:][0]]
+        data=data[np.where((data['mAB_dA_total_g']-data['mAB_dA_total_i'])>-0.1)[:][0]]
+    
+        prop = 0.7*(data['mAB_dA_total_g']-data['mAB_dA_total_i'])
+        
+        data=data[np.where((data['mAB_dA_total_g']-data['mAB_dA_total_r'])>(prop-0.4))[:][0]]   
+        data=data[np.where((data['mAB_dA_total_g']-data['mAB_dA_total_r'])<(prop+0.4))[:][0]]
+        
+        data=data[np.where(data['mcold']/(data['mstar']+data['mcold'])>0.75)[:][0]]
+
+        if legend.find('e<')!=-1:
+            data['a'][np.where(data['rdisk']>data['rbulge'])[:][0]]=data['rdisk'][np.where(data['rdisk']>data['rbulge'])[:][0]]       
+            data['b'][np.where(data['rdisk']>data['rbulge'])[:][0]]=data['rbulge'][np.where(data['rdisk']>data['rbulge'])[:][0]]              
+        
+            data['a'][np.where(data['rdisk']<=data['rbulge'])[:][0]]=data['rbulge'][np.where(data['rdisk']<=data['rbulge'])[:][0]]
+            data['b'][np.where(data['rdisk']<=data['rbulge'])[:][0]]=data['rdisk'][np.where(data['rdisk']<=data['rbulge'])[:][0]]
+            
+            data['ecc']=(1.0-(data['b']/data['a'])**2)**0.5            
+            #print 'min/max ecc:', min(data['ecc']), '/', max(data['ecc']) 
+        
+        if legend.startswith('e'):            
+            data=data[np.where(data['ecc']<0.7)[:][0]]
+
+        frac_to_select=int(np.floor(data.size/100.0*15.0))                      
+
+        if legend=='>>$j$':
+                print 'select: 20% >> j stellar'
+                data['angM_disk']=np.log10((data['angM_disk']+data['angM_spheroid'])/data['mstar'])
+                data = data[np.argsort(data['angM_disk'])]
+                #print data['angM_disk'][0:100]
+                    
+                data=data[data.size-frac_to_select:data.size]
+
+        if legend=='>>$j_{disk}$':
+                print 'select: 20% >> j disk'
+                
+                data['angM_disk']/=data['mstar']
+                
+                data = data[np.argsort(data['angM_disk'])]
+
+                start_size=data.size-frac_to_select                       
+                data=data[start_size:data.size]
+                
+        if legend=='>>$j_{bulge}$':
+                print 'select: 20% >> j bulge'
+                
+                data['angM_spheroid']/=data['mstar']
+                
+                data = data[np.argsort(data['angM_spheroid'])]
+                   
+                data=data[data.size-frac_to_select:data.size]                
+           
+        if legend=='>>$J_{bulge}$':
+                #print 'section of selected!', frac_to_select
+                data = data[np.argsort(data['angM_spheroid'])]
+                
+                data=data[data.size-frac_to_select:data.size]
+ 
+        if legend=='>>$J_{disk}$':
+
+                data = data[np.argsort(data['angM_disk'])]
+                     
+                data=data[data.size-frac_to_select:data.size]
+                #print data['angM_disk'][start_size:start_size+100]               
+                
+        if legend=='<<$M_{*}/M_{vir}$':
+                data=data[np.where(data['orphan']==0)[:][0]]
+                data=data[np.where(data['mstar']>1e9)[:][0]]
+                mL.property_stats(data,['mhalo','mstar'])
+                
+                data['mhalo']=data['mstar']/data['mhalo']
+                
+                data = data[np.argsort(data['mhalo'])]
+                print data['mhalo'][0:100]                   
+                data=data[0:frac_to_select]
+                mL.property_stats(data,['mhalo','mstar'])
+
+        if legend=='<<e':
+                data = data[np.argsort(data['ecc'])]
+                print data['ecc'][0:100]                   
+                data=data[0:frac_to_select]                    
+    
+    #data['a']=data['mAB_dA_total_g']-data['mAB_dA_total_i']
+    #data['b']=data['mAB_dA_total_g']-data['mAB_dA_total_r']
+    #mL.property_stats(data,['mhalo','mstar', 'mcold','angM_disk','angM_spheroid', 'ecc', 'rbulge','rdisk','mAB_dA_total_i','a','b'])
+    
+    #print 'final shape:', data.shape, 'min/max x:', min(data['mAB_dA_total_i']), '/', max(data['mAB_dA_total_i']), 'min/max y:', min(data['rdisk']), '/', max(data['rdisk']),  min(data['rbulge']), '/', max(data['rbulge'])
+
     return adjust_data_for_plot(data, plot_type), legend, True
 
+plot_type = 'g-r_g-i'
+plot_type = 'j_mstar'
+#plot_type = 'jbar_mbar'
+plot_type = 'jbarcomp_mbar'
+plot_type = 'ssfr_mstar'
+#plot_type = 'g-i_mhalo'
 
+mycomp='/home/doris/anaconda/pro/data/'
+#mycomp='/z/doris/'
 
 def CMASS_spall_wis_056_DR12v4(load_from_file=False): return CMASS_DR12_catalog('0.61_spall_wis', '0.51', info='DR12v4_compl_sample', legend='CMASS DR12')
 def CMASS_spall_gra_056_DR12v4(load_from_file=False): return CMASS_DR12_catalog('0.61_spall_gra_nodust', '0.51', info='DR12v4_compl_sample', legend='CMASS DR12')
@@ -1509,7 +1726,6 @@ def create_snapzred_list():
     filename_out = mycomp+'anaconda/pro/data/sussing_tree/snapidzred_out.txt'
     myOutput.writeIntoFile(filename_out, 
                            obs_data_array,
-                           #myheader='# Elbaz et al. A&A 533, A119 (2011), pbwo5rks.CosmicCarnage2015 file: "/CalibrationData/PROPER_DATA/SpecificStarFormationRatevsStellarMassBlue/Elbaz+11/elbaz_11_masssfr.dat" \n(1) Mstar [Msun], (2) sSFR [Gyr-1], (3) binsize, (4) Phi error (-),  (5) Phi error (+)',
                            data_format='%i\t%0.6f\t%0.6f\t%0.6f\t%0.6f',
                            mydelimiter='\t')        
 
@@ -1818,7 +2034,7 @@ def Elbaz11_function(load_from_file=False):
 
     data[:,0]=10**(np.log10(data[:,0]/reference['little_h'])+reference['IMF_corr'])   
     data[:,1] = data[:,1]/data[:,0]
-
+    
     return ssfr2mstar_ref(reference,data)
     
 def Elbaz11_dots(load_from_file=False):
@@ -2576,14 +2792,7 @@ def ssfr2mstar_ref(reference,
     print reference['name'], 'data.shape:', data.shape, 'little-h:', reference['little_h'], 'IMF correction:', reference['IMF_corr']
 
     myFuncs = mF.MyFunctions()
-    
-    data=data[np.where(data[:,1] > 1.0e-11)[:][0]]
- 
-    data = data[np.where(data[:,0]>=np.percentile(data[:,0],0.01))[:][0]]
-    data = data[np.where(data[:,0]<np.percentile(data[:,0],99.9))[:][0]]                          
-
-    print data
-                                        
+                                         
     mybinned_array, binsize = myFuncs.binUp(data,
                                             20,
                                             histo_min='min',
@@ -2594,7 +2803,7 @@ def ssfr2mstar_ref(reference,
                                             norm_by_binsize=False,
                                             equal_bins=False)
     
-    #print mybinned_array
+    print mybinned_array
 
     obs_data_array = np.zeros((mybinned_array[:,0].size,7), dtype=np.float32)  
     #Errorbars in log(y) vs log(x) plot
@@ -2607,21 +2816,19 @@ def ssfr2mstar_ref(reference,
     #where the quantities are log-values, the error bars are always SYMETRIC
     
     #shaded region corresponding to error bars
-    obs_data_array[:,4] = obs_data_array[:,1] + ((mybinned_array[:,4]/mybinned_array[:,1]))*0.43
-    obs_data_array[:,5] = obs_data_array[:,1] - ((mybinned_array[:,5]/mybinned_array[:,1]))*0.43
+    #obs_data_array[:,4] = obs_data_array[:,1] + ((mybinned_array[:,4]/mybinned_array[:,1]))*0.43
+    #obs_data_array[:,5] = obs_data_array[:,1] - ((mybinned_array[:,5]/mybinned_array[:,1]))*0.43
 
     #error bars                
     obs_data_array[:,4] = ((mybinned_array[:,4]/mybinned_array[:,1]))*0.43
     obs_data_array[:,5] = ((mybinned_array[:,4]/mybinned_array[:,1]))*0.43
                
-#    filename_out = mycomp+'anaconda/pro/OBS/'+reference['legend0']+'_'+reference['filename0']+'_sSFR2Mstar.txt'
-#    myOutput.writeIntoFile(filename_out, 
-#                           mybinned_array,
-#                           myheader='#'+reference['paper0']+', pbwo5rks.CosmicCarnage2015 file: "/CalibrationData/PROPER_DATA/'reference['filneame0']+'_masssfr.dat" \n(1) Mstar [Msun], (2) sSFR [yr-1], (3) binsize, (4) Phi error (-),  (5) Phi error (+)',
-#                           data_format="%0.8e",
-#                           mydelimiter='\t')
-
-    #print obs_data_array[:, [0,1]]
+    filename_out = mycomp+'anaconda/pro/OBS/'+reference['legend']+'_sSFR2Mstar.txt'
+    myOutput.writeIntoFile(filename_out, 
+                          mybinned_array[:,0:7],
+                          myheader='#'+reference['paper']+', IMF corrected to Chabrier! from pbworks.CosmicCarnage2015 file: "/CalibrationData/PROPER_DATA/'+reference['filename']+'\n(1) Mstar [Msun] (2) sSFR [yr-1] (3) +dx (4) -dx (5) +dy (6) -dy (7) N [-]',
+                          data_format="%0.8e",
+                          mydelimiter='\t')
 
     return obs_data_array, reference['legend'], False
 
@@ -2871,6 +3078,50 @@ def format_MTs_Rockstar(load_from_file=False):
 
 
     exit()        
+
+def Salinas21_LSBGs_Fig6_jstar_mstar(load_from_file=False):
+    #from Sergio
+    data_array = myData.readAnyFormat(config=False, mypath=mycomp+'/anaconda/pro/OBS/Salinas+Gaspar21_LSBGs_Fig6_jstar_mstar.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float32, skiprow=2)
+
+    obs_data_array = np.zeros((data_array[:,0].size,7), dtype=np.float32)
+  
+    obs_data_array[:,0] = data_array[:,0]
+    obs_data_array[:,1] = data_array[:,1]
+    
+    return obs_data_array, 'Salinas+Galaz 21', False
+
+def Salinas21_LSBGs_Fig6_fit(load_from_file=False):
+    #from Sergio
+    data_array = myData.readAnyFormat(config=False, mypath=mycomp+'/anaconda/pro/OBS/Salinas+Gaspar21_LSBGs_Fig6_fit.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float32, skiprow=2)
+
+    obs_data_array = np.zeros((data_array[:,0].size,7), dtype=np.float32)
+  
+    obs_data_array[:,0] = data_array[:,0]
+    obs_data_array[:,1] = data_array[:,1]
+    
+    return obs_data_array, 'linear fit +/-dy', False
+
+def Salinas21_LSBGs_Fig6_fit_dy_lower(load_from_file=False):
+    #from Sergio
+    data_array = myData.readAnyFormat(config=False, mypath=mycomp+'/anaconda/pro/OBS/Salinas+Gaspar21_LSBGs_Fig6_fit_dy_lower.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float32, skiprow=2)
+
+    obs_data_array = np.zeros((data_array[:,0].size,7), dtype=np.float32)
+  
+    obs_data_array[:,0] = data_array[:,0]
+    obs_data_array[:,1] = data_array[:,1]
+    
+    return obs_data_array, '-dy', False
+
+def Salinas21_LSBGs_Fig6_fit_dy_higher(load_from_file=False):
+    #from Sergio
+    data_array = myData.readAnyFormat(config=False, mypath=mycomp+'/anaconda/pro/OBS/Salinas+Gaspar21_LSBGs_Fig6_fit_dy_higher.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float32, skiprow=2)
+
+    obs_data_array = np.zeros((data_array[:,0].size,7), dtype=np.float32)
+  
+    obs_data_array[:,0] = data_array[:,0]
+    obs_data_array[:,1] = data_array[:,1]
+    
+    return obs_data_array, '+dy', False
 
 ##############################################################################################################################################################  
 

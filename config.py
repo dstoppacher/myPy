@@ -168,7 +168,7 @@ class Configuration:
         nr_cols2read_tarsel_col=0
         while i<data_array[:,0].size:
             
-            #print 'i:', i, 'a:', data_array[i,1], data_array[i,:]
+            #print 'i:', i, 'x:', x, 'y:', y, 'z:', z, data_array[i,:]
             #print 'name', data_array[i,2], 'value:', data_array[i,0]
             #print data_array[i,2]
 
@@ -686,7 +686,7 @@ class Configuration:
                         self.SAM_scale_factor_map[data_array[i,0]+'_scale_factor'+str(i)] = float(data_array[i,3])
                         i+=1
             except:
-                print 'data_array=None'
+                pass
 
         print 'HERE:', data_array
         

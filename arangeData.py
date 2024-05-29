@@ -49,10 +49,15 @@ class	ArangeData:
                 halo_id_col_array=[],
                 start_fileID=0,
                 nr_files_snapshot=1,
-                end_fileID=1):
+                end_fileID=1,
+                scale_factor_map=None):
 
 
-        def create_structed_array():
+        def create_structed_array(set_nr_rows=False):
+            
+            if set_nr_rows!=False:
+                nr_rows=set_nr_rows                
+            
             mytypes={}
             a=0
             while a<int(id_col_array['nr_entries']):
@@ -70,6 +75,56 @@ class	ArangeData:
                 
             return structured_array               
 
+        def read_simple_hdf52struct_array(path,
+                                          cols=[]):
+            """Reads a set of columns dedicated by col from and hdf5-file to a structured array
+            thereby it uses the dtype of each column to generate the array:
+                
+                input
+                =========
+                    
+                path:   the path to the hdf5-file
+                col:    keyword, exact name of the column to be accessed in the hdf5-file,
+                        if not set, the column name from the hdf5-file is used and all columns
+                        in the hdf5-file are read to the structured array
+                        
+                output
+                =========
+                
+                returns a structured array with column names and dtypes and size as in the hdf5-file.
+                The array dimension is taken from the hdf5-file. The shape of the structured array
+                needs to be identical for all column which should be read in.
+            
+            """
+            import h5py as hdf5
+            
+            f=hdf5.File(path, 'r')
+            print '\nSimple read-in hdf5 data to structured array! --> \npath:', path
+            
+            redshift    =f.attrs['redshift']
+            scale_factor=f.attrs['scaleFactor']
+            
+            if cols==[]:
+                cols=f.keys()
+        
+            dt = np.dtype([(k, f[k].dtype) for k in cols])
+        
+            data = np.zeros((f[cols[0]].size,), dtype=dt)
+           
+            #print(np.info(data))
+        
+            for name in cols:
+                #print('property:', name,)
+                for dim in range(len(f[cols[0]].shape)):
+                    #print('dim:', dim)
+                    try:
+                        data[name][dim,:]=f[name][dim]
+                    except:
+                       data[name]=f[name][:] 
+                                  
+            f.close()
+                
+            return data, redshift, scale_factor
 
         def readANDConvert(convert):            
             print '###################################################################################'
@@ -211,7 +266,6 @@ class	ArangeData:
                     i+=1
                 
                 print self.data_array[0:10,:]
-
 
             def caseSwitcher(convert):
 
@@ -569,7 +623,7 @@ class	ArangeData:
                         a+=1
                 i+=1      
            
-            SAM_binary_filestruct_map[catname+'_nr_files'] = a        
+            SAM_binary_filestruct_map[catname+'_nr_files'] = 50#a        
 
             dt =    [
                     ('SnapNum'                      , np.int32),                    
@@ -613,9 +667,9 @@ class	ArangeData:
                     ('rdisk'                       , np.float32), #DiskRadius                  
                     ('Cooling'                      , np.float32),                  
                     ('Heating'                      , np.float32),
-                    ('QuasarModeBHaccretionMass'    , np.float32),
-                    ('TimeOfLastMajorMerger'        , np.float32),
-                    ('TimeOfLastMinorMerger'        , np.float32),
+                    ('mbh_acc_quasar'                , np.float32), #QuasarModeBHaccretionMass
+                    ('lastMajorM'                   , np.float32), #TimeOfLastMajorMerger
+                    ('lastMinorM'                   , np.float32), #TimeOfLastMinorMerger
                     ('OutflowRate'                  , np.float32),
                     ('mean_age_stars'               , np.float32), #MeanStarAge
                     ('mhalo_sat'                   , np.float32), #infallMvir
@@ -658,7 +712,15 @@ class	ArangeData:
                 a=0
                 while a<id_col_array['nr_entries']:
                     #print 'a:', a, 'name:', id_col_array['name'+str(a)], 'id_col:', id_col_array['col_id'+str(a)]
-                    if id_col_array['name'+str(a)]=='Z':
+                    if id_col_array['name'+str(a)]=='Z'\
+                        or id_col_array['name'+str(a)]=='ssfr'\
+                        or id_col_array['name'+str(a)]=='Tcons'\
+                        or id_col_array['name'+str(a)]=='cgf'\
+                        or id_col_array['name'+str(a)]=='zcold'\
+                        or id_col_array['name'+str(a)]=='fbar'\
+                        or id_col_array['name'+str(a)]=='bheff'\
+                        or id_col_array['name'+str(a)]=='SHMR'\
+                        or id_col_array['name'+str(a)]=='regionName':
                         pass                        
                     elif id_col_array['name'+str(a)]=='sfr':
                         #print 'here: sfr!'
@@ -879,114 +941,46 @@ class	ArangeData:
             print 'read MultiDark-Galaxies HDF5 file format'
             print ' '
             #print id_col_array
-
-           
-            gal_properties={
-                     'name0': 'GalaxyType', 'dtype0': np.int8, 'unit0': '[]',
-                     'name1': 'HaloMass', 'dtype1': np.float64, 'unit1': '[]',
-                     'name2': 'HostHaloID', 'dtype2': np.uint64, 'unit2': '[]',
-                     'name3': 'LstarSDSSg', 'dtype3': np.float64, 'unit3': '[]',
-                     'name4': 'LstarSDSSi', 'dtype4': np.float64,'unit4': '[]',
-                     'name5': 'LstarSDSSr', 'dtype5': np.float64,'unit5': '[]',
-                     'name6': 'LstarSDSSu', 'dtype6': np.float64,'unit6': '[]',
-                     'name7': 'LstarSDSSz', 'dtype7': np.float64,'unit7': '[]',                        
-                     'name8': 'MagStarSDSSg', 'dtype8': np.float64, 'unit8': '[]',
-                     'name9': 'MagStarSDSSi', 'dtype9': np.float64,'unit9': '[]',
-                     'name10': 'MagStarSDSSr', 'dtype10': np.float64,'unit10': '[]',
-                     'name11': 'MagStarSDSSu', 'dtype11': np.float64,'unit11': '[]',
-                     'name12': 'MagStarSDSSz', 'dtype12': np.float64,'unit12': '[]',
-                     'name13': 'MainHaloID', 'dtype13': np.uint64,'unit13': '[]',
-                     'name14': 'Mbh', 'dtype14': np.float64,'unit14': '[]',
-                     'name15': 'McoldSpheroid', 'dtype15': np.float64, 'unit15': '[]',
-                     'name16': 'MeanAgeStars', 'dtype16': np.float64, 'unit16': '[]',
-                     'name17': 'Mhot', 'dtype17': np.float64, 'unit17': '[]',
-                     'name18': 'MstarDisk', 'dtype18': np.float64, 'unit0': '[]',
-                     'name19': 'MstarIC', 'dtype19': np.float64, 'unit0': '[]',
-                     'name20': 'MstarSpheroid', 'dtype20': np.float64, 'unit0': '[]',
-                     'name21': 'MZgasDisk', 'dtype21': np.float64, 'unit0': '[]',
-                     'name22': 'MZgasSpheroid', 'dtype22': np.float64, 'unit0': '[]',
-                     'name23': 'MZhotHalo', 'dtype23': np.float64, 'unit0': '[]',
-                     'name24': 'MZstarDisk', 'dtype24': np.float64, 'unit0': '[]',
-                     'name25': 'MZstarSpheroid', 'dtype25': np.float64, 'unit0': '[]',
-                     'name26': 'NFWconcentration', 'dtype26': np.float64, 'unit0': '[]',
-                     'name27': 'OH_gas_disk_bulge', 'dtype27': np.float64, 'unit0': '[]',
-                     'name28': 'rbulge', 'dtype28': np.float64, 'unit0': '[]',
-                     'name29': 'rdisk', 'dtype29': np.float64, 'unit0': '[]',
-                     'name30': 'rhalf_bulge', 'dtype30': np.float64, 'unit0': '[]',
-                     'name31': 'rhalf_disk', 'dtype31': np.float64, 'unit0': '[]',
-                     'name32': 'rhalf_mass', 'dtype32': np.float64, 'unit0': '[]',
-                     'name33': 'sfr_quies_inst', 'dtype33': np.float64, 'unit0': '[]',
-                     'name34': 'sfr_spheroid_inst', 'dtype34': np.float64, 'unit0': '[]',                        
-                     'name35': 'SFRdisk', 'dtype35': np.float64, 'unit0': '[]',
-                     'name36': 'SFRspheroid', 'dtype36': np.float64, 'unit0': '[]',
-                     'name37': 'SpinParameter', 'dtype37': np.float64, 'unit0': '[]',
-                     'name38': 'Vmax', 'dtype38': np.float64, 'unit0': '[]',
-                     'name39': 'Vpeak', 'dtype39': np.float64, 'unit0': '[]',
-                     'name40': 'Vx', 'dtype40': np.float64, 'unit0': '[]',
-                     'name41': 'Vy', 'dtype41': np.float64, 'unit0': '[]',
-                     'name42': 'Vz', 'dtype42': np.float64, 'unit0': '[]',
-                     'name43': 'X', 'dtype43': np.float64, 'unit0': '[]',
-                     'name44': 'Y', 'dtype44': np.float64, 'unit0': '[]',
-                     'name45': 'Z', 'dtype45': np.float64, 'unit0': '[]',
-                     'name46': 'ZgasDisk', 'dtype46': np.float64, 'unit0': '[]',           
-                     'name47': 'ZgasSpheroid' , 'dtype47': np.float64, 'unit0': '[]',                  
-                    }
-
-
-            mycol=[0,1,2,45,35]
-
-            mytypes={}
-            for col in mycol:
-                print 'col', col
-                mytypes.update({gal_properties['name'+str(col)]: gal_properties['dtype'+str(col)]})                    
- 
-            dt = np.dtype([(k, mytypes[k]) for k in mytypes.keys()])
-
-
-            num_rows=100000000
             
-            data_struct=np.zeros((num_rows,), dtype=dt)
+            #Galaxy properties availalble
+            gal_props =['GalaxyType','HaloMass','HostHaloID',\
+                        'LstarSDSSg','LstarSDSSi','LstarSDSSr','LstarSDSSu','LstarSDSSz',\
+                        'MZgasDisk','MZgasSpheroid','MZhotHalo','MZstarDisk','MZstarSpheroid',\
+                        'MainHaloID','Mbh','McoldDisk','McoldSpheroid','Mhot','MhotOutflow','MstarDisk','MstarSpheroid',\
+                        'SFRdisk','SFRspheroid','SpinParameter',\
+                        'Vx','Vy','Vz','X','Y','Z',\
+                        'rbulge','rdisk','rhalf_mass']      
 
-            
-            myfilename='/home/doris/anaconda/pro/data/Galacticus_1Gpc/Galacticus_1Gpc_z_0.0_tarsel_test.hdf5'
-            f = hdf5.File(myfilename, "r")
+            cols=[] 
+            print 'file_count:', file_count
+
+            myfilename=config_array[catname+'_use_store_registerpath']+'MDPL2_Galacticus_z_'+str(format(scale_factor_map[catname+'_redshift'+str(file_count)], '0.2f'))+'.hdf5'
+            print 'myfilename:', myfilename
                 
+            data,self.redshift, self.scale_factor = read_simple_hdf52struct_array(myfilename)  
 
-            cat_attributes = {}                           
-            i=0
-            while i<len(f.attrs.keys()):
-                print f.attrs.keys()[i], f.attrs.values()[i]
-                cat_attributes[f.attrs.keys()[i]] = f.attrs.values()[i]
-                i+=1
-
-            redshift     = cat_attributes['redshift']
-            scale_factor = cat_attributes['scaleFactor']
+            #print np.info(data)
+            self.data_array=create_structed_array(set_nr_rows=data.size)       
             
-            i=0
-            for col in mycol:
-                try:                   
-                    print 'name', gal_properties['name'+str(col)], 'size:', f[col].size, 
-                    data_struct[gal_properties['name'+str(col)]][0:f[gal_properties['name'+str(col)]].size] = f[gal_properties['name'+str(col)]]
-                    print 'default!'
-                    
-                    mysave_colname=gal_properties['name'+str(col)]
-                
+            
+            for a, item in enumerate(self.data_array.dtype.names):
+                try:
+                    print 'a:', a, 'item:', item, name_conv_map[item]
+                    self.data_array[item] = data[name_conv_map[item]]
                 except:
-                    print 'not excisting ...',
-                                                                      
-                    data_struct[gal_properties['name'+str(col)]] = -99
-                    print 'values are set to -99'
-                i+=1
+                    print 'DOES NOT EXIST here set to default!', item
+                    if item.find('AB')!=-1:
+                        print '--> magnitudes ... set to 0.0!'
+                        self.data_array[item] = 0.0
+                    else:
+                        print '--> ... set to -99!'
+                        self.data_array[item] = -99
 
-            data_struct = data_struct[:f[mysave_colname].size]
-            print 'data shape:', data_struct.shape
-            
-            print data_struct
-            
-            exit()
+                
+            #print name_conv_map
+            print np.info(self.data_array)                                                     
 
-
-
+                                                            
         def readHDF5(crossmatch=''):
             
             print '###################################################################################'
@@ -996,12 +990,11 @@ class	ArangeData:
 
             mytypes={}
             a=0
-            while a<int(id_col_array['nr_entries']):
-                
+            while a<int(id_col_array['nr_entries']):                
                 mytypes.update({id_col_array['name'+str(a)]: id_col_array['data_type'+str(a)]})                    
                 a+=1
 
-            print mytypes
+            #print mytypes
  
             dt = np.dtype([(k, mytypes[k]) for k in mytypes.keys()])
 
@@ -1011,7 +1004,7 @@ class	ArangeData:
             except:
                 self.data_array=np.zeros((nr_rows,), dtype=dt)
                 nr_entries=nr_col
-            
+            #print 'HERE!'
             #myfilename='/store/erebos/doris/Galacticus_1Gpc_z_0.09_CUT3_Contreras+13_mcold.hdf5'
             print 'myfilename:', myfilename
             
@@ -1038,6 +1031,7 @@ class	ArangeData:
                     try:
                         if config_array[catname+'_UNIT_CODE']=='MD':
                             print 'i:', i, name_conv_map[id_col_array['name'+str(i)]], '-->',
+                            #print '('+name_conv_map[id_col_array['name'+str(i)]]+','+
                             name=name_conv_map[id_col_array['name'+str(i)]]
                         else:
                             name=id_col_array['name'+str(i)]
@@ -1063,7 +1057,12 @@ class	ArangeData:
                         try:
                             self.data_array[id_col_array['name'+str(i)]][0::] = 0.0
                         except:
-                            self.data_array[id_col_array['name'+str(i)]] = 0.0                       
+                            self.data_array[id_col_array['name'+str(i)]] = 0.0
+                    elif id_col_array['name'+str(i)].find('sample_key')!=-1:
+                        print '--> string ... DO NOTHING!'
+                    elif id_col_array['name'+str(i)].find('flag')!=-1:
+                        print '--> flag ... set to FALSE/0!'
+                        self.data_array[id_col_array['name'+str(i)]]   = 0                     
                     else:
                         print 'here set to -99!', id_col_array['name'+str(i)]
                         try:
@@ -1092,11 +1091,6 @@ class	ArangeData:
             #ID DescID Mvir Vmax Vrms Rvir Rs Np X Y Z VX VY VZ JX JY JZ Spin rs_klypin Mvir_all M200b M200c M500c M2500c Xoff Voff spin_bullock 
             #b_to_a c_to_a A[x] A[y] A[z] b_to_a(500c) c_to_a(500c) A[x](500c) A[y](500c) A[z](500c) T/|U| M_pe_Behroozi M_pe_Diemer Halfmass_Radius
 
-            data= pd.read_csv(path, skiprows=16, \
-                              names=['haloid','descIndex','mhalo','vmax','vdisp','rvir','rscale','debugR','x_pos','y_pos','z_pos','x_vel','y_vel', 'z_vel', 'x_ang', 'y_ang', 'z_ang', 'spinParameter',\
-                                     'rscale_Klypin','mhalo_unbound', 'mhalo_200b', 'mhalo_200c', 'mhalo_500c', 'mhalo_2500c', 'xoff', 'voff', 'spin_Bullock',\
-                                     'b_to_a', 'c_to_a','x_a', 'y_a', 'z_a', 'b_to_a_500c', 'c_to_a_500c', 'x_a_500c', 'y_a_500c', 'z_a_500c','T_U',\
-                                     'Mpseudo_Behroozi', 'Mpseudo_Diemer', 'rhalf_mass'], sep=' ')
 
      
             self.data_array = mL.df_to_sarray(data)
@@ -1105,7 +1099,276 @@ class	ArangeData:
             #exit()
             #print self.data_array['mhalo_500c']
             #print np.info(self.data_array)           
-                        
+
+        def readEAGLE_ASCII(key):
+                    
+            import pandas as pd
+            
+            if key=='full':
+                print '###################################################################################'
+                print 'read EAGLE ASCII FORMAT\n catname: ', catname, 'snapid:', snapid
+                mypath=mycomp+'anaconda/pro/data/EAGLE_100Mpc/original_catalogs/EAGLE_100Mpc_full_catalog.dat'
+                print 'mypath:', mypath
+    
+                data=pd.read_csv(mypath, skiprows=1, \
+                                  names=['fofID', 'haloid', 'hostid', 'galaxyID', 'nSubhalos',  'mhalo_fof', 'mhalo_200c', 'r200c',\
+                                         'x_pos_subhalo', 'y_pos_subhalo', 'z_pos_subhalo', 'mPart_DM', 'rhalf_DM', 'rhalf_DM_2D', 'mPart_stars', 'mstar_30kpc',\
+                                         'rhalf_stars',  'rhalf_stars_2D', 'mPart_gas', 'rhalf_gas', 'rhalf_gas_2D', 'mPart_bh', 'rhalf_bh', 'rhalf_bh_2D',\
+                                         'vmax', 'rVmax', 'x_pos', 'y_pos', 'z_pos', 'x_vel', 'y_vel', 'z_vel', 'spinGas_x', 'spinGas_y', 'spinGas_z',\
+                                         'mbh', 'vdisp', 'mstar_birth', 'sfr_total', 'Etot',  'Ekin', 'Etherm'] , sep=' ')
+                    
+                # names_props=['fofID', 'haloid', 'hostid', 'galaxyID', 'nSubhalos',  'mhalo_fof', 'mhalo_200c', 'r200c',\
+                #            'x_pos_subhalo', 'y_pos_subhalo', 'z_pos_subhalo', 'mPart_DM', 'rhalf_DM', 'rhalf_DM_2D', 'mPart_stars', 'mstar_30kpc',\
+                #            'rhalf_stars',  'rhalf_stars_2D', 'mPart_gas', 'rhalf_gas', 'rhalf_gas_2D', 'mPart_bh', 'rhalf_bh', 'rhalf_bh_2D',\
+                #            'vmax', 'rVmax', 'x_vel', 'y_vel', 'z_vel', 'spinGas_x', 'spinGas_y', 'spinGas_z',\
+                #            'vdisp', 'sfr_total']
+                # data = data[names_props]
+                
+
+            elif key=='full_trees':
+                
+                print '###################################################################################'
+                print 'read EAGLE ASCII FULT MERGER TREE FORM DATA BASE\n catname: ', catname, 'snapid:', snapid
+                mypath=mycomp+'anaconda/pro/data/EAGLE_ev_100Mpc/EAGLE_ev_100Mpc_full_centrals_main_progenitor_trees.txt'
+                print 'mypath:', mypath
+    
+                data= pd.read_csv(mypath, skiprows=1,\
+                                  names=['fofID',  'progFofID',  'redshift',  'haloid',  'hostid',  'galaxyID',  'lastProgID',  'topLeafID',\
+                                         'mhalo_200c',  'r200c',  'nSubhalos',  'x_pos',  'y_pos',  'z_pos',  'x_pos_subhalo',  'y_pos_subhalo',  'z_pos_subhalo',\
+                                         'x_pos_cof',  'y_pos_cof',  'z_pos_cof',  'mPart_DM',  'mPart_bh',  'mPart_gas',  'mPart_stars',\
+                                         'sfr',  'vmax',  'rVmax',  'vdisp',  'mstar_birth',  'mbh',  'bh_acc_rate',\
+                                         'mstar_30kpc',  'sfr_30kpc',  'vdisp_30kpc',  'mgas_30kpc',  'mhalo_30kpc',\
+                                         'rhalf_stars',  'rhalf_gas',  'mgas_SF',  'mgas_NSF',  'spinGasNSF_x',  'spinGasNSF_y',  'spinGasNSF_z',\
+                                         'spinGasSF_x',  'spinGasSF_y',  'spinGasSF_z',  'spinStars_x',  'spinStars_y',  'spinStars_z',\
+                                         'z_mean_birth_stars',  'age_mean_stars',  'x_vel',  'y_vel',  'z_vel'],\
+                                         sep=',')                      
+         
+                 
+            elif key=='Patricia1':
+                """
+                Catalog created by Patricia Tissera
+                name:           REF100_generaltable_z0-header.dat
+                sim:            EAGLE 100Mpc/h, fiducial model 1504^3 particles, Gadget-3, Planck cosmology, Chabrier IMF
+                description:    catalog used for Yetli's project on void galaxies
+                properties:     jsub, ndiskt, nopts, noptg, sfr, mstartotal, DT_stars, DT_gas, r80, M200, R200, ssfr, refftotal, MBH, 
+                                MBHrate, idhalo ,dtgx,sfrgastota
+                    
+                    Property description
+                    ================================
+                    jsub:       internal index
+                    ndiskt:     number of stellar particles in the discs within 1.5 r80 (or ropt)
+                    nopts:      number of stars particles within 1.5 ropt
+                    noptg:      number of gas particles withn 1.5 ropt
+                    sfr:        star formation rate estimated by using stellar particles younger than 2e9 yrs (Msun/yr).
+                    mstartotal: stellar mass within 1.5 ropt (Msun)
+                    DT_stars:   disc-to-total stellar mass >0.4
+                    DT_gas:     disc-to-total gas mass >0.4 most of the gas
+                    ropt/r80:   radius that enclosed 83% of the stellar mass (Mpc)
+                    M200:       virial mass in Msun
+                    R200:       virial radius in Mpc
+                    sSFR:       Specific star foramtion rate defined sfr/mstars (yr-1)
+                    refftotal:  half-mass stellar radius (all particles within 1.5 ropt has been used) (Mpc)
+                    MBH:        mass of the black hole (Msun).
+                    MBHrate1:   rate of accretion (Msun/yr) 
+                    idhalo:     ID of the FoF group
+                    DTstars1:   the same as DT_stars but using a  circularity >0.5
+                    sfrgastotal: estimating using the instantaneous star formation rate of gas particles  within 1.5 ropt (Msun/yr)
+                     
+    
+            """           
+                
+                print '###################################################################################'
+                print 'read EAGLE ASCII FORMAT\n catname: ', catname, 'snapid:', snapid
+                mypath=mycomp+'anaconda/pro/data/EAGLE_100Mpc/REF100_generaltable_z0-header.dat'
+                print 'mypath:', mypath
+                                       
+                data= pd.read_csv(mypath, skiprows=19,\
+                                   names=['jsub','np_disk_1.5ropt','np_stars_1.5ropt','np_gas_1.5ropt','sfr','mstar_1.5ropt','DvT_stars_c0.4','DvT_gas_c0.4','ropt','mhalo_200c','r200c',\
+                                          'ssfr','rhalf_stars_1.5ropt', 'mbh', 'bh_acc_rate', 'fofID', 'DvT_stars_c0.5', 'sfr_int_gas'],
+                                   sep=' ')           
+                    
+  
+                    
+            elif key=='Patricia2':
+                 """
+                 Catalog created by Patricia Tissera and sent March 2023, it differce a little form the first catalog she sent (DTgas circularity
+                 is now c>0.5), 1/3 less stellar particles in the disk).
+                 name:           REF25_generaltable_z0-header.dat
+                 sim:            EAGLE 100Mpc/h, fiducial model 1504^3 particles, Gadget-3, Planck cosmology, Chabrier IMF
+                 description:    catalog used for Yetli's project on void galaxies
+                 properties:     jsub, ndiskt, nopts, noptg, sfr, mstartotal, DT_stars, DT_gas, r80, M200, R200, ssfr, refftotal, MBH, 
+                                 MBHrate, idhalo ,dtgx,sfrgastota
+                     
+                     Property description
+                     ================================
+                     jsub:       internal index
+                     ndiskt:     number of stellar particles in the discs within 1.5 r80 (or ropt) (1/3 less than in the catalog before!)
+                     nopts:      number of stars particles within 1.5 ropt
+                     noptg:      number of gas particles withn 1.5 ropt
+                     sfr:        star formation rate estimated by using stellar particles younger than 2e9 yrs (Msun/yr).
+                     mstartotal: stellar mass within 1.5 ropt (Msun)
+                     DT_stars_c0.4:   disc-to-total stellar mass >0.4
+                     DT_gas_c0.5:     disc-to-total gas mass >0.5 most of the gas (before was c>0.4)
+                     ropt/r80:   radius that enclosed 83% of the stellar mass (Mpc)
+                     M200:       virial mass in Msun
+                     R200:       virial radius in Mpc
+                     sSFR:       Specific star foramtion rate defined sfr/mstars (yr-1)
+                     refftotal:  half-mass stellar radius (all particles within 1.5 ropt has been used) (Mpc)
+                     MBH:        mass of the black hole (Msun).
+                     MBHrate1:   rate of accretion (Msun/yr) 
+                     idhalo:     ID of the FoF group
+                     DTstars1:   the same as DT_stars but using a  circularity >0.5
+                     sfrgastotal: estimating using the instantaneous star formation rate of gas particles  within 1.5 ropt (Msun/yr)
+                     reffgas:    effective radius (Mpc)
+                     jmodgas:    angular momentuio with 1.5 ropt normalized to Mgas
+                     jmodstars:  with 1.5 ropt normalized to Mstars
+            
+             """           
+                 
+                 print '###################################################################################'
+                 print 'read EAGLE ASCII FORMAT\n catname: ', catname, 'snapid:', snapid
+                 mypath=mycomp+'anaconda/pro/data/EAGLE_100Mpc/REF25_generaltable_z0.dat'
+                 print 'mypath:', mypath
+            
+                 data= pd.read_csv(mypath, skiprows=1,\
+                                   names=['jsub','np_disk_1.5ropt','np_stars_1.5ropt','np_gas_1.5ropt','sfr','mstar_1.5ropt','DvT_stars_c0.4','DvT_gas_c0.5','ropt','mhalo_200c','r200c',\
+                                          'ssfr','rhalf_stars_1.5ropt', 'mbh', 'bh_acc_rate', 'fofID', 'DvT_stars_c0.5', 'sfr_int_gas', 'ropt_gas', 'angM_norm_1.5ropt_stars', 'angM_norm_1.5ropt_gas'],
+                                   sep=' ')
+                
+            elif key=='Yetli':
+                 """Catalog with Mgas and environment send January 2023
+             """           
+                 
+                 print '###################################################################################'
+                 print 'read EAGLE ASCII FORMAT\n catname: ', catname, 'snapid:', snapid
+                 mypath=mycomp+'anaconda/pro/data/EAGLE_100Mpc/Catalogue_Galaxies_Doris_January2023.dat'
+                 print 'mypath:', mypath
+            
+                 data= pd.read_csv(mypath, skiprows=1,\
+                                   names=['haloid', 'hostid', 'envr', 'lastMajorM', 'lastMinorM',\
+                                          'Mgas_HI_30kpc_GK11', 'Mgas_HII_30kpc_GK11', 'Mgas_HI_30kpc_K13', 'Mgas_HII_30kpc_K13',\
+                                          'Mgas_HI_60kpc_GK11', 'Mgas_HII_60kpc_GK11', 'Mgas_HI_60kpc_K13', 'Mgas_HII_60kpc_K13',\
+                                           'MAB_total_u', 'MAB_total_i', 'MAB_total_r', 'MAB_total_z', 'MAB_total_g', 'mstar_30kpc'],
+                                   sep=' ')
+                     
+
+                    
+            elif key=='Silvio':
+                """
+                Catalog created by Patricia Tissera for Silvio (handed to me March 2023), reference: Van De Sande, J. 2019
+                name:           EAGLE_L100N1504_ForSilvio
+                sim:            EAGLE 100Mpc/h, fiducial model 1504^3 particles, Gadget-3, Planck cosmology, Chabrier IMF
+                description:    catalog has kinematic information and Hydrogen Masses, 54 properties in total
+                properties:     GroupNumber SubGroupNumber stellar_mass[Msun]
+                                r50(2D)[pkpc] v_dispersion_2D[km/s, edge-on, r50_2D] V/S(r50_2D, edge-on) v_dispersion_2D[km/s, random, r50_2D] V/S(r50_2D, random)  ellipticity(r50_2D, edge-on) ellipticity(r50_2D, random
+                                B/T_kinematics(Lagos17b) n_sersic(3D) lambdaR(r50_2D, edge-on) lambdaR(r50_2D, random)
+                                MHI(60kpc,GK11) MHI(60kpc,K13) MH2(60kpc,GK11) MH2(60kpc,K13) 
+                                v_dispersion_2D[km/s, edge-on, 2r50_2D] V/S(2r50_2D, edge-on)  v_dispersion_2D[km/s, random, 2r50_2D] V/S(2r50_2D, random)
+                                ellipticity(2r50_2D, edge-on) ellipticity(2r50_2D, random) lambdaR(2r50_2D, edge-on) lambdaR(2r50_2D, random)
+                                stellar_age(rband,r50_2D,[Gyr]) stellar_age(rband,2r50_2D,[Gyr]) 
+                                SFR[Msun/yr] GroupMass[Msun] 
+                                LambdaR_lasttimecentral(r50_2D, random) LambdaR_lasttimecentral(2r50_2D, random) SSFR_lastimecentral(yr^-1) 
+                                SFR_lastimecentral(Msun yr^-1) stellar_mass_lastimecentral(Msun) V/S_lasttimecentral(r50_2D, random) 
+                                V/S_lasttimecentral(2r50_2D, random) V/S_lasttimecentral(r50_2D, edge-on) V/S_lasttimecentral(2r50_2D, edge-on)
+                                LookbackTime_LastCentral[Gyr]
+                                Pos_x[Mpc] Pos_y[Mpc] Pos_z[Mpc] Vel_x[km/s] Vel_y[km/s] Vel_z[km/s]
+                                DistToCentre/R200crit SurfaceDensN10[Mpc^-2] SurfaceDensN7[Mpc^-2] SurfaceDensN5[Mpc^-2]
+                                LookbackTime_LastMerger[Gyr] MassRatio_LastMerger r50_SM(3D)[pkpc] r50_SFR(3)[pkpc]
+                    
+                    Property description
+                    ================================
+                    GroupNumber: FoFID
+                    SubGroupNumber: Satellite ID
+                    stellar_mass[Msun]
+                    r50(2D)[pkpc]: half mass radius projected 2D
+                    v_dispersion_2D[km/s,edge-on,r50_2D]
+                    V/S(r50_2D,edge-on)
+                    v_dispersion_2D[km/s,random,r50_2D]
+                    V/S(r50_2D,random)
+                    ellipticity(r50_2D,edge-on)
+                    ellipticity(r50_2D,random)
+                    B/T_kinematics(Lagos17b)
+                    n_sersic(3D)
+                    lambdaR(r50_2D,edge-on): angular momentum
+                    lambdaR(r50_2D,random)
+                    MHI(60kpc,GK11)
+                    MHI(60kpc,K13)
+                    MH2(60kpc,GK11)
+                    MH2(60kpc,K13)
+                    v_dispersion_2D[km/s,edge-on,2r50_2D]
+                    V/S(2r50_2D,edge-on)
+                    v_dispersion_2D[km/s,random,2r50_2D]
+                    V/S(2r50_2D,random)
+                    ellipticity(2r50_2D,edge-on)
+                    ellipticity(2r50_2D,random)
+                    lambdaR(2r50_2D,edge-on)
+                    lambdaR(2r50_2D,random)
+                    stellar_age(rband,r50_2D,[Gyr])
+                    stellar_age(rband,2r50_2D,[Gyr])
+                    SFR[Msun/yr]
+                    GroupMass[Msun]: virial halo mass
+                    LambdaR_lasttimecentral(r50_2D,random)
+                    LambdaR_lasttimecentral(2r50_2D,random)
+                    SSFR_lastimecentral(yr^-1)
+                    SFR_lastimecentral(Msunyr^-1)
+                    stellar_mass_lastimecentral(Msun)
+                    V/S_lasttimecentral(r50_2D,random)
+                    V/S_lasttimecentral(2r50_2D,random)
+                    V/S_lasttimecentral(r50_2D,edge-on)
+                    V/S_lasttimecentral(2r50_2D,edge-on)
+                    LookbackTime_LastCentral[Gyr]
+                    Pos_x[Mpc]
+                    Pos_y[Mpc]
+                    Pos_z[Mpc]
+                    Vel_x[km/s]
+                    Vel_y[km/s]
+                    Vel_z[km/s]
+                    DistToCentre/R200crit: distance to center vs. r200c
+                    SurfaceDensN10[Mpc^-2]
+                    SurfaceDensN7[Mpc^-2]
+                    SurfaceDensN5[Mpc^-2]
+                    LookbackTime_LastMerger[Gyr]
+                    MassRatio_LastMerger
+                    r50_SM(3D)[pkpc]
+                    r50_SFR(3)[pkpc]                 
+    
+            """           
+                
+                print '###################################################################################'
+                print 'read EAGLE ASCII FORMAT KINEMATIC CATALOG\n catname: ', catname, 'snapid:', snapid
+                mypath=mycomp+'anaconda/pro/data/EAGLE_100Mpc/EAGLE_L100N1504_ForSilvio.dat'
+                print 'mypath:', mypath
+    
+                data= pd.read_csv(mypath, skiprows=1,\
+                                  names=['fofID','hostid','mstar','rhalf_stars_2D',\
+                                         'vdisp_r502D_edgeOn', 'VvS_r502D_edgeOn', 'vdisp_r502D_random', 'VvS_r502D_random',\
+                                         'ell_r502D_edgeOn','ell_r502D_random', 'BvT', 'Sersic_n',\
+                                         'lambda_r502D_edgeOn','lambda_r502D_random', 'Mgas_HI_60kpc_GK11', 'Mgas_HI_60kpc_K13', 'Mgas_HII_60kpc_GK11', 'Mgas_HII_60kpc_K13',\
+                                         'vdisp_2r502D_edgeOn', 'VvS_2r502D_edgeOn', 'vdisp_2r502D_random', 'VvS_2r502D_random', \
+                                         'ell_2r502D_edgeOn', 'ell_2r502D_random',\
+                                         'lambda_2r502D_edgeOn', 'lambda_2r502D_random', 'age_stars_rband_r502D', 'age_stars_rband_2r502D',\
+                                         'sfr', 'mhalo',\
+                                         'lambda_r502D_random_ltc', 'lambda_2r502D_random_ltc', 'ssfr_ltc', 'sfr_ltc', 'mstar_ltc',\
+                                         'VvS_r502D_random_ltc', 'VvS_2r502D_random_ltc', 'VvS_r502D_edgeOn_ltc', 'VvS_2r502D_edgeOn_ltc', 'lastTimeCentral',\
+                                         'x_pos', 'y_pos', 'z_pos', 'x_vel', 'y_vel', 'z_vel',\
+                                         'rcenter2r200c', 'sDensity_N10', 'sDensity_N7', 'sDensity_N5', 'lastMerger', 'ratio_lastM', 'rhalf_stars_3D', 'rhalf_sfr_3D'],\
+                                         sep=' ')         
+            else:
+                print 'No key set! --> Go back to main!'
+                exit()
+
+
+            self.data_array = mL.df_to_sarray(data)
+
+            #import numpy.lib.recfunctions as rcfuncs
+            #self.data_array = rcfuncs.append_fields([self.data_array], ['orphan','nsats'] ,[np.zeros(self.data_array.size,),np.zeros(self.data_array.size,)], usemask=False)
+
+            self.data_array=self.data_array[np.where(self.data_array['redshift']<0.0001)[0][:]]
+            #print 'ncentrals:', self.data_array.size
+            #self.data_array['fofID']-=28000000000000
+            #rint self.data_array
+            print np.info(self.data_array)
+            #exit()                   
 
         def readCHOLLAHDF5(halocat_code):
             
@@ -1499,6 +1762,130 @@ class	ArangeData:
 
             #exit()
 
+        def readHydroHDF5(key):      
+
+            print '###################################################################################'
+            print 'read Hydro HDF5'
+            print ' '
+            print 'HDF5', 'catname:', catname
+            print 'HDF5 begin: mypath:', mypath
+            
+            def caseSwitcher(item):
+
+                choose = {
+                    'EAGLE_': EAGLE,
+                    'EAGLE_ev': EAGLE_ev,
+                    'IllustrisTNG300': IllustrisTNG300
+                    }
+                    
+                func = choose.get(item)
+                return func()
+
+
+            def EAGLE():
+                file_struc_info= hdf5lib.EAGLE_HDF5_filestruct(catname, snapid, path_to_directory=mypath)
+                return file_struc_info
+ 
+            def EAGLE_ev():
+                file_struc_info= hdf5lib.EAGLE_ev_HDF5_filestruct(catname, snapid, path_to_directory=mypath)
+                return file_struc_info
+            
+            def IllustrisTNG300():
+                file_struc_info= hdf5lib.IllustrisTNG300_HDF5_Subhalo_filestruct(catname, snapid, path_to_directory=mypath)
+                return file_struc_info             
+
+            from cosmolopy import cparam, cd, cc
+
+            fidcosmo = cparam.PlanckEAGLE(flat=True, extras=False)
+
+            file_struc_info, snapidzred = caseSwitcher(key)
+            
+            mytypes={}
+            a=0
+            while a<int(id_col_array['nr_entries']):
+                mytypes.update({id_col_array['name'+str(a)]: id_col_array['data_type'+str(a)]})                    
+                a+=1
+ 
+
+            dt = np.dtype([(k, mytypes[k]) for k in mytypes.keys()])
+            try:
+                self.data_array=np.zeros((nr_rows,), dtype=dt)
+                nr_entries=int(id_col_array['nr_entries'])
+            except:
+                self.data_array=np.zeros((nr_rows,), dtype=dt)
+                nr_entries=nr_col   
+                
+            f = hdf5.File(file_struc_info[catname+'_filename0'], "r")
+
+            print f.values()
+            
+            for item in f.keys():
+                print 'env:', item, f[item].values()[0]
+
+
+            snapidzred.sort(order=['snapid'], axis=0)
+            
+            rowNrs = [3,65,209,305,101,400]
+            #env = 'WallGals'
+            
+            for env in f.keys():
+                for rowNr in rowNrs:
+                    print env,'\t', rowNr, '\t', f[env+'/Group'][rowNr],'\t', format(f[env+'/M200'][rowNr], '0.6e'), format(f[env+'/Mstar30kpc'][rowNr], '0.6e'), format(f[env+'/TimeGalaxy50'][rowNr], '0.4f'), format(f[env+'/MBH'][rowNr], '0.6e')
+            
+            #exit()
+            
+            # print 'haloid:', f[env+'/Group'][rowNr], f[env+'/Subgroup'][rowNr], 'rVoid:', f[env+'/Rvoid'][rowNr], 'r2rVoid:', f[env+'/DtoVoid'][rowNr]
+            # print 't50_stars:', f[env+'/TimeGalaxy50'][rowNr], 't70_stars:', f[env+'/TimeGalaxy70'][rowNr]
+            # print 'mstar_30kpc(z0):', f[env+'/Mstar30kpc'][rowNr], 'evol:', f[env+'/Mstar_ev'][rowNr]
+            # print 'm200c(z0):', f[env+'/M200'][rowNr], 'evol:', f[env+'/M200_ev'][rowNr]
+            # print 'mbh(z0):', f[env+'/MBH'][rowNr], 'evol:', f[env+'/BHmass_ev'][rowNr]
+            # print 'mgas_30kpc(z0):', f[env+'/Mgas30kpc'][rowNr], 'evol:',f[env+'/Mgas_ev'][rowNr] 
+            
+            # from scipy import interpolate
+            # func = interpolate.interp1d(f[env+'/Mstar_ev'][rowNr]/f[env+'/Mstar30kpc'][rowNr], snapidzred['z'])
+            
+            # print '\t z 50%/70%:', format(func(0.5), '0.2f'), '/', format(func(0.7), '0.2f')
+            # print '\t LBT t50/t70:', cd.lookback_time(func(0.5), z0=0.0, **fidcosmo)/3.1536e+16, '/', cd.lookback_time(func(0.7), z0=0.0, **fidcosmo)/3.1536e+16 #seconds to Gyrs     
+
+            #print snapidzred
+            exit()
+   
+            #print snapidzred['z']
+            
+            last_valid_item='haloid'
+            size_before=0
+            l=0
+            for a, env in enumerate(file_struc_info[catname+'_myenv'].values()):
+                
+                for item in sorted(self.data_array.dtype.names, key=str.lower):
+
+                    if item=='envr':
+                        
+                        print 'SET ENVR FLAG:', a, 'env:', env, 'last_valid_item:', last_valid_item
+                        self.data_array[item][size_before:size_before+f[file_struc_info[catname+'_'+env+'_'+last_valid_item]][:].size] = a        
+                 
+                    else:
+                        print 'env:', env, 'a:', a, 'item:', item, file_struc_info[catname+'_'+env+'_'+item], 'size_before:', size_before, 'size:', f[file_struc_info[catname+'_'+env+'_'+item]][:].size 
+                        #print f[file_struc_info[catname+'_'+env+'_'+item]][:]
+                        self.data_array[item][size_before:size_before+f[file_struc_info[catname+'_'+env+'_'+item]][:].size] = f[file_struc_info[catname+'_'+env+'_'+item]][:]
+                        last_valid_item=item                     
+
+                size_before+=f[file_struc_info[catname+'_'+env+'_'+last_valid_item]][:].size
+                
+            
+            self.data_array = self.data_array[:size_before]
+            #print np.info(self.data_array)
+            #self.data_array.sort(order=['haloid'], axis=0)
+            #print self.data_array[['haloid', 'envr', 'mhalo_200c', 'mstar_30kpc', 't50_stars', 't70_stars', 'sfr_30kpc']][0:100]
+                  
+            
+            self.redshift=False
+            self.scale_factor=False
+            
+            #print np.info(self.data_array)
+            #exit()
+            print 'self.data_array after read-in:', self.data_array.shape, 'redshift:', self.redshift, 'scale factor:', self.scale_factor            
+
 
         def readSAMHDF5(halocat_code):
             print '###################################################################################'
@@ -1513,9 +1900,8 @@ class	ArangeData:
                     'Galacticus_': Galacticus,
                     'SAG_': SAG,
                     'SAGE_': SAGE,
-                    'LGALAXIES_': LGALAXIES,                  
-                    'sussing_': ROCKSTAR,
-                    'IllustrisTNG300': IllustrisTNG300
+                    'LGALAXIES_': LGALAXIES,
+                    'sussing_': ROCKSTAR
                     }
                     
                 func = choose.get(catname)
@@ -1550,9 +1936,6 @@ class	ArangeData:
                 file_struc_info= hdf5lib.ROCKSTAR_HDF5_halocat_filestruct(catname, snapid, path_to_directory=mypath)
                 return file_struc_info
             
-            def IllustrisTNG300():
-                file_struc_info= hdf5lib.IllustrisTNG300_HDF5_Subhalo_filestruct(catname, snapid, path_to_directory=mypath)
-                return file_struc_info            
                 
             def other():
                 file_struc_info= hdf5lib.default_HDF5_filestruct(catname, snapid)
@@ -1655,59 +2038,63 @@ class	ArangeData:
 #                exit()
 
 #                SAG                
-#                for name in f:
-#                    count_att=0
-#                    print 'name:', name.ljust(20), 
-#                    for att in f[name].attrs:
-#                        print 'description:', f[name].attrs.get('Description')
-#                        count_att=1
-#                    if count_att==0:
-#                        count_att2=0
-#                        print '\n',
-#                        for key in f[name].keys():
-#                            print '        ', key.ljust(17), 
-#                            for att in f[name+'/'+key].attrs:
-#                                print'description:', f[name+'/'+key].attrs.get('Description')
-#                                count_att2=1
-#                            if count_att2==0:
-#                                print '\n',
-#                                for key2 in f[name+'/'+key].keys():
-#                                    print '           ', key2.ljust(14), 'description:', f[name+'/'+key+'/'+key2].attrs.get('Description')
-#                                    
-#                exit()                                    
+                # for name in f:
+                #     count_att=0
+                #     print 'name:', name.ljust(20), 
+                #     for att in f[name].attrs:
+                #         print 'description:', f[name].attrs.get('Description')
+                #         count_att=1
+                #     if count_att==0:
+                #         count_att2=0
+                #         print '\n',
+                #         for key in f[name].keys():
+                #             print '        ', key.ljust(17), 
+                #             for att in f[name+'/'+key].attrs:
+                #                 print'description:', f[name+'/'+key].attrs.get('Description')
+                #                 count_att2=1
+                #             if count_att2==0:
+                #                 print '\n',
+                #                 for key2 in f[name+'/'+key].keys():
+#                                     print '           ', key2.ljust(14), 'description:', f[name+'/'+key+'/'+key2].attrs.get('Description')
+# #                                    
+#                 exit()                                    
                 #Galacticus
-#                path='Outputs/Output96/nodeData/'
-#                print f.keys()
-#                for key in f.keys():
-#                    print key, '\n-----------------\n'
-#                    for keykey in f[key].keys():
-#                        print keykey, ':\t', f[key].attrs.get(keykey)
-#                        #path='Outputs/Output96/nodeData/'
-#                    print '++++++++++++++++++++\n'
-#
-#                for name in f[path]:
-#                    print 'name:', name.ljust(20)                           
-#                            
-#              
-#                path='Parameters/'
-#
-#                    
-#                for name in f[path].attrs.items():            
-#                    print name[0].ljust(60), name[1]
-# 
-#                for name in f[path].keys():            
-#                    print name
-#                    for key in f[path+'/'+name].attrs.items():
-#                        print '\t', key[0].ljust(20), key[1]                                             
-#
-#                exit()
+#                 path='Outputs/Output79/nodeData/'
+#                 print f.keys()
+#                 for key in f.keys():
+#                     print key, '\n-----------------\n'
+#                     for keykey in f[key].keys():
+#                         print keykey, ':\t', f[key].attrs.get(keykey)
+#                         #path='Outputs/Output96/nodeData/'
+#                     print '++++++++++++++++++++\n'
+                    
+
+# #
+#                 for name in f[path]:
+#                     print 'name:', name.ljust(20)
+
+#                 exit()                      
+                            
+              
+#                 path='Parameters/'
+
+                    
+#                 for name in f[path].attrs.items():            
+#                     print name[0].ljust(60), name[1]
+
+#                 for name in f[path].keys():            
+#                     print name
+#                     for key in f[path+'/'+name].attrs.items():
+#                         print '\t', key[0].ljust(20), key[1]                                             
+
+#                 exit()
                    
                     
                 if halocat_code=='False' and file_struc_info['catname'].find('SAGE')==-1:
                     if file_struc_info['catname'].find('SAGE')!=-1:
                         self.scale_factor = None
                         self.redshift = snapid
-                    elif file_struc_info['catname'].find('SAG_')==-1 and file_struc_info['catname'].find('LGALAXIES')==-1 and file_struc_info['catname'].find('Illustris')==-1:
+                    elif file_struc_info['catname'].find('SAG_')==-1 and file_struc_info['catname'].find('LGALAXIES')==-1 and file_struc_info['catname'].find('Illustris')==-1 and file_struc_info['catname'].find('EAGLE')==-1:
                         self.scale_factor = f[file_struc_info[catname+'_path_to_snapid']].attrs.get(file_struc_info[catname+'_redshift_attribute'])
                         self.redshift = mL.expfactor_to_redshift(self.scale_factor)                     
                     else:
@@ -1899,12 +2286,22 @@ class	ArangeData:
                 'BINARY_SAGE': BINARY_SAGE,
                 'HDF5': HDF5,
                 'SAMHDF5': SAMHDF5,
-                'CHOLLAHDF5': CHOLLAHDF5,                
+                'HYDROHDF5': HYDROHDF5,
+                'CHOLLAHDF5': CHOLLAHDF5,
+                'MDHDF5': MDGalaxies, 
                 'HDF52HDF5': HDF52HDF5,
                 'READ2ARRAY': READ2ARRAY,
                 'FITS2HDF5': FITS2HDF5,
                 'CROSSMATCH': CROSSMATCH,
-                'ROCKSTAR_ASCII': ROCKSTAR_ASCII
+                'ROCKSTAR_ASCII': ROCKSTAR_ASCII,
+                'EAGLE_ASCII_Silvio': EAGLE_ASCII,
+                'EAGLE_ASCII_Patricia1': EAGLE_ASCII,
+                'EAGLE_ASCII_Patricia2': EAGLE_ASCII,
+                'EAGLE_ASCII_Patricia_rgas': EAGLE_ASCII,
+                'EAGLE_ASCII_Yetli': EAGLE_ASCII,
+                'EAGLE_ASCII_full': EAGLE_ASCII,
+                'EAGLE_ASCII_full_trees': EAGLE_ASCII,
+                'EAGLE_ASCII': EAGLE_ASCII,
                 }
                 
             func = choose.get(data_format)
@@ -1921,6 +2318,19 @@ class	ArangeData:
            
         def SAMHDF5():
             readSAMHDF5(halocat_code)
+ 
+        def HYDROHDF5():
+            key = catname[0:catname.find('ev')+2]
+            print 'key', key  
+            readHydroHDF5(key)
+            
+        def MDGalaxies():
+            read_MDGalaxies()            
+
+        def EAGLE_ASCII():
+            key = data_format[data_format.find('ASCII')+6::]
+            print 'key', key       
+            readEAGLE_ASCII(key)
 
         def ROCKSTAR_ASCII():
             readROCKSTAR_ASCII(halocat_code) 
