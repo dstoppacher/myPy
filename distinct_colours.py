@@ -69,7 +69,7 @@ def get_distinct(nr):
     #
     
     if nr < 1 or nr > 14:
-        print "wrong nr of distinct colours!"
+        print("wrong nr of distinct colours!")
         return
 
     #
@@ -97,17 +97,8 @@ def get_distinct(nr):
 # displays usage information and produces example plot.
 if __name__ == '__main__':
     import numpy as np
-    import matplotlib.mlab as mlab
     import matplotlib.pyplot as plt
 
-    print __doc__
-    print "usage examples: "
-    print "print distinct_colours.get_distinct(2)"
-    print get_distinct(2)
-    print "print distinct_colours.greysafecols"
-    print greysafecols
-
-    print "\ngenerating example plot: distinct_colours_example.png"
     plt.close()
     t = np.arange(0.0, 2.0, 0.01)
     s = np.sin(2*np.pi*t)

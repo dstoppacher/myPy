@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 system_info = os.getcwd()
 start = system_info.find('anaconda')
@@ -8,41 +9,9 @@ import arangeData as aD
 import outputData as oD
 import myLib as mL
 
-myOutput = oD.OutputData(config=False)
+#myOutput = oD.OutputData(config=False)
 
 SAM_hdf5_filestruct_map = {}
-
-band_map = {'0': 'u', '1': 'g', '2': 'r', '3': 'i', '4': 'z', '5': 'NUV', '6': 'FUV'}
-map_surveys = {'0': 'SDSS_', '1': 'Galex_'}
-
-map_comoving = {'0': 'observed'}
-map_gal_parts = {'0': 'total_', '1': 'disk_', '2': 'spheroid_', '3': ''}
-
-map_mags = {'0': 'mag', '1': 'mAB', '2': 'mAs'}
-
-map_dust_atlas = {'0': 'dA_', '1': '', 'dA_': ':dustAtlas', '': '', '':''}
-
-lum_map = {}
-mag_type_map = {}
-
-i=0
-count_surveys=0
-while i<len(map_surveys):
-    j=0
-    count=0
-    while j<len(map_gal_parts):
-        lum_map.update({str(count_surveys+j): 'L_'+map_surveys[str(i)]+'_'+map_gal_parts[str(j)]+'_'})
-       
-        a=0      
-        while a<len(map_mags):
-            mag_type_map.update({str(count): map_mags[str(a)]+'_'+map_gal_parts[str(j)]})
-            count+=1              
-            a+=1         
-        j+=1
-     
-    count_surveys+=1
-    i+=1
-
 
 def catascii(catname,
              snapid,
@@ -122,7 +91,7 @@ def EAGLE_HDF5_filestruct(catname,
     SAM_hdf5_filestruct_map[catname+'_MAB_total_i']   = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/i_fil'
     SAM_hdf5_filestruct_map[catname+'_MAB_total_z']   = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/z_fil'
                
-    print 'EALGE filestructure:',  SAM_hdf5_filestruct_map     
+    print('EALGE filestructure:',  SAM_hdf5_filestruct_map) 
 
     return SAM_hdf5_filestruct_map 
 
@@ -185,13 +154,13 @@ def EAGLE_ev_HDF5_filestruct(catname,
         
     """  
  
-    print 'HERE READ HYDRO ENV from Yetli!'
+    print('HERE READ HYDRO ENV from Yetli!')
    
     import pandas as pd
     snapidzred = pd.read_csv(path_to_directory+'/snapidzred.txt', skiprows=2, names=['snapid', 'z'], sep=' ')
     snapidzred = mL.df_to_sarray(snapidzred)
     
-    #print snapidzred['z']   
+    #print(snapidzred['z']   
  
     SAM_hdf5_filestruct_map['catname']  = catname
     
@@ -242,7 +211,7 @@ def EAGLE_ev_HDF5_filestruct(catname,
         SAM_hdf5_filestruct_map[catname+'_'+item+'_mbh_ev']               = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/'+item+'/BHmass_ev' 
 
         
-    #print 'EALGE filestructure:',  SAM_hdf5_filestruct_map   
+    #print('EALGE filestructure:',  SAM_hdf5_filestruct_map   
     
     return SAM_hdf5_filestruct_map, snapidzred
 
@@ -275,7 +244,7 @@ def ROCKSTAR_HDF5_halocat_filestruct(catname,
     SAM_hdf5_filestruct_map[catname+'_npros']            = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/NumProgenitors'
     SAM_hdf5_filestruct_map[catname+'_firstProgenitorID']= SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/FirstProgenitor'   
     SAM_hdf5_filestruct_map[catname+'_siblingIndex']     = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/Sibling'
-    #print SAM_hdf5_filestruct_map 
+    #print(SAM_hdf5_filestruct_map 
     return SAM_hdf5_filestruct_map   
 
 def Galacticus_HDF5_halocat_filestruct(catname,
@@ -335,6 +304,8 @@ def Galcticus_HDF5_filestruct(
     SAM_hdf5_filestruct_map['catname']                      = catname
     SAM_hdf5_filestruct_map[catname+'_snapid']              = snapid
     SAM_hdf5_filestruct_map[catname+'_path_to_directory']   = path_to_directory
+    
+    #print('here 308: snapid', snapid, path_to_directory)
     
     myData = aD.ArangeData()
     try:
@@ -493,62 +464,16 @@ def Galcticus_HDF5_filestruct(
     SAM_hdf5_filestruct_map[catname+'_L_OII_disk_cont']          = ''
     SAM_hdf5_filestruct_map[catname+'_L_OII_spheroid_cont']      = ''
     SAM_hdf5_filestruct_map[catname+'_L_OII_total_cont']         = '' 
-
-        
-    SAM_hdf5_filestruct_map[catname+'_Mag_dA_total_B']    = ''
     
     SAM_hdf5_filestruct_map[catname+'_vmax']               = SAM_hdf5_filestruct_map[catname+'_path_to_data']+snapid+'/nodeData/nBodyVelocityMaximum'   
     SAM_hdf5_filestruct_map[catname+'_vdisp']              = SAM_hdf5_filestruct_map[catname+'_path_to_data']+snapid+'/nodeData/nBodyVelocityDispersion'  
  
+    SAM_hdf5_filestruct_map[catname+'_L_OII_total_cont']         = '' 
     
-    c=0
-    while c<len(map_surveys):   
-        i=0
-        while i<len(band_map):
-            a=0
-            while a<len(lum_map):
-                b=0
-                while b<len(map_gal_parts):
-                    d=0
-                    while d<len(map_dust_atlas)/2.:
-                        e=0
-                        while e<len(map_comoving):
-                            #print 'L_'+map_surveys[str(c)]+map_gal_parts[str(b)]+band_map[str(i)]
-                            SAM_hdf5_filestruct_map[catname+'_L_'+map_surveys[str(c)]+map_dust_atlas[str(d)]+map_gal_parts[str(b)]+band_map[str(i)]] = ''
-                            
-                            if map_gal_parts[str(b)]=='':
-                                
-                                SAM_hdf5_filestruct_map[catname+'_L_'+map_surveys[str(c)]+map_dust_atlas[str(d)]+map_gal_parts[str(b)]+band_map[str(i)]+'_part1'] = ''
-                                SAM_hdf5_filestruct_map[catname+'_L_'+map_surveys[str(c)]+map_dust_atlas[str(d)]+map_gal_parts[str(b)]+band_map[str(i)]+'_part2'] = ''
-                                
-                            else:
-                                #print SAM_hdf5_filestruct_map[catname+'_path_to_data']+snapid+'/nodeData/'+map_gal_parts[str(b)][0:len(map_gal_parts[str(b)])-1]+'LuminositiesStellar:'+map_surveys[str(c)]+band_map[str(i)]+':'+map_comoving[str(e)]+':z',map_dust_atlas[str(d)] 
-                                SAM_hdf5_filestruct_map[catname+'_L_'+map_surveys[str(c)]+map_dust_atlas[str(d)]+map_gal_parts[str(b)]+band_map[str(i)]+'_part1'] = SAM_hdf5_filestruct_map[catname+'_path_to_data']+snapid+'/nodeData/'+map_gal_parts[str(b)][0:len(map_gal_parts[str(b)])-1]+'LuminositiesStellar:'+map_surveys[str(c)]+band_map[str(i)]+':'+map_comoving[str(e)]+':z'                            
-                                SAM_hdf5_filestruct_map[catname+'_L_'+map_surveys[str(c)]+map_dust_atlas[str(d)]+map_gal_parts[str(b)]+band_map[str(i)]+'_part2'] = map_dust_atlas[map_dust_atlas[str(d)]]           
-
-                            
-                            e+=1
-                        d+=1
-                    b+=1
-                a+=1        
-            
-            j=0
-            while j<len(mag_type_map):                    
-                d=0
-                while d<len(map_dust_atlas)/2.:    
-                    SAM_hdf5_filestruct_map[catname+'_'+mag_type_map[str(j)]+map_dust_atlas[str(d)]+'_'+band_map[str(i)]] = ''
-                    d+=1
-                j+=1
-            
-            map_magnitudes_and_colour_cuts(catname, SAM_hdf5_filestruct_map, mag_type_map, index=i)
-                
-            i+=1
-        c+=1
+    for band in ['g','r','i']:
+        SAM_hdf5_filestruct_map[catname+'_L_SDSS_dA_total_'+band+'_part1']    = SAM_hdf5_filestruct_map[catname+'_path_to_data']+snapid+'/nodeData/totalLuminositiesStellar:SDSS_'+band+':observed:z'
+        SAM_hdf5_filestruct_map[catname+'_L_SDSS_dA_total_'+band+'_part2']    = ':dustAtlas'
  
-    
-    #print SAM_hdf5_filestruct_map
-        
-    return SAM_hdf5_filestruct_map
 
 def map_magnitudes_and_colour_cuts(catname,
                                    filestruct_map,
@@ -583,7 +508,7 @@ def MDGalaxies_SkiesANDUniverses(catname,
                                 comment='#')
     
     path_to_directory=data[0]
-    print 'path to directory:', path_to_directory
+    print('path to directory:', path_to_directory)
     
     
     SAM_hdf5_filestruct_map[catname+'_haloid']   = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/MainHaloID' 
@@ -647,7 +572,7 @@ def SAG_HDF5_filestruct(catname,
     SAM_hdf5_filestruct_map[catname+'_snapid']              = 'snapshot_'+snapid
     SAM_hdf5_filestruct_map[catname+'_path_to_directory']   = path_to_directory
     
-    #print 'path to directory:', path_to_directory
+    #print('path to directory:', path_to_directory
     
     myData = aD.ArangeData()
     data = myData.readAnyFormat(config=False, 
@@ -655,13 +580,11 @@ def SAG_HDF5_filestruct(catname,
                                 mypath=mycomp+'anaconda/pro/data/'+catname+'/'+catname+'_file_names.txt', 
                                 data_shape='shaped', 
                                 comment='#')
-    
-    #print 'data:', data.size, snapid
 
     i=0
     a=0
     while i<data.size:
-        #print 'i:', i, 'a:', a, data[i].find(snapid), catname+'_filename'+str(a), data[i]
+        #print('i:', i, 'a:', a, data[i].find(snapid), catname+'_filename'+str(a), data[i])
         if data.size==1:
             SAM_hdf5_filestruct_map[catname+'_filename'+str(a)] = path_to_directory+SAM_hdf5_filestruct_map[catname+'_snapid'] +'/'+str(data)
             a+=1
@@ -671,13 +594,13 @@ def SAG_HDF5_filestruct(catname,
             #are named like this e.g. gal_125_xxxx_numerating_xxx.hdf5
             if data[i].find(snapid)==4 or data[i].find(snapid)==5 or data[i].find(snapid)==8:  
                 if catname.find('sub')!=-1:
-                    #print 'HERE: sub!'
+                    #print('HERE: sub!'
                     SAM_hdf5_filestruct_map[catname+'_filename'+str(a)] = path_to_directory+'/'+data[i]                
                 else:
-                    #print 'HERE: normal!'
+                    #print('HERE: normal!'
                     SAM_hdf5_filestruct_map[catname+'_filename'+str(a)] = path_to_directory+SAM_hdf5_filestruct_map[catname+'_snapid'] +'/'+data[i]
                 
-                #print 'chosen filename:', SAM_hdf5_filestruct_map[catname+'_filename'+str(a)]
+                #print('chosen filename:', SAM_hdf5_filestruct_map[catname+'_filename'+str(a)]
                 a+=1
         i+=1  
 
@@ -760,6 +683,7 @@ def SAG_HDF5_filestruct(catname,
 
     SAM_hdf5_filestruct_map[catname+'_orphan']   = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/Galaxy_Type'
     SAM_hdf5_filestruct_map[catname+'_mhalo']    = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/Halo/M200c'
+    SAM_hdf5_filestruct_map[catname+'_mhalo_200c']    = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/Halo/M200c'
     SAM_hdf5_filestruct_map[catname+'_mhalo_cents']    = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/Halo/M200c'
     SAM_hdf5_filestruct_map[catname+'_r200c']    = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/Halo/R200c'
     SAM_hdf5_filestruct_map[catname+'_vmax']     = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/Halo/Vmax'
@@ -855,7 +779,7 @@ def SAG_HDF5_filestruct(catname,
     SAM_hdf5_filestruct_map[catname+'_mAB_dA_total_i']   = ''
     SAM_hdf5_filestruct_map[catname+'_mAB_dA_total_z']   = ''    
         
-    #print 'SAG filestructure:',  SAM_hdf5_filestruct_map     
+    #print('SAG filestructure:',  SAM_hdf5_filestruct_map     
     
     return SAM_hdf5_filestruct_map
     
@@ -881,12 +805,12 @@ def SAG_NIFTY_filestruct(catname,
 #                                data_shape='shaped', 
 #                                comment='#')
     
-    #print 'data:', data.size, snapid
+    #print('data:', data.size, snapid
        
 #    i=0
 #    a=0
 #    while i<data.size:
-#        #print 'i:', i, 'a:', a, data[i].find(snapid), catname+'_filename'+str(a), data[i]
+#        #print('i:', i, 'a:', a, data[i].find(snapid), catname+'_filename'+str(a), data[i]
 #        if data.size==1:
 #            SAM_hdf5_filestruct_map[catname+'_filename'+str(a)] = path_to_directory+SAM_hdf5_filestruct_map[catname+'_snapid'] +'/'+str(data)
 #            a+=1
@@ -896,7 +820,7 @@ def SAG_NIFTY_filestruct(catname,
 #            #are named like this e.g. gal_125_xxxx_numerating_xxx.hdf5
 #            if data[i].find(snapid)==4 or data[i].find(snapid)==5 :               
 #                SAM_hdf5_filestruct_map[catname+'_filename'+str(a)] = path_to_directory+SAM_hdf5_filestruct_map[catname+'_snapid'] +'/'+data[i]
-#                #print 'chosen filename:', SAM_hdf5_filestruct_map[catname+'_filename'+str(a)]
+#                #print('chosen filename:', SAM_hdf5_filestruct_map[catname+'_filename'+str(a)]
 #                a+=1
 #        i+=1  
 
@@ -958,7 +882,7 @@ def SAG_NIFTY_filestruct(catname,
     SAM_hdf5_filestruct_map[catname+'_MAB_total_i']   = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/SED/Magnitudes/Mag_id122_AB_tot_r'
     SAM_hdf5_filestruct_map[catname+'_MAB_total_z']   = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/SED/Magnitudes/Mag_id123_AB_tot_r'
   
-    #print 'SAG filestructure:',  SAM_hdf5_filestruct_map     
+    #print('SAG filestructure:',  SAM_hdf5_filestruct_map     
     
     return SAM_hdf5_filestruct_map
     
@@ -989,6 +913,7 @@ def SAGE_HDF5_filestruct(catname,
     SAM_hdf5_filestruct_map[catname+'_orphan']          = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/Galaxy_Classification'
     SAM_hdf5_filestruct_map[catname+'_TreeIndex']          = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/TreeIndex' 
     SAM_hdf5_filestruct_map[catname+'_mhalo']           = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/Mvir'
+    SAM_hdf5_filestruct_map[catname+'_mhalo_200c']           = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/Mvir'
     SAM_hdf5_filestruct_map[catname+'_mhalo_cents']           = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/Central_Galaxy_Mvir'
     SAM_hdf5_filestruct_map[catname+'_mhalo_sat']           = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/Subhalo_Mvir_at_Infall'
     SAM_hdf5_filestruct_map[catname+'_rvir']            = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/Rvir'
@@ -1047,7 +972,7 @@ def SAGE_HDF5_filestruct(catname,
     SAM_hdf5_filestruct_map[catname+'_MAB_dA_total_i']  = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/SDSS_i_Absolute'
     SAM_hdf5_filestruct_map[catname+'_MAB_dA_total_z']  = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/SDSS_z_Absolute'
   
-    #print 'SAGE filestructure:',  SAM_hdf5_filestruct_map     
+    #print('SAGE filestructure:',  SAM_hdf5_filestruct_map     
     
     return SAM_hdf5_filestruct_map
 
@@ -1066,8 +991,7 @@ def LGALAXIES_HDF5_Tree_filestruct(catname,
                                 mypath=mycomp+'anaconda/pro/data/'+catname+'/'+catname+'_file_names.txt', 
                                 data_shape='shaped', 
                                 comment='#')
-                                    
-    print data                                
+                             
                                 
     SAM_hdf5_filestruct_map[catname+'_nr_files']            = 1
     SAM_hdf5_filestruct_map[catname+'_path_to_data']        = '/Arr'
@@ -1113,7 +1037,7 @@ def LGALAXIES_HDF5_filestruct(catname,
     SAM_hdf5_filestruct_map[catname+'_snapid']              = ''
     SAM_hdf5_filestruct_map[catname+'_redshift_attribute']  = ''
 
-    #print 'path to data:', SAM_hdf5_filestruct_map[catname+'_path_to_data']
+    #print('path to data:', SAM_hdf5_filestruct_map[catname+'_path_to_data'])
 
 
 
@@ -1156,7 +1080,7 @@ def LGALAXIES_HDF5_filestruct(catname,
     SAM_hdf5_filestruct_map[catname+'_MAB_dA_total_i']  = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/iDust'
     SAM_hdf5_filestruct_map[catname+'_MAB_dA_total_z']  = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/zDust'
       
-    #print 'LGALAXIES filestructure:',  SAM_hdf5_filestruct_map     
+    #print('LGALAXIES filestructure:',  SAM_hdf5_filestruct_map)    
     
 
 
@@ -1181,7 +1105,7 @@ def IllustrisTNG300_HDF5_Subhalo_filestruct(catname,
     SAM_hdf5_filestruct_map[catname+'_snapid']              = ''
     SAM_hdf5_filestruct_map[catname+'_redshift_attribute']  = ''
 
-    print 'path to data:', SAM_hdf5_filestruct_map[catname+'_path_to_data']
+    print('path to data:', SAM_hdf5_filestruct_map[catname+'_path_to_data'])
  
     SAM_hdf5_filestruct_map[catname+'_haloid']          = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/GrNr'    
     SAM_hdf5_filestruct_map[catname+'_orphan']          = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/SatCen'
@@ -1211,7 +1135,7 @@ def CHOLLA_50Mpc_HDF5_filestruct(catname,
         data = myData.readAnyFormat(config=False, mydtype=np.str_, mypath=mycomp+'anaconda/pro/data/'+catname+'/file_names.txt', data_shape='shaped', comment='#')
     except:          
         data = myData.readAnyFormat(config=False, mydtype=np.str_, mypath=mycomp+'anaconda/pro/data/'+catname+'/'+catname+'_file_names.txt', data_shape='shaped', comment='#')
-    print data.size
+    print(data.size)
     i=0
     while i<data.size:
         if data.size==1:
@@ -1222,7 +1146,7 @@ def CHOLLA_50Mpc_HDF5_filestruct(catname,
     
     SAM_hdf5_filestruct_map[catname+'_nr_files'] = i 
 
-    print 'path to data:', SAM_hdf5_filestruct_map[catname+'_path_to_data']
+    print('path to data:', SAM_hdf5_filestruct_map[catname+'_path_to_data'])
  
     SAM_hdf5_filestruct_map[catname+'_density']         = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/density'    
     SAM_hdf5_filestruct_map[catname+'_temperature']     = SAM_hdf5_filestruct_map[catname+'_path_to_data']+'/temperature'
@@ -1257,7 +1181,7 @@ def CHOLLA_50Mpc_PARTICLE_HDF5_filestruct(catname,
         data = myData.readAnyFormat(config=False, mydtype=np.str_, mypath=mycomp+'anaconda/pro/data/'+catname+'/file_names.txt', data_shape='shaped', comment='#')
     except:          
         data = myData.readAnyFormat(config=False, mydtype=np.str_, mypath=mycomp+'anaconda/pro/data/'+catname+'/'+catname+'_file_names.txt', data_shape='shaped', comment='#')
-    print data.size
+    print(data.size)
     i=0
     while i<data.size:
         if data.size==1:
@@ -1268,7 +1192,7 @@ def CHOLLA_50Mpc_PARTICLE_HDF5_filestruct(catname,
     
     SAM_hdf5_filestruct_map[catname+'_nr_files'] = i 
 
-    print 'path to data:', SAM_hdf5_filestruct_map[catname+'_path_to_data']
+    print('path to data:', SAM_hdf5_filestruct_map[catname+'_path_to_data'])
 
     SAM_hdf5_filestruct_map[catname+'_x_pos']      = 'pos_x'
     SAM_hdf5_filestruct_map[catname+'_y_pos']      = 'pos_y'
@@ -1306,7 +1230,7 @@ def CHOLLA_50Mpc_ROCKSTAR_filestruct(catname,
         data = myData.readAnyFormat(config=False, mydtype=np.str_, mypath=mycomp+'anaconda/pro/data/'+catname+'/file_names.txt', data_shape='shaped', comment='#')
     except:          
         data = myData.readAnyFormat(config=False, mydtype=np.str_, mypath=mycomp+'anaconda/pro/data/'+catname+'/'+catname+'_file_names.txt', data_shape='shaped', comment='#')
-    #print 'Nr of files to read:', data.size
+    #print('Nr of files to read:', data.size)
 #    i=0
 #    while i<data.size:
 #        if data.size==1:
@@ -1315,10 +1239,10 @@ def CHOLLA_50Mpc_ROCKSTAR_filestruct(catname,
 #            SAM_hdf5_filestruct_map[catname+'_filename'+str(i)]            = path_to_directory+data[i]
 #        i+=1
     
-    print 'test: 1048', data[np.where(data.find(snapid)!=-1)[:][0]]
+    print('test: 1048', data[np.where(data.find(snapid)!=-1)[:][0]])
     SAM_hdf5_filestruct_map[catname+'_filename']            = path_to_directory+'out_'+str(snapid)+'.list'
     SAM_hdf5_filestruct_map[catname+'_nr_files'] = i 
 
-    #print 'path to data:', SAM_hdf5_filestruct_map[catname+'_path_to_data']
+    #print('path to data:', SAM_hdf5_filestruct_map[catname+'_path_to_data'])
 
     return SAM_hdf5_filestruct_map
