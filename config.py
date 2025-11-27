@@ -1,5 +1,6 @@
 #configure a structure array where configuration details are stored
 #--------------------------------------------
+from __future__ import print_function
 import os
 system_info = os.getcwd()
 start = system_info.find('anaconda')
@@ -37,28 +38,28 @@ class Configuration:
 
         my_count=np.char.count(data_array, ':')
         data['nr_cats'] = np.sum(my_count)
-
+        
         j=0
         count=0
         while j<np.sum(my_count):
             
             i=0 # i=redshift
             a=0 # a=filenr
-            #print 'j:', j, 'i:', i, 'count:', count
+            #print('j:', j, 'i:', i, 'count:', count
             start = data_array[i+count].find(':')
             key_catname='catname'+str(j)
-            data[key_catname]                     = data_array[i+count][start+1::]
+            data[key_catname]  = data_array[i+count][start+1::]
             i+=1
             
 
             key = data[key_catname]+'_mysoftlink_dir'
             data[key] = data_array[i+count]            
-            #print 'data[key]:', data[key]
+            #print('data[key]:', data[key]
             i+=1
             
             key = data[key_catname]+'_mydir'
             data[key] = data_array[i+count]
-            #print 'data[key]:', data[key]
+            #print('data[key]:', data[key]
             
             i+=1
             cat_test=-1
@@ -74,10 +75,10 @@ class Configuration:
                 data['read_filenr_from'] = read_filenr_from
                 data['read_filenr_until'] = read_filenr_until
                 
-                #print 'from:', read_filenr_from, 'until:', read_filenr_until
+                #print('from:', read_filenr_from, 'until:', read_filenr_until
             
             while cat_test <= -1 and i+count!= data_array.size:
-                #print 'CAT_test! i:', i, 'a:', a
+                #print('CAT_test! i:', i, 'a:', a
                     
                 if read_filenr_sequence==True:
                     
@@ -89,10 +90,10 @@ class Configuration:
                         b+=1
 
                 else:
-                    #print 'key:', key
+                    #print('key:', key
                     key = data[key_catname] + '_filename' +str(a)                   
                     data[key]=data[key_catname] + '_' + data_array[i+count]
-                    #print 'data[key]:', data[key]
+                    #print('data[key]:', data[key]
                                         
                     if key.find('DIV')!=-1:
                         self.snapIdzRed(self.snapid_array, data[key]+'snapidzred.txt', data[key_catname], data[data[key_catname]+'_inputfilename_part1'], data[data[key_catname]+'_snapid'], data[data[key_catname]+'_inputfilename_part2'], myfile_format, data[data[key_catname]+'_use_snapidz_mapping'], key_filename=data[key])
@@ -103,17 +104,17 @@ class Configuration:
 
 
                 if i+count!=data_array.size: 
-                    #print 'i+count:', i+count, 'mydata size', data_array.size
+                    #print('i+count:', i+count, 'mydata size', data_array.size
                     cat_test = data_array[i+count].find(':')
-                    #print 'cat_test:', cat_test
+                    #print('cat_test:', cat_test
             count=count+i
             j+=1
         
         #Count nr of Redshifts of
         data['nr_zs']= a    
-        #print 'snapid_array:', self.snapid_array
+        #print('snapid_array:', self.snapid_array
         self.config_array = data
-        #print self.config_array
+        #print(self.config_array
  
     def myConfigArray(self,
                       data,
@@ -124,7 +125,7 @@ class Configuration:
 
         myData = aD.ArangeData()
         unit_corr_array= myData.readAnyFormat(config=False, mydtype=np.str_, mypath=self.mypath_handler['MY_UNIT_CORRECT_FILE'], data_shape='shaped', skiprow=0, delim=' ')
-        
+
         if np.prod(unit_corr_array.shape)==3:
             unit_corr_array = np.expand_dims(unit_corr_array, axis=0)
             
@@ -141,14 +142,16 @@ class Configuration:
 
             c=0
             while c<multicol_test.size:              
-                unit_map_array[catkey+'_unit_corr_'+unit_corr_array[i,0]+str(c)] = multicol_test[c]
-                unit_map_array[catkey+'_data_type_'+unit_corr_array[i,0]] = unit_corr_array[i,2]
+                unit_map_array[catkey+'_unit_corr_'+unit_corr_array[i,0]+str(c)] = multicol_test[c].decode()
+                unit_map_array[catkey+'_data_type_'+unit_corr_array[i,0]] = str(unit_corr_array[i,2])
                 unit_map_array[catkey+'_unit_corr_'+unit_corr_array[i,0]+'_nr_corrs'] = c+1
                 
-                #print 'i:', i, 'name:', unit_corr_array[i,0], 'c:', c,'multicol_test[c]:', multicol_test[c], '[i,1]:', unit_corr_array[i,1],'[i,2]:', unit_corr_array[i,2], unit_map_array[catkey+'_unit_corr_'+unit_corr_array[i,0]+str(c)]
-                #print 'data_type:', unit_map_array[catkey+'_data_type_'+unit_corr_array[i,0]], 'unit_corr:', unit_map_array[catkey+'_unit_corr_'+unit_corr_array[i,0]+str(c)], 'nr_corrs:',  unit_map_array[catkey+'_unit_corr_'+unit_corr_array[i,0]+'_nr_corrs']
-                #print '------------'
-                #print ' '
+                #print('i:', i, 'name:', unit_corr_array[i,0], 'c:', c,'multicol_test[c]:', multicol_test[c], '[i,1]:', unit_corr_array[i,1],'[i,2]:', unit_corr_array[i,2], unit_map_array[catkey+'_unit_corr_'+unit_corr_array[i,0]+str(c)])
+                # print('data_type:', unit_map_array[catkey+'_data_type_'+unit_corr_array[i,0]], 
+                #       'unit_corr:', unit_map_array[catkey+'_unit_corr_'+unit_corr_array[i,0]+str(c)],
+                #       'nr_corrs:',  unit_map_array[catkey+'_unit_corr_'+unit_corr_array[i,0]+'_nr_corrs'])
+                # print('------------\n')
+
                 c+=1
             i+=1
             #unit_map_array[catkey+'_unit_corr_'+unit_corr_array[i,0]] = unit_corr_array[i+c,1]
@@ -168,40 +171,36 @@ class Configuration:
         nr_cols2read_tarsel_col=0
         while i<data_array[:,0].size:
             
-            #print 'i:', i, 'x:', x, 'y:', y, 'z:', z, data_array[i,:]
-            #print 'name', data_array[i,2], 'value:', data_array[i,0]
-            #print data_array[i,2]
+            #print('i:', i, 'x:', x, 'y:', y, 'z:', z, data_array[i,:])
+            #print('name', data_array[i,2].decode(), 'value:', data_array[i,0].decode())
+            #print(data_array[i,2]
 
-            data[catkey+'_'+data_array[i,2]] = mL.check_datatype(data_array[i,0])
+            data[catkey+'_'+data_array[i,2].decode()] = mL.check_datatype(data_array[i,0].decode())
 
-            if data_array[i,2].startswith('col_'):
-                #print 'here: assembly id_col_array!'
-                if data_array[i,0]!=str(99):
+            if data_array[i,2].decode().startswith('col_'):
+                #print('here: assembly id_col_array!')
+                if data_array[i,0].decode()!=str(999):
                     nr_cols2read_col+=1
                     p=0
-                    while p<unit_map_array[catkey+'_unit_corr_'+data_array[i,2][4::]+'_nr_corrs']:
-                        #print 'x:', x, data_array[i,2][4::], 'p:', 'nr_corrs:', unit_map_array[catkey+'_unit_corr_'+data_array[i,2][4::]+'_nr_corrs']
-                        #print unit_map_array[catkey+'_unit_corr_'+data_array[i,2][4::]+str(p)]
-                        #print data[catkey+'_unit_corr_'+unit_map_array[catkey+'_unit_corr_'+data_array[i,2][4::]+str(p)]]
-                        data[catkey+'_id_col_array'].update({'name'+str(x): data_array[i,2][4::], data_array[i,2][4::]+'_col_id': data[catkey+'_'+data_array[int(data_array[i,1]),2]], str(data[catkey+'_'+data_array[int(data_array[i,1]),2]])+'_name'+str(x): data_array[i,2][4::],  'data_type'+str(x): unit_map_array[catkey+'_data_type_'+data_array[i,2][4::]], 'col_id'+str(x): data[catkey+'_'+data_array[int(data_array[i,1]),2]], 'corr_type'+str(x): unit_map_array[catkey+'_unit_corr_'+data_array[i,2][4::]+str(p)], 'unit_corr'+str(x): data[catkey+'_unit_corr_'+unit_map_array[catkey+'_unit_corr_'+data_array[i,2][4::]+str(p)]], 'conv_to_AB_mag'+str(x): data[catkey+'_conv_to_AB_mag']})
+                    while p<unit_map_array[catkey+'_unit_corr_'+data_array[i,2][4::].decode()+'_nr_corrs']:
+                        #print('x:', x, data_array[i,2][4::].decode(), 'p:', 'nr_corrs:', unit_map_array[catkey+'_unit_corr_'+data_array[i,2][4::].decode()+'_nr_corrs'], data_array[i,1].decode())
+                        #print(unit_map_array[catkey+'_unit_corr_'+data_array[i,2][4::]+str(p)]
+                        #print(data[catkey+'_unit_corr_'+unit_map_array[catkey+'_unit_corr_'+data_array[i,2][4::]+str(p)]]
+
+                        data[catkey+'_id_col_array'].update({'name'+str(x): data_array[i,2][4::].decode(), 
+                                                             data_array[i,2][4::].decode()+'_col_id': data[catkey+'_'+data_array[int(data_array[i,1].decode()),2].decode()], 
+                                                             str(data[catkey+'_'+data_array[int(data_array[i,1].decode()),2].decode()])+'_name'+str(x): data_array[i,2][4::].decode(), 
+                                                             'data_type'+str(x): unit_map_array[catkey+'_data_type_'+data_array[i,2][4::].decode()],
+                                                             'col_id'+str(x): data[catkey+'_'+data_array[int(data_array[i,1].decode()),2].decode()],
+                                                             'corr_type'+str(x): unit_map_array[catkey+'_unit_corr_'+str(data_array[i,2][4::].decode())+str(p)],
+                                                             'unit_corr'+str(x): data[catkey+'_unit_corr_'+unit_map_array[catkey+'_unit_corr_'+data_array[i,2][4::].decode()+str(p)]],
+                                                             'conv_to_AB_mag'+str(x): data[catkey+'_conv_to_AB_mag']})
                         p+=1                        
                         x+=1
-                                          
-            if data_array[i,2].startswith('halo_col_'):
-                #print 'here: assembly id_col_array!'
-                nr_cols2read_halo_col+=1
-                if data_array[i,0]!=str(99):
-                    
-                    #print 'y:', y, data_array[i,2][9::]
-                    #print unit_map_array[catkey+'_unit_corr_'+data_array[i,2][9::]]
-                    #print data[catkey+'_unit_corr_'+unit_map_array[catkey+'_unit_corr_'+data_array[i,2][9::]]]
-                                  
-                    data[catkey+'_halo_id_col_array'].update({'name'+str(y): data_array[i,2][4::], data_array[i,2][9::]+'_col_id': data[catkey+'_'+data_array[int(data_array[i,1]),2]],  'data_type'+str(y): unit_map_array[catkey+'_data_type_'+data_array[i,2][9::]], 'col_id'+str(y): data[catkey+'_'+data_array[int(data_array[i,1]),2]], 'corr_type'+str(y): unit_map_array[catkey+'_unit_corr_'+data_array[i,2][9::]], 'unit_corr'+str(y): data[catkey+'_unit_corr_'+unit_map_array[catkey+'_unit_corr_'+data_array[i,2][9::]]], 'dummy'+str(y): 'dummy'})
-                    y+=1
-                
+                                                         
 
-            if data_array[i,2].startswith('analyse_tarsel_'):
-                #print 'here: assembly id_col_array!'
+            if str(data_array[i,2]).startswith('analyse_tarsel_'):
+                #print('here: assembly id_col_array!')
                                                 
                 nr_cols2read_tarsel_col+=1
                 name_map={}
@@ -209,78 +208,81 @@ class Configuration:
                 find_name_before=len('analyse_tarsel_')
 
                 if data_array[i,2].find('hist')!=-1:
-                    #print 'analyse_tarsel_HIST!!!'                 
-                    name_map.update({'col_name1': data[catkey+'_id_col_array']['name0'], 'id_col_1': 0, 'col_name2': data[catkey+'_id_col_array']['name0'], 'id_col_2': 0})
+                    #print('analyse_tarsel_HIST!!!'                 
+                    name_map.update({'col_name1': data[catkey+'_id_col_array']['name0'],
+                                     'id_col_1': 0,
+                                     'col_name2': data[catkey+'_id_col_array']['name0'],
+                                     'id_col_2': 0})
                 
                 else:
                     
                     while k<3:
-                        #print 'name', data_array[i,2], 'value:', data_array[i,0], 'k:', k, 'find_name_before:', find_name_before, 'len of name to find:', len(data_array[i,2])
+                        #print('name', data_array[i,2], 'value:', data_array[i,0], 'k:', k, 'find_name_before:', find_name_before, 'len of name to find:', len(data_array[i,2])
                         find_name = data_array[i,2][find_name_before::].find('-')
     
                         if find_name!=-1:
                             try:
-                                #print data_array[i,2][find_name_before+find_name-1:find_name_before+find_name+2]
+                                #print(data_array[i,2][find_name_before+find_name-1:find_name_before+find_name+2]
                                 find_band_name = data_array[i,2][find_name_before+find_name-1:find_name_before+find_name+2]
                                 find_minus_sign=find_band_name.find('-')
                                 #correct the minus sign
-                                #print 'minus:', find_minus_sign
+                                #print('minus:', find_minus_sign
                                 col_name='mAB_dA_total_cut_'+find_band_name[find_minus_sign-1:find_minus_sign]+'_'+find_band_name[find_minus_sign+1::]
-                                #print 'col_name:', col_name
+                                #print('col_name:', col_name
 
                                 try:
                                     id_col=data[catkey+'_id_col_array'][col_name+'_col_id']
                                 except:
                                     try:
-                                        #print '-: try2:',
+                                        #print('-: try2:',
                                         col_name='mAB_dA_total_'+find_band_name[0]
                                         id_col=data[catkey+'_id_col_array'][col_name+'_col_id']
-                                        #print 'col_name:', col_name
+                                        #print('col_name:', col_name
                                     except:
                                         col_name='MAB_dA_total_'+find_band_name[0]
                                         id_col=data[catkey+'_id_col_array'][col_name+'_col_id']
-                                #print 'col_name:', col_name
+                                print('col_name:', col_name)
                             except:
-                                id_col = 99
-                                data[catkey+'_id_col_array'].update({'name': col_name, col_name+'_col_id': id_col})
+                                id_col = 999
+                                data[catkey+'_id_col_array'].update({'name': col_name.decode(), col_name.decode()+'_col_id': id_col})
                            
                             find_name=3
                         else:
-                            #print 'find_name_before:', find_name_before
+                            #print('find_name_before:', find_name_before
                             find_name = data_array[i,2][find_name_before::].find('_')
-                            #print 'find_name else:', find_name
+                            #print('find_name else:', find_name
                             if find_name==0: 
                                 find_name_before+=1
                                 find_name=len(data_array[i,2])-find_name_before
-                            #print 'find_name+1:', find_name_before, 'find_name:', find_name
+                            #print('find_name+1:', find_name_before, 'find_name:', find_name
                             try:
                                 try:
-                                    #print 'col name --> mAB!'
+                                    #print('col name --> mAB!'
                                     col_name='mAB_dA_total_'+data_array[i,2][find_name_before:find_name_before+find_name]
-                                    print 'try:', data_array[i,2][find_name_before:find_name_before+find_name],  'col_name:', col_name,data[catkey+'_id_col_array'][col_name+'_col_id']
+                                    print('try:', data_array[i,2][find_name_before:find_name_before+find_name],  'col_name:', col_name,data[catkey+'_id_col_array'][col_name+'_col_id'])
                                 except:
                                     try:
-                                        print 'try2:',
+                                        print('try2:', end=' ')
                                         col_name='mAB_dA_total_'+find_band_name[0]
                                         id_col=data[catkey+'_id_col_array'][col_name+'_col_id']
-                                        #print 'col_name:', col_name
+                                        #print('col_name:', col_name
                                     except:
                                         col_name='MAB_dA_total_'+find_band_name[0]
                                         id_col=data[catkey+'_id_col_array'][col_name+'_col_id']
-                                #print 'col_name:', col_name
+                                #print('col_name:', col_name
                             except:
                                 try:
                                     if data_array[i,2][find_name_before:find_name_before+find_name].find('I')!=-1:
-                                        #print 'col name --> MAB!'
+                                        #print('col name --> MAB!'
                                         col_name='MAB_total_'+data_array[i,2][find_name_before+1:find_name_before+1+find_name-1]
                                     else:
                                         col_name='mAB_total_'+data_array[i,2][find_name_before:find_name_before+find_name]
-                                    print 'try3:', data[catkey+'_id_col_array'][col_name+'_col_id']
+                                    print('try3:', data[catkey+'_id_col_array'][col_name+'_col_id'])
                                                             
                                 except:
                                     try:                                
                                         col_name='mAB_dA_total_cut_'+data_array[i,2][find_name_before:find_name_before+find_name]
-                                        print data[catkey+'_id_col_array'][col_name+'_col_id']
+                                        print(data[catkey+'_id_col_array'][col_name+'_col_id'])
                                     
                                     except:
                                         if col_name.find('rhalfmass')!=-1:
@@ -308,22 +310,22 @@ class Configuration:
                                         else:
                                             col_name=data_array[i,2][find_name_before:find_name_before+find_name]
                                             
-                                        print 'except:', col_name
+                                        print('except:', col_name)
                                         try:
-                                            #print 'except2:', col_name, 
+                                            #print('except2:', col_name, 
                                             if catkey=='SAGE_1Gpc' and col_name=='mcold': col_name='mcold_disk'
                                             #if catkey=='Galacticus_1Gpc' and col_name=='Mzgas': col_name='zgas_spheroid'
-                                            #print data[catkey+'_id_col_array'][col_name+'_col_id']
+                                            #print(data[catkey+'_id_col_array'][col_name+'_col_id']
                                             
                                         except:
-                                            #print 'col_name:', col_name, 'total name:', data_array[i,2][find_name_before::],
+                                            #print('col_name:', col_name, 'total name:', data_array[i,2][find_name_before::],
                                             find_name=data_array[i,2][find_name_before+len(col_name)+1::].find('_')
 
-                                            #print 'except3:', 'find name:', find_name, 
+                                            #print('except3:', 'find name:', find_name, 
                                             col_name=data_array[i,2][find_name_before:find_name_before+len(col_name)+1+find_name]
                                             find_name=len(col_name)
-                                            #print 'new col_name:', col_name, 'new find_name_before:', find_name_before,                                                                              
-                                            #print data[catkey+'_id_col_array'][col_name+'_col_id']
+                                            #print('new col_name:', col_name, 'new find_name_before:', find_name_before,                                                                              
+                                            #print(data[catkey+'_id_col_array'][col_name+'_col_id']
                         
                         find_name_before+=find_name
                         #name_map.update({'col_name'+str(k): col_name, 'id_col_'+str(k): id_col})
@@ -331,25 +333,26 @@ class Configuration:
                         
                         k+=1
                     
-                print 'name_map:', name_map
+                print('name_map:', name_map)
 
                 #data[catkey+'_analyse_tarsel_id_col_array'].update({'name'+str(z): data_array[i,2], data_array[i,2]+'_col_name1': name_map['col_name1'],   data_array[i,2]+'_col_name_id1': data[catkey+'_id_col_array'][name_map['col_name1']+'_col_id'],  data_array[i,2]+'_col_name2': name_map['col_name2'],   data_array[i,2]+'_col_name_id2': data[catkey+'_id_col_array'][name_map['col_name2']+'_col_id']})
                 data[catkey+'_analyse_tarsel_id_col_array'].update({'name'+str(z): data_array[i,2], data_array[i,2]+'_col_name1': name_map['col_name1'],  data_array[i,2]+'_col_name2': name_map['col_name2']})
                 
                 z+=1
-            
-            if data_array[i,2].startswith('snapid'):
                 
-                snapidID=int(data_array[i,1])       
-                data[catkey+'_snapid0']  = data_array[i,0]
-                #print 'i:', i, 'snapid'+str(0), data[catkey+'_snapid'+str(0)]
+            if data_array[i,2].decode().startswith('snapid'):
+                #print(data_array[:,0].size, data_array[i,[0,1]])
+                snapidID=int(data_array[i,1].decode())       
+                data[catkey+'_snapid0']  = data_array[i,0].decode()
+                #print('347 i:', i, 'snapid'+str(0), data[catkey+'_snapid'+str(0)], 'snapidID:', snapidID)
                 
                 a=i+1
                 count=1
                 while a<data_array[:,0].size:
-                    if data_array[a,1]==str(snapidID):
-                        data[catkey+'_snapid'+str(count)]=data_array[a,0]
-                        #print 'i:', i, 'a:', a, data_array[a,:], 'snapid'+str(count), data[catkey+'_snapid'+str(count)]
+                    #print('a:', a, data_array[a,1].decode(), str(snapidID))
+                    if str(data_array[a,1].decode())==str(snapidID):
+                        data[catkey+'_snapid'+str(count)]=data_array[a,0].decode()
+                        #print('here 354 i:', i, 'a:', a, data_array[a,:], 'snapid'+str(count), data[catkey+'_snapid'+str(count)])
                         count+=1
                     a+=1
                 i+=count-1
@@ -359,6 +362,8 @@ class Configuration:
 
             i+=1
   
+        #print('here 364: count', count)
+        #exit()
         data[catkey+'_id_col_array'].update({'nr_entries': x})
         data[catkey+'_id_col_array'].update({'nr_cols2read': nr_cols2read_col})
         data[catkey+'_halo_id_col_array'].update({'nr_entries': y})
@@ -374,7 +379,7 @@ class Configuration:
        
         if np.prod(data_array.shape)==1 or np.prod(data_array.shape)==5:
             data_array = np.expand_dims(data_array, axis=0)
-        #print data_array
+
         self.plot_map_array = {}
         j=0
         self.plot_map_array['run_nr'] = data_array[j,1]
@@ -426,7 +431,7 @@ class Configuration:
             self.plot_config_array[data_array[i,0]] = data_array[i,1]
             i+=1
 
-        #print self.plot_config_array
+        #print(self.plot_config_array
 
     def load_matplot_stylefiles(self,
                                 catname,
@@ -460,8 +465,8 @@ class Configuration:
         a=0
         while a<=10:
             data_array = myData.readAnyFormat(config=False, mydtype=np.str_, mypath=mypaths[str(a)], data_shape='shaped', comment='', delim='= ')
-            #print 'mypath:', mypaths[str(a)]            
-            #print 'data_array:', data_array
+            #print('mypath:', mypaths[str(a)]            
+            #print('data_array:', data_array
             if data_array.size==2:
                 data_array = np.expand_dims(data_array, axis=0)
                 
@@ -473,21 +478,21 @@ class Configuration:
             
         if ncolours!=0:
             import distinct_colours as cb_col 
-            #print 'use color-blind friendly colors!'
-           # print catname
+            #print('use color-blind friendly colors!'
+           # print(catname
             cb_colours = cb_col.get_distinct(ncolours)           
             if ncolours==1:
                 if catname.find('Galacticus')!=-1:
-                    #print 'Gal'
+                    #print('Gal'
                     color['0']='#225588'
                 elif catname.find('SAG_')!=-1 or str(catname).find('SAG_1Gpc_v2')!=-1:
-                    #print 'SAG'
+                    #print('SAG'
                     color['0']='#CC6677'
                 elif catname.find('SAGE')!=-1:
-                    #print 'SAGE'
+                    #print('SAGE'
                     color['0']='#DDCC77'
                 else:
-                    #print 'else'
+                    #print('else'
                     color['0']=cb_colours[0]
             else:
                 i=0
@@ -537,7 +542,7 @@ class Configuration:
             
         i=0
         while i<data_array[:,0].size:
-            #print 'i:', i, data_array[i,0], '-->', data_array[i,1]
+            #print('i:', i, data_array[i,0], '-->', data_array[i,1]
             self.name_conv_map[data_array[i,0]] = data_array[i,1]
             i+=1 
     
@@ -552,7 +557,7 @@ class Configuration:
             file_format,
             use_snapidz_mapping,
             config_array):
-        #print 'HERE!', use_snapidz_mapping        
+        #print('HERE!', use_snapidz_mapping        
         if use_snapidz_mapping=='True':
             mySnap = aD.ArangeData()
             if catkey.startswith('sussing')==-1:
@@ -560,7 +565,7 @@ class Configuration:
             else:
                 snap_array = mySnap.readAnyFormat(config=False, mypath=myconfig_datafile, data_shape='shaped', comment='#', delim='\t') 
                 
-            #print 'snap_array'
+            print('here 565: snap_array:', snap_array) 
           
             i=0
             while i<snap_array[:,0].size:
@@ -598,28 +603,29 @@ class Configuration:
 
         else:
                 i=0
+                print('here 606:', config_array[catkey+'_nr_zs_count'])
                 while i<config_array[catkey+'_nr_zs_count']:
-                    #print 'key_filename part1:', inputfilename_part1, 'snapid:', snapid, 'part2:', inputfilename_part2
+                    #print('here 608:', 'i:', i, ' key_filename part1:', inputfilename_part1, 'snapid:', snapid, 'part2:', inputfilename_part2)
 
                     if config_array[catkey+'_create_subcat']=='True':
-                        #print 'create subcat!'
-                        #print 'scale_factor_map:', self.SAM_scale_factor_map
+                        #print('create subcat!')
+                        #print('here 612: scale_factor_map:', self.SAM_scale_factor_map)
                         my_z=self.SAM_scale_factor_map[catkey+'_redshift'+str(i)]
                     
                     elif config_array[catkey+'_use_snapidz_mapping']=='False' and config_array[catkey+'_load_from_file']=='False' and config_array[catkey+'_load_subcat']!='True':                  
-                        #print 'snapidz_mapping False!'
+                        print('snapidz_mapping False!')
                         my_z=config_array[catkey+'_snapid'+str(i)]
       
                     elif config_array[catkey+'_load_from_file']=='True' or config_array[catkey+'_load_subcat']=='True':
-                        #print 'manual z:', config_array[catkey+'_manual_input_redshift']
+                        print('manual z:', config_array[catkey+'_manual_input_redshift'])
                         my_z=config_array[catkey+'_manual_input_redshift']
                     
-                    if inputfilename_part1=='':
+                    if inputfilename_part1=='""':
                         self.snapid_array[catkey+'_snapid'+str(i)] = {'z': my_z}
                     else:
                         self.snapid_array[catkey+'_'+inputfilename_part1+'_snapid'+str(i)] = {'z': my_z}
                     i+=1               
-        print 'self.snapid_array:', self.snapid_array
+        print('here 628: self.snapid_array:', self.snapid_array)
         
     def filterDataConfig(self):
 
@@ -629,7 +635,7 @@ class Configuration:
 
         if data_array.size==10:
             data_array = np.expand_dims(data_array, axis=0)
-        #print data_array
+        #print(data_array
         i=0
         while i<data_array[:,0].size:
             self.mycond_config_array['name'+str(i)] = data_array[i,0]
@@ -646,32 +652,15 @@ class Configuration:
             i+=1
         
         self.mycond_config_array['nr_entries'] = i
-        #print self.mycond_config_array
+        #print(self.mycond_config_array
         return self.mycond_config_array
-
-    def getCUTEParameterFile(self):
-
-        self.CUTE_params = {}
-        myData = aD.ArangeData()
-        data_array = myData.readAnyFormat(config=False, mydtype=np.str_, mypath=self.mypath_handler['MYCUTE_PARAMFILE'], data_shape='shaped', comment='#', delim='= ')
-       
-        i=0
-        while i<data_array[:,0].size:
-            self.CUTE_params['name'+str(i)] = data_array[i,0]
-            self.CUTE_params[data_array[i,0]+'_param'] = data_array[i,1] 
-            i+=1
-            
-        self.CUTE_params['nr_entries'] = i
-        
-        return self.CUTE_params
-
 
     def SAMScaleFactorMapping(self):
 
         self.SAM_scale_factor_map = {}
         myData = aD.ArangeData()
         data_array = myData.readAnyFormat(config=False, mydtype=np.str_, mypath=self.mypath_handler['SAM_SCALE_FACTOR_MAPPING'], data_shape='shaped', comment='#', delim=' ')
-        #print data_array
+        #print(data_array
         def check_data(data_array):
         
             try:
@@ -682,17 +671,14 @@ class Configuration:
                     i=0
                     while i<data_array[:,0].size:
                         self.SAM_scale_factor_map[data_array[i,0]+'_redshift'+str(i)] = float(data_array[i,2])
-                        self.SAM_scale_factor_map[data_array[i,0]+'_snapid'+str(i)] = data_array[i,1]
+                        self.SAM_scale_factor_map[data_array[i,0]+'_snapid'+str(i)] = str(data_array[i,1])
                         self.SAM_scale_factor_map[data_array[i,0]+'_scale_factor'+str(i)] = float(data_array[i,3])
                         i+=1
             except:
                 pass
-
-        print 'HERE:', data_array
-        
-
+       
         check_data(data_array)
            
-        #print self.SAM_scale_factor_map 
+        #print('here: 679', self.SAM_scale_factor_map) 
         return self.SAM_scale_factor_map  
                   

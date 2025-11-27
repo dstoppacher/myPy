@@ -1,4 +1,4 @@
-# Load packages
+from __future__ import print_function
 #import config as conf
 #myConfig = conf.Configuration()
 import scipy as scipy
@@ -64,7 +64,7 @@ class MyFunctions:
         histo[:,5] = +dy  
         histo[:,6] = number count of binned objects y-axis
         """
-        #print 'Normalisations y-Axis: NORM Y:', norm_y, 'error type:', y_error_type, 'NORM X:', norm_x
+        #print('Normalisations y-Axis: NORM Y:', norm_y, 'error type:', y_error_type, 'NORM X:', norm_x
         #Choose x-axis, log or linear?
 
         #Normalisations x-Axis
@@ -92,7 +92,7 @@ class MyFunctions:
         #Choose error type for y-error
         if y_error_type=='Poisson':
             #y-error --> N/poisson(N**0.5)
-            print 'log_y_err:', log_y_err
+            print('log_y_err:', log_y_err)
             if log_y_err==True:
                 
                 histo[:,4] = (histo[:,1]/(histo[:,6]**0.5))*0.43
@@ -123,7 +123,9 @@ class MyFunctions:
         norm_by_binsize=True,
         cumulative=False,
         weights=False,
-        equal_bins=True):
+        equal_bins=True,
+        perc_lower=16,
+        perc_higher=84):
 
         """
         Input:
@@ -149,23 +151,10 @@ class MyFunctions:
         #sort values to bins!
         def sortAndCalc():
             
-            data2bin= {}
-            i=0
-            while (i<binned_array[:,0].size):
-                #binned_array[i,0] = (data_min + binsize*(i+0.5))
-                #print 'bucket example:', 'bin:', binned_array[i,0], 'Mhalo:', 9+i*0.3, (9+i*0.3-data_min)/binsize   
-                key = 'x'+str(i)
-                data2bin[key] = []
-    
-                key = 'y'+str(i)
-                data2bin[key] = []
-                
-                key = 'x_add_axis'+str(i)
-                data2bin[key] = []                           
-                i+=1
-               
             def calc_buckets(data1,data2,data3):
-                
+                #print(data1.size, data2.size, data3.size)
+                #print(data_min, data_max)
+                #print(data1)
 
                 data1=data1[np.where(data1>data_min)[:][0]]
                 data1=data1[np.where(data1<=data_max)[:][0]]
@@ -176,7 +165,8 @@ class MyFunctions:
                 else:
                     data_weight=np.ones((data1.size,), dtype=np.int8)
                                 
-                for i in range(len(data1)):                        
+                for i in range(len(data1)):
+                    print('i:', i, data1[i])                        
                     if log10bin==True:
                         bucket = np.floor((data1[i]-data_min)/binsize)
                     elif linbin==True:
@@ -185,16 +175,16 @@ class MyFunctions:
                         bucket = np.floor(np.log10(data1[i]/data_min)/binsize)
                     
                     bucket = np.int_(bucket)
-                    #print 'i:', i, 'bucket:', bucket, 'data[i]:', "{0:.10e}".format(10**data1[i]), "{0:.10e}".format(10**data_weight[i])
+                    print('i:', i, 'bucket:', bucket, 'log10bin:', log10bin, 'data[i]:', data[i], "{0:.10e}".format(10**data1[i]), "{0:.10e}".format(10**data_weight[i]))
             
                     if data1[i]==data_max:
-                        #print 'data_max:', data_max,#, data[i,0]
+                        #print('data_max:', data_max,#, data[i,0]
                         bucket=nbins-1
-                        #print bucket
+                        #print(bucket
 #                    elif data1[i]==data_min:
-#                        print 'data_min:', data_min, data[i,0]
+#                        print('data_min:', data_min, data[i,0]
 #                        bucket=0 
-#                        print bucket
+#                        print(bucket
                         
             
                     if log10bin==True:
@@ -207,41 +197,59 @@ class MyFunctions:
                         data2bin['x_add_axis'+str(bucket)].append(data3[i])                              
                     
                     #bucket number count n
-                    binned_array[bucket,6]+=1*data_weight[i]       
+                    binned_array[bucket,6]+=1*data_weight[i]   
 
             
+            data2bin= {}
+            i=0
+            while (i<binned_array[:,0].size):
+                #binned_array[i,0] = (data_min + binsize*(i+0.5))
+                #print('bucket example:', 'bin:', binned_array[i,0], 'Mhalo:', 9+i*0.3, (9+i*0.3-data_min)/binsize   
+                key = 'x'+str(i)
+                data2bin[key] = []
+    
+                key = 'y'+str(i)
+                data2bin[key] = []
+                
+                key = 'x_add_axis'+str(i)
+                data2bin[key] = []                           
+                i+=1
+            
             #sort into the buckets    
-            try:               
-                calc_buckets(data[str(names[0])],data[str(names[1])],data[str(names[2])])    
-            except:
-                calc_buckets(data[:,0],data[:,1],data[:,2]) 
+            # try:
+            #print(names
+            print(data[names])
+            calc_buckets(data[str(names[0])],data[str(names[1])],data[str(names[2])])
+            print(data2bin)
+            # except:
+            #     calc_buckets(data[:,0],data[:,1],data[:,2]) 
 
             #Calculate median/mean values of the buckets!              
             i=0            
             while i<binned_array[:,0].size:
 
                 if names[1]=='ngal':
-                        #print 'i:', i, 'n counts:', binned_array[i,6]
-                        if len(data2bin['x'+str(i)])>0:
-                            binned_array[i,0] = np.nanmedian(data2bin['x'+str(i)])
-                            binned_array[i,2] = np.percentile(data2bin['x'+str(i)], 95)                
-                        if len(data2bin['y'+str(i)])>0:
-                            #print data2bin['y'+str(i)]
-                            #print 'sum:', np.sum(data2bin['y'+str(i)]), '/nhalos:', np.sum(data2bin['y'+str(i)])/len(data2bin['y'+str(i)])#, '+/-', np.percentile(data2bin['y'+str(i)], 95)/len(data2bin['y'+str(i)]), '/', np.percentile(data2bin['y'+str(i)], 5)/len(data2bin['y'+str(i)])
-                            binned_array[i,1] = np.sum(data2bin['y'+str(i)])/len(data2bin['y'+str(i)])
-    
-                            binned_array[i,3] = np.nanpercentile(data2bin['y'+str(i)], 95)/binned_array[i,6]
-                            binned_array[i,4] = np.nanpercentile(data2bin['y'+str(i)], 5)/binned_array[i,6]                         
-                        try:
-                            if len(data2bin['x_add_axis'+str(i)])>0:
-                                binned_array[i,7] = np.sum(data2bin['x_add_axis'+str(i)])
-                                binned_array[i,8] = np.nanpercentile(data2bin['x_add_axis'+str(i)], 95)/binned_array[i,6]
-                                binned_array[i,9] = np.nanpercentile(data2bin['x_add_axis'+str(i)], 5)/binned_array[i,6]                              
-                        except:
-                            pass
+                    print('i:', i, 'n counts:', binned_array[i,6])
+                    if len(data2bin['x'+str(i)])>0:
+                        binned_array[i,0] = np.nanmedian(data2bin['x'+str(i)])
+                        binned_array[i,2] = np.percentile(data2bin['x'+str(i)], 95)                
+                    if len(data2bin['y'+str(i)])>0:
+                        #print(data2bin['y'+str(i)]
+                        #print('sum:', np.sum(data2bin['y'+str(i)]), '/nhalos:', np.sum(data2bin['y'+str(i)])/len(data2bin['y'+str(i)])#, '+/-', np.percentile(data2bin['y'+str(i)], 95)/len(data2bin['y'+str(i)]), '/', np.percentile(data2bin['y'+str(i)], 5)/len(data2bin['y'+str(i)])
+                        binned_array[i,1] = np.sum(data2bin['y'+str(i)])/len(data2bin['y'+str(i)])
+
+                        binned_array[i,3] = np.nanpercentile(data2bin['y'+str(i)], 95)/binned_array[i,6]
+                        binned_array[i,4] = np.nanpercentile(data2bin['y'+str(i)], 5)/binned_array[i,6]                         
+                    try:
+                        if len(data2bin['x_add_axis'+str(i)])>0:
+                            binned_array[i,7] = np.sum(data2bin['x_add_axis'+str(i)])
+                            binned_array[i,8] = np.nanpercentile(data2bin['x_add_axis'+str(i)], 95)/binned_array[i,6]
+                            binned_array[i,9] = np.nanpercentile(data2bin['x_add_axis'+str(i)], 5)/binned_array[i,6]                              
+                    except:
+                        pass
                 else:
                     if use_MAD==True:
-                        #print 'USE MEDIAN AND MAD!'
+                        #print('USE MEDIAN AND MAD!'
                         if len(data2bin['x'+str(i)])>0: 
                             binned_array[i,0] = np.nanmedian(data2bin['x'+str(i)])
                             #MAD is 75% percentile!
@@ -262,13 +270,15 @@ class MyFunctions:
                             pass
     
                     else:
-                        #print 'USE MEDIAN AND PERCENTILES!'
-                        for col_data,col_bin,perc in zip(['x','y','x','x','y','y','x_add_axis','x_add_axis','x_add_axis'],[0,1,2,3,4,5,7,8,9],[50,50,32,68,32,68,50,32,68]):
-                            #print 'col_bin:', col_bin, 'col_data:', col_data, 'perc:', perc
-                            try:
-                                binned_array[i,col_bin] =  np.percentile(data2bin[col_data+str(i)], perc)
-                            except:
-                                print 'bin:', col_bin, 'for:', col_data, 'not calculateable for ', perc                                                                                                                
+                        #print('USE MEDIAN AND PERCENTILES!'
+                        for col_data,col_bin,perc in zip(['x','y','x','x','y','y','x_add_axis','x_add_axis','x_add_axis'],
+                                                         [0,1,2,3,4,5,7,8,9],
+                                                         [50,50,perc_lower,perc_higher,perc_lower,perc_higher,50,perc_lower,perc_higher]):
+                            print('col_bin:', col_bin, 'col_data:', col_data, 'perc:', perc, 'size:', data2bin[col_data+str(i)])
+                            #try:
+                            binned_array[i,col_bin] =  np.percentile(data2bin[col_data+str(i)], perc)
+                            # except:
+                            #     print('bin:', col_bin, 'for:', col_data, 'not calculateable for ', perc                                                                                                                
                 i+=1
       
 
@@ -276,19 +286,19 @@ class MyFunctions:
             #binning the data if a number counted histogram is calculated (no cumulative, no bin2D)
             
             if names[1]!='ngal':         
-                print 'binup_2D and cumulative: False --> normalise through!', binsize
+                print('binup_2D and cumulative: False --> normalise through!', binsize)
                 binned_array[:,1] = binned_array[:,6]/binsize
 
             if equal_bins==True:
                 if log10bin==True:
                     bins=np.arange(data_min,data_max,binsize)
-                    print bins
+                    print(bins)
                     binned_array[:,0]=10**bins
                     
             else:
                 if log10bin==True:
-                    print 'log10bin: True --> log quantity , linear binning!'               
-                    #print 'data_min:', data_min, 'data_max:', data_max, 'bin_size:', binsize
+                    print('log10bin: True --> log quantity , linear binning!')               
+                    #print('data_min:', data_min, 'data_max:', data_max, 'bin_size:', binsize)
                     i=1
                     while i<nbins+1:
                         bucket_left = data_min + (i-1)*binsize
@@ -296,23 +306,23 @@ class MyFunctions:
                                        
                         binned_array[i-1,0] = (10**bucket_left*10**bucket_right)**0.5
                         
-                        #print 'i-1:', i-1, 'bucket_left:', bucket_left, 'bucket_right:', bucket_right, 'bucket_center:', binned_array[i-1,0], 'log10bin', (bucket_left*bucket_right)**0.5
+                        #print('i-1:', i-1, 'bucket_left:', bucket_left, 'bucket_right:', bucket_right, 'bucket_center:', binned_array[i-1,0], 'log10bin', (bucket_left*bucket_right)**0.5
                         i+=1                                      
                 else:
-                    print 'log10bin: False --> linear quantity , log binning!'                           
-                    #print 'data_min:', data_min, 'data_max:', data_max, 'bin_size:', binsize                    
+                    print('log10bin: False --> linear quantity , log binning!')                           
+                    #print('data_min:', data_min, 'data_max:', data_max, 'bin_size:', binsize)                    
                     i=1
                     while i<nbins+1:
                         bucket_left = data_min*10**(binsize*(i-1))
                         bucket_right = data_min*10**(binsize*i)
                                        
                         binned_array[i-1,0] = (bucket_left+bucket_right)*0.5
-                        #print 'i-1:', i-1, 'bucket_left:', bucket_left, 'bucket_right:', bucket_right, 'bucket_center:', binned_array[i-1,0], 'log10bin', (bucket_left*bucket_right)**0.5
+                        #print('i-1:', i-1, 'bucket_left:', bucket_left, 'bucket_right:', bucket_right, 'bucket_center:', binned_array[i-1,0], 'log10bin', (bucket_left*bucket_right)**0.5
                         i+=1 
           
 
         def cumHisto():
-            print 'create cumulative histogramm!'
+            print('create cumulative histogramm!')
             cumhisto, limits, binsize, extrapoints=scipy.stats.cumfreq(data[:,0], defaultreallimits=(data_min, data_max), numbins=nbins)
 
             binned_array[:,1] = cumhisto[::-1]
@@ -322,13 +332,12 @@ class MyFunctions:
         
         #MAIN binup()
         #------------------------------------------------------------------
-        from statsmodels import robust            
+        #from statsmodels import robust            
         start = time()
         #rearange input data array --> has to have this shape data.shape = (n-rows,3)
 
         try: 
-            print 'try in case data is structured array!'
-
+            print('try in case data is structured array!')
 
             names=[]        
             for f in data.dtype.names:
@@ -339,18 +348,18 @@ class MyFunctions:
             else:
                 myexpand_col = names[1]
                 
-            #print 'col to expand', myexpand_col
+            #print('col to expand', myexpand_col
             if len(names)<3:       
                 import numpy.lib.recfunctions as rcfuncs
                 data = rcfuncs.append_fields([data], ['add_axis'] ,[data[str(myexpand_col)]], usemask=False)
                 names+=['add_axis']
-            #print 'names', names
+            #print('names', names
             
             data_min = min(data[str(names[0])])
             data_max = max(data[str(names[0])])
       
             if div_y2x==True:
-                #print 'div_y2x:', div_y2x
+                #print('div_y2x:', div_y2x
                 data[str(names[1])]/=data[str(names[0])]    
     
             if log10bin==True:
@@ -361,7 +370,7 @@ class MyFunctions:
         
         except:
             names=[99,99]          
-            #print 'except!'
+            #print('except!'
             #data is not a structured array, treat as numpy ndarray!
             if div_y2x==False:
                 myexpand_col = 0
@@ -372,7 +381,7 @@ class MyFunctions:
             data = mL.dim_expander(data, 3, id_of_col_to_expand=myexpand_col) 
     
             if div_y2x==True:
-                print 'div_y2x:', div_y2x
+                print('div_y2x:', div_y2x)
                 data[:,1]/=data[:,0]
 
             if histo_min=='min':   
@@ -389,11 +398,11 @@ class MyFunctions:
         
         linbin=False
         if log10bin==True:
-            #print 'log quantity, linear binning!'
+            #print('log quantity, linear binning!'
             
             if equal_bins==True:              
                                 
-                #print 'equal bins!', histo_min
+                #print('equal bins!', histo_min
                 data_min=float(histo_min)
                 data_max=float(histo_max)
                                 
@@ -407,20 +416,11 @@ class MyFunctions:
 
             if np.int_(binsize)<0:
                 binsize = np.log10(data_max-data_min)/nbins
-                print 'linear quantity, linear binning!'
+                print('linear quantity, linear binning!')
                 linbin=True
             else:                             
-                print 'linear quantity, log binning!'
+                print('linear quantity, log binning!')
 
-
-        #print 'data info:\n', np.info(data), '\n------------------\n'
-#        print 'use MAD?\t', use_MAD, '\nlog10 bining?\t', log10bin, '\nlin bining?\t', linbin, '\nweights?\t', weights, \
-#              '\nequal bins?\t', equal_bins, '\ndiv y/x?\t', div_y2x, '\nbinup 2D?\t', binup_2D, '\nnorm by binsz?\t', norm_by_binsize, '\ncumulative?\t', cumulative, \
-#              '\nadd axis?\t', add_axis
-
-
-
-                
         if add_axis!=False:
             size_binned_array=10
         else:
@@ -428,9 +428,7 @@ class MyFunctions:
             
         binned_array = np.zeros((nbins, size_binned_array), dtype=np.float64)
         
-        print 'data_min:', data_min, 'data_max:', data_max, 'histo min/max:', histo_min, '/', histo_max, 
-                                                                                      
-        print 'binsize:', binsize, 'shape of binned_array:', binned_array.shape 
+        print('data_min:', data_min, 'data_max:', data_max, 'histo min/max:', histo_min, '/', histo_max, 'binsize:', binsize, 'shape of binned_array:', binned_array.shape) 
 
         if cumulative==False:
             sortAndCalc()
@@ -441,12 +439,13 @@ class MyFunctions:
         if use_MAD==True and binup_2D==False:
             binData()
             
-        #print 'Time 2 bin up with binUp:', (time()-start)/60.0, 'min/', (time()-start), 'sec'
+        #print('Time 2 bin up with binUp:', (time()-start)/60.0, 'min/', (time()-start), 'sec'
 
-#        print 'check_shape:', binned_array.shape
-        #print binned_array
+#        print('check_shape:', binned_array.shape
+        #print(binned_array
 
         return binned_array, binsize
+    
     def fit_HOD(data):
 
         from scipy.special import erf as erf
@@ -468,569 +467,5 @@ class MyFunctions:
             return cents*((10**data-kappa*10**Mcut)/10**M1)**alpha
 
         cents = HOD_White11_cents()
-
-        from scipy.optimize import curve_fit
-        
-        return
-        
-    
-    def calc_twoPCF_monopol(
-                            self,
-                            data,
-                            nbins,
-                            log10bin=False,
-                            histo_min=0.0,
-                            histo_max=0.0,
-                            sub_box_size=True,
-                            angular=False,
-                            ngalaxies='max',
-                            use_random_cat=False,
-                            CF_estimator=False):
-
-
-
-        def caseSwitcher(use_random_cat):
-        
-            choose = {
-                True: calcDeltaPosMoreElements,
-                False: calcDeltaPos1Element
-                }
-                
-            func = choose.get(use_random_cat)
-            return func()
-        
        
-        def checkBoundaries(check_BC_array,
-                            loops=1):
-
-            i=0
-            while i<loops:
-                #print 'ckeBoundaries:', check_BC_array[i], '[i]-boxsize:', box_size-check_BC_array[i]
-                if check_BC_array[i]>(sub_box_size-check_BC_array[i]): check_BC_array[i]= sub_box_size-check_BC_array[i]          
-                i+=1
-                
-            return check_BC_array
-            
-        def calcDeltaPos1Element():
-           
-            d[str(a)] = abs(data[i,a]-data[j,a])
-            
-            d[str(a)] = checkBoundaries([d[str(a)]])[0]
-
-                                                                        
-        def calcDeltaPosMoreElements():
-            
-            calcDeltaPos1Element()
-
-            d_RR[str(a)] = abs(data_RR[i,a]-data_RR[j,a])
-            
-            d_DR[str(a)+'_ij'] = abs(data[i,a]-data_RR[j,a])
-            d_DR[str(a)+'_ji'] = abs(data[j,a]-data_RR[i,a])
-            
-#            print 'data[i,a]',i,a, data[i,a], 'with data[j,a]',j,a, data[j,a]
-#            print 'data_RR[i,a]',i,a, data_RR[i,a], 'with data_RR[j,a]',j,a, data_RR[j,a]
-#            print 'data[i,a]',i,a, data[i,a], 'with data_RR[j,a]',j,a, data_RR[j,a]
-#            print 'data[j,a]',j,a, data[j,a], 'with data_RR[i,a]',i,a, data_RR[i,a]
-
-            calculateEvenDRPairs(i,b)
-            
-            check_BC_array = checkBoundaries([d_RR[str(a)],d_DR[str(a)+'_ij'],d_DR[str(a)+'_ji'],d_DR_even[str(a)]], loops=4)
-                    
-            d_RR[str(a)] = check_BC_array[0]
-            d_DR[str(a)+'_ij'] = check_BC_array[1]
-            d_DR[str(a)+'_ji'] = check_BC_array[2]
-            d_DR_even[str(a)] = check_BC_array[3]
-                   
-        def calculateEvenDRPairs(i,b):
-#            print ' '
-#            print 'a:', a, 'even pairs: i:', i, 'b:', b, 'data[i,a]', data[i,a], 'data_RR[b,a]', data_RR[b,a] 
-            d_DR_even[str(a)] = abs(data[i,a]-data_RR[b,a])
-            
-
-        """
-        CF recipe from: David Alonso http://members.ift.uam-csic.es/dmonge/data/CUTE/README (former IFT PhD)
-              - Take a pair of objects in the data catalog.
-              - Calculate the distance between both objects.
-              - Bin the pair in a histogram according to the calculated distance.
-              - Repeat for all pairs in the catalog to obtain the histogram DD.
-              - Do the same for a random catalog to obtain RR.
-              - Do the same but with each pair composed of a data object and a random
-                object to obtain DR.
-              - Use DD, DR and RR to estimate the correlation function through the
-                estimator defined in the options file.
-        """
-        
-        start = time()
-        print 'calc_twoPCF_monopol'
-        print '---------------------------------------'
-        
-        
-        print 'ngalaxies', ngalaxies
-        if ngalaxies=='max': 
-            ngalaxies=data[:,0].size
-        else:
-            ngalaxies=int(ngalaxies)
-
-
-        """
-                Particle-based algorithms.
-           Brute-force and tree algorithms both belong to this class. The basic
-           algorithm is as follows:
-             - Take a pair of objects in the data. The way to find the nearest
-               neighbors at this stage is what distinguishes brute-force and 
-               tree methods.
-             - Calculate the distance between both objects.
-             - Bin the pair in a histogram according to the calculated distance.
-             - Repeat for all pairs in the catalog to obtain the histogram DD.
-             - The correlation function is estimated as:
-                   xi=(V/v(r))*(DD(r)/N^2)
-               where v(r)=4*pi*((r+dr/2)^3-(r-dr/2)^3)/3, V=box_size^3 and N is the
-               total # particles.
-           Note that, since in this case we have simple periodic boundary conditions,
-           no random catalogs are needed.
-           For the default algorithm, the box is divided into smaller sub-boxes,
-           which are used to find the nearest neighbors for each particle. If the
-           tree algorithm is selected, the method described in Moore et al. 
-           astro-ph/0012333 is used. The latter algorithm may perform better in
-           certain cases.
-        """
-        
-             
-        #print 'data:', data[0:50,:]
-        #choose randomly a number of galaxies:
-        data = mL.choose_random_sample(data, ngalaxies)
-
-        #print 'data:', data[0:6236,:]
-
-        data = mL.dim_expander(data, 5)        
-        print 'new data:', data.shape
-        #data = np.concatenate((data, np.expand_dims(data[:,[0,1]], axis=1)), axis=1)
-
-        print 'sub_box_size:', sub_box_size
-        print ' '
-
-#        myOutput.writeIntoFile(mycomp+'anaconda/pro/myRun/histos/twoPCF/data_twoPCF.txt',
-#                               data[:,[0,1,2]],
-#                               myheader= 'data for 2PCF Mstar>1e9 randowm sample 50000 Galaxies \n(1) x-pos [Mpc]\t(2) y-pos [Mpc]\t(3) z-pos [Mpc]',
-#                               data_format='%0.4f\t%0.4f\t%0.4f') 
-
-
-        #if use_random_cat==True:        
-            
-        random.seed()
-
-        i=0
-        while i<3:
-            data_RR = np.random.random((data[:,0].size*10,4))*sub_box_size
-            i+=1
-        
-
-        print 'size Data_DR:', (data[:,0].size*(data[:,0].size-1))*2+data[:,0].size
-        data_DR = np.zeros(((data[:,0].size*(data[:,0].size-1))*2+data[:,0].size, 2), dtype=np.float32)        
-        print 'data_DR', data_DR.shape, 'data_RR', data_RR.shape
-
-                
-
-        d = {}
-        d_RR = {}
-        d_DR = {}
-        d_DR_even = {}
-        
-        b=0
-        i=0
-        c=0
-        while i<data[:,0].size:
-#            if i==5:
-#                break
-            b=i
-            j=i+1
-            #print 'i:', i, 'j:', j, 'j-1:', j-1, 'b:', b
-            while j<data[:,0].size:
-                a=0
-                while a<3:
-                    #print 'data[i,a]:', str(data[i,a])[0], 'data[j,a]:', data[j,a], 'd[a]:', data[i,a]-data[j,a]
-                    
-                    #if use_random_cat==False:
-                    calcDeltaPos1Element()
-                    #else:
-                    calcDeltaPosMoreElements()
-                    a+=1
-
-                #angular=False --> dz (z(i) - z(j), angular=Ture, dz = abs(z(i) - z(j) + (vz(i)-vz(j))/(scale_factor*hubble))
-                if angular==True:
-                    d['2'] = abs((d['2'] + d['3'] - sub_box_size )/sub_box_size**3)
-
-                #calculate rp_DD (Data-Data pairs)
-                data[i,4] = (abs(d['0'])**2 + abs(d['1'])**2 + d['2']**2)**0.5
-                
-                if use_random_cat==True:
-                #calculate rp_RR (Random-Random pairs)
-                    data_RR[i,3] = (abs(d_RR['0'])**2 + abs(d_RR['1'])**2 + d_RR['2']**2)**0.5
-    
-                    #calculate rp_DR 3 types of pairs 1: Data(i=0,n)-Random(j=i+1,n), 2: Random(i=0,n)-Data(j=i+1,n), 3: pairs with i=j Data(0,n)-Random(0,n)
-                    data_DR[c,0] = (abs(d_DR['0_ij'])**2 + abs(d_DR['1_ij'])**2 + d_DR['2_ij']**2)**0.5
-                    data_DR[c+1,0] = (abs(d_DR['0_ji'])**2 + abs(d_DR['1_ji'])**2 + d_DR['2_ji']**2)**0.5
-                    data_DR[c+2,0] = (abs(d_DR_even['0'])**2 + abs(d_DR_even['1'])**2 + d_DR_even['2']**2)**0.5
-                    c+=3
-                       
-                
-                j+=1
-            i+=1
-
-
-        
-        print 'i:', i-1, 'j:', j-1
-        print 'Time 2 Calculate pairs:', (time()-start)/60.0, 'min/', (time()-start), 'sec'
-        print ' '
-        print 'histo_min:', histo_min, 'histo_max:', histo_max
-
-        data = mL.filter_data_before_analysis(data, 
-                                            histo_min, 
-                                            histo_max, 
-                                            4)
-        print 'data:', data.shape, 'data[min]:', min(data[:,4]),   'data[max]:', max(data[:,4])
-
-        #if use_random_cat==True:                            
-        data_RR = mL.filter_data_before_analysis(data_RR, 
-                                                histo_min, 
-                                                histo_max, 
-                                                3)                                     
-        print 'data_RR:', data_RR.shape, 'data_RR[min]:', min(data_RR[:,3]),   'data_RR[max]:', max(data_RR[:,3])  
-
-
-        print data_DR
-                                         
-        data_DR = mL.filter_data_before_analysis(data_DR, 
-                                                histo_min, 
-                                                histo_max, 
-                                                0)
-        print 'data_DR:', data_DR.shape, 'data[min]:', min(data_DR[:,0]),   'data_DR[max]:', max(data_DR[:,0]) 
-
-                                          
-        print 'DD:'
-        print '+++++++++++++'
-        print ' '
-        DD = self.binUp(data[:,4],
-                           nbins,
-                           histo_min=histo_min,
-                           histo_max=histo_max,
-                           log10bin=True,
-                           use_median=True)
-        print 'DD', DD.shape                   
-        myOutput.writeIntoFile(mycomp+'anaconda/pro/myRun/histos/twoPCF/DD.txt',
-                               DD,
-                               myheader= 'DD 2PCF \n(1) Mstar [Msun]\t(2) Phi [dex^-1 Mpc^-3 h^3]\t(3) dx\t(4) -dy\t(5) +dy\t(6) N count',
-                               data_format='%0.1f\t%0.7f\t%0.1f\t%0.7f\t%0.7f\t%d\t%0.7f\t%0.7f') 
-                             
-        #if use_random_cat==True:                            
-        print 'RR:'
-        print '+++++++++++++'
-        print ' '                           
-        RR = self.binUp(data_RR[:,3],
-                           nbins,
-                           histo_min=histo_min,
-                           histo_max=histo_max,
-                           log10bin=True,
-                           use_median=True)
-                           
-        myOutput.writeIntoFile(mycomp+'anaconda/pro/myRun/histos/twoPCF/RR.txt',
-                               RR,
-                               myheader= 'RR 2PCF \n(1) Mstar [Msun]\t(2) Phi [dex^-1 Mpc^-3 h^3]\t(3) dx\t(4) -dy\t(5) +dy\t(6) N count',
-                               data_format='%0.1f\t%0.7f\t%0.1f\t%0.7f\t%0.7f\t%d\t%0.7f\t%0.7f') 
-                               
-        print 'DR:'
-        print '+++++++++++++'
-        print ' '                           
-        DR = self.binUp(data_DR[:,0],
-                           nbins,
-                           histo_min=histo_min,
-                           histo_max=histo_max,
-                           log10bin=True,
-                           use_median=True)                           
-
-        myOutput.writeIntoFile(mycomp+'anaconda/pro/myRun/histos/twoPCF/DR.txt',
-                               DR,
-                               myheader= 'DR 2PCF \n(1) Mstar [Msun]\t(2) Phi [dex^-1 Mpc^-3 h^3]\t(3) dx\t(4) -dy\t(5) +dy\t(6) N count',
-                               data_format='%0.1f\t%0.7f\t%0.1f\t%0.7f\t%0.7f\t%d\t%0.7f\t%0.7f') 
-
-
-        TwoPCF_CAM = np.zeros((DD[:,0].size,2), dtype=np.float32)  
-        TwoPCF_LS = np.zeros((DD[:,0].size,2), dtype=np.float32)  
-        TwoPCF_ALO = np.zeros((DD[:,0].size,2), dtype=np.float32)  
-        TwoPCF_HAM = np.zeros((DD[:,0].size,2), dtype=np.float32)  
-        TwoPCF_DEF = np.zeros((DD[:,0].size,2), dtype=np.float32)      
-        TwoPCF_CAM[:,0] = DD[:,0]
-        TwoPCF_HAM[:,0] = DD[:,0]
-        TwoPCF_ALO[:,0] = DD[:,0]
-        TwoPCF_LS[:,0] = DD[:,0]
-        
-
-#        i=0       
-#        while i<DD[:,0].size:
-#            #print 'DD[i,0]:', "{0:.1f}".format(DD[i,0]), 'DD[i,1]:', "{0:.2f}".format(DD[i,1]), 'RR[i,0]:', "{0:.2f}".format(RR[i,0]), 'DR[i,0]:', "{0:.2f}".format(DR[i,0])
-#            i+=1
-
-        #if use_random_cat==False: 
-        i=0
-        while i<DD[:,0].size:
-            v_shell = (4*np.pi*DD[i,0]**3)/3                                        # v(r)=4*pi*((r+dr/2)^3-(r-dr/2)^3)/3
-            bucket_random =  v_shell/sub_box_size**3                                 
-            TwoPCF_ALO[i,1] = (sub_box_size**3 / v_shell) * (DD[i,1]/data[:,4].size**2) # xi=(V/v(r))*(DD(r)/N^2)
-            TwoPCF_CAM[i,1] = DD[i,1]/bucket_random - 1.0                               #Cameron, Ginevra: !DD/RR-1
-            print 'v_shell', v_shell, TwoPCF_CAM[i,1]
-            i+=1
-        #else:
-            #Reference: Revies: Jones+04 "Scaling Laws in Distribution of Galaxies" arXiv:astro-ph/0406086v1
-            #if CF_estimator=='LS':
-        part_1 = (data_RR[:,0].size/data[:,0].size )**2 
-        part_2 = data_RR[:,0].size/data[:,0].size
-        TwoPCF_LS[:,1] = 1 + part_1 * (DD[:,1]/RR[:,1]) - 2 * part_2 * (DR[:,1]/RR[:,1])
-        print '2PCF: part_1:', part_1, 'part_2:', part_2, 'data[:,0].size:', data[:,0].size, 'data_RR[:,0].size:', data_RR[:,0].size
-            
-            #elif CF_estimator=='HAM':
-        TwoPCF_HAM[:,1] = (DD[:,1]*RR[:,1])/DR[:,1]**2 - 1
-            #else:
-                #Correlationfunction xi = ( DD / RR ) -1
-        TwoPCF_DEF[:,1] = (data_RR[:,0].size/data[:,0].size) * (DD[:,1]/RR[:,1]) - 1
-            
-        
-
-        print 'Time for calculating whole 2PCF:', (time()-start)/60.0, 'min/', (time()-start), 'sec'
-
-        myOutput.writeIntoFile(mycomp+'anaconda/pro/myRun/histos/twoPCF/TwoPCF_CAM.txt',
-                               TwoPCF_CAM,
-                               myheader= '2PCF Ginevra, Cameron \n(1) r [Mpc]\t(2) Xi(r)',
-                               data_format='%0.3f\t%0.4f')
-
-        myOutput.writeIntoFile(mycomp+'anaconda/pro/myRun/histos/twoPCF/TwoPCF_ALO.txt',
-                               TwoPCF_ALO,
-                               myheader= '2PCF David Alonso \n(1) r [Mpc]\t(2) Xi(r)',
-                               data_format='%0.3f\t%0.4f')                               
-
-        myOutput.writeIntoFile(mycomp+'anaconda/pro/myRun/histos/twoPCF/TwoPCF_HAM.txt',
-                               TwoPCF_HAM,
-                               myheader= '2PCF Hamilton \n(1) r [Mpc]\t(2) Xi(r)',
-                               data_format='%0.3f\t%0.4f')
-
-        myOutput.writeIntoFile(mycomp+'anaconda/pro/myRun/histos/twoPCF/TwoPCF_DEF.txt',
-                               TwoPCF_DEF,
-                               myheader= '2PCF default \n(1) r [Mpc]\t(2) Xi(r)',
-                               data_format='%0.3f\t%0.4f')
-
-        myOutput.writeIntoFile(mycomp+'anaconda/pro/myRun/histos/twoPCF/TwoPCF_LS.txt',
-                               TwoPCF_LS,
-                               myheader= '2PCF LS \n(1) r [Mpc]\t(2) Xi(r)',
-                               data_format='%0.3f\t%0.4f')
-        
-        return TwoPCF_CAM
-
-    def ttest(self, 
-              data1,
-              data2,
-              prop):
-        
-        from scipy import stats
-        len_data1 = data1.size
-        len_data2 = data2.size
-        
-        if len_data1!=len_data2:
-            print 'len_data1:', len_data1, 'len_data2:', len_data2,
-            if len_data1>len_data2:
-                data1 = mL.choose_random_sample(data1, len_data2)
-            else:
-                data2 = mL.choose_random_sample(data2, len_data1)
-            
-            print 'set len to equal --> len_data1',  data1.size, 'len_data2:', data2.size
-            
-        print 'calculating:', prop
-            
-        return stats.ttest_ind(data1[prop], data2[prop], nan_policy='omit')
-    
-
-    def Ftest(self, 
-              data_dict,
-              nr_tests=100):
-
-        """
-        input
-        -----------------
-            data_dict:        list of means of various samples (mean for 'red', 'low-Zcold', 'high-Zcold' etc.)
-            subgroups:           list of sub-groups the samples are ordered (knot and filaments)
-            
-            
-            calculate:
-            ==========
-            
-            sum of squares between samples
-            
-            
-            Table Example
-            ===========================
-            
-            Measurments| Group 1   | Group 2    | Group i
-            -----------------------------------------------
-                1      |    G11   |  G21      |   Gi1
-                2      |    G12   |  G22      |   Gi2
-                3      |    G13   |  G23      |   Gi3
-                ...
-                n      |    G1n   |  G2n      |   Gin
-                
-                
-            i = number of groups (horizontal)
-            n = number of measurments per group (vertical)
-        
-        
-        """ 
-        
-        import pandas as pd
-        data1 = pd.read_csv(mycomp+'anaconda/pro/myRun/test_data_stats.txt', skiprows=1, names=['A', 'B', 'C', 'D'], sep='\t')
-        data1 = mL.df_to_sarray(data1)
-        
-        #rint data1
-        
-        data_dict={}
-        for item in ['A','B','C','D']:
-            data_dict.update({item: data1[item]})
-                             
-        #print data_dict
-        
- 
-        from scipy import stats
-        print data_dict.keys()
-        
-        nr_groups   = len(data_dict.keys())        
-        
-        nr_tests     = 5
-        
-        #1) Mean within each group
-        mean_samples=[]
-        for item in data_dict.keys():
-            print 'group', item
-            mean_samples.append(np.mean(data_dict[item]))
-            
-        #2) Overall mean, mean of all means
-        overall_mean = np.mean(mean_samples)
-
-        #3) "between-group" sum of square difference
-        SB = np.sum([nr_tests * (mean_samples[i] - overall_mean)**2 for i in range(nr_groups)])
-            
-        #4) "between-group" degree of freedom        
-        df_B = nr_groups-1
-        
-        #5) "between-group"  mean square value
-        M_SB = SB / df_B
-        
-        #6) "within-group" sum of squares        
-        SW = 0
-        for i, item in enumerate(data_dict.keys()):
-            print 'i:', i, 'item:', item, mean_samples[i]
-            group = data_dict[item]          
-            SW += np.sum((group - mean_samples[i])**2)
-
-        #7) "within-group" degree of freedom
-        df_W = nr_tests*(nr_groups-1)
-
-        #8) "within-group" mean square value
-        M_SW = SW / df_W 
-
-        #9) F-ratio
-        F_value = M_SB / M_SW
-        
-        #10) create F-distribution
-        
-        alpha = 0.05 #confidence level is 95%
-        # Calculate the F-value using Percent point function (inverse of cdf)
-        f_critical = stats.f.ppf(1 - alpha, df_B, df_W)
-        
-        print '\nResults\n============\nnr_groups:', nr_groups, 'nr_tests in each group:', nr_tests
-        print '\nbetween the samples:\n----------------\nSB:', "{0:.2f}".format(SB), 'df_B:', df_B, 'M_SB:', "{0:.2f}".format(M_SB)
-        print '\nwithin the samples:\n----------------\nSW:', "{0:.2f}".format(SW), 'df_W:', df_W, 'M_SW:', "{0:.2f}".format(M_SW) 
-        print 'F-value:', "{0:.2f}".format(F_value), 'f-critical:', "{0:.2f}".format(f_critical)
-        
-        
-        exit()
-        
-    def ANOVA(self,
-              data_dict,
-              prop):
-        
-        """
-        Generate a ANOVA Table
-        
-        test data set:
-            Test data
-            df = pd.read_csv("https://reneshbedre.github.io/assets/posts/anova/onewayanova.txt", sep="\t") 
-            
-        """
-        
-        from scipy import stats
-        import pandas as pd
-        
-        myprop_unit_map  = mL.get_prop_unit_map_latex()
-
-
-        nr_samples       = len(data_dict.keys())
-        print data_dict.keys()  
-        
-        df = pd.DataFrame.from_dict(data_dict)
-        #print df
-        
-        # myvalues = []
-        # for item in data_dict.keys():
-        #     myvalues.append(sample_name_dict[item]['name_Latex'])
-        
-        # reshape the d dataframe suitable for statsmodels package 
-        df_melt = pd.melt(df.reset_index(), id_vars=['index'], value_vars=data_dict.keys())
-        # replace column names
-        df_melt.columns = ['index', 'samples', 'values']
-        mL.generate_box_plot(df_melt,
-                               myprop_unit_map[prop][0],
-                               nr_samples)
-        
-        # stats f_oneway functions takes the groups as input and returns ANOVA F and p value
-        fvalue, pvalue = stats.f_oneway([df[item] for item in data_dict.keys()])
-        #print fvalue, pvalue
-        
-        # get ANOVA table as R like output
-        import statsmodels.api as sm
-        from statsmodels.formula.api import ols
-        
-        # Ordinary Least Squares (OLS) model
-        model = ols('values ~ C(samples)', data=df_melt).fit()
-        anova_table = sm.stats.anova_lm(model, typ=2)
-        print anova_table
-        
-        
-        
-    def bootstrap_error(self, 
-                        data,
-                       n_resamples=1000,
-                       confidence_level=0.95):
-        
-        num_samples = 1000
-         
-        bootstrap_means = np.zeros(num_samples)
-         
-        # Perform bootstrap sampling
-        for i in range(num_samples):
-         
-            bootstrap_sample = np.random.choice(data, size=10000, replace=True)
-            bootstrap_mean = np.mean(bootstrap_sample)
-            bootstrap_means[i] = bootstrap_mean
-         
-        estimated_mean = np.mean(bootstrap_means)
-        estimated_std = np.std(bootstrap_means, ddof=1)
-         
-         
-        print "MEAN", "{0:.2f}".format(estimated_mean), "STD", "{0:.3f}".format(estimated_std)
-        
-        return estimated_mean, estimated_std
-        
-
-        
-
-        
-
-    
-    
-    
+        return   

@@ -57,25 +57,25 @@ Examples:
 I want to address the 'HaloMass'
 ++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    print data_struct['HaloMass']
+    print(data_struct['HaloMass']
    
     --> only write the name of the property in [] next to the data structure.
 
 the unit of the 'HaloMass' can be found here and printed to screen
 
-    print data_struct['HaloMass'].attrs['unit'] --> h-1Msun
+    print(data_struct['HaloMass'].attrs['unit'] --> h-1Msun
    
 
-I only want to print the first 10 'HaloMasses'
+I only want to print(the first 10 'HaloMasses'
 ++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    print data_struct['HaloMass'][0:9]
+    print(data_struct['HaloMass'][0:9]
    
    
 I want info about the column 'HaloMass'
 ++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    print data_struct.dtype.fields['HaloMass']
+    print(data_struct.dtype.fields['HaloMass']
 
 All fields of the galaxy property 'HaloMass' is printed on the screen
         --> (dtype('float64'), 1, 'h-1Msun')
@@ -86,7 +86,7 @@ dictionary, units of the properties
 if you want all properties of your 'data_struct' to be printed use:
  
     for k in data_struct.dtype.names:
-        print 'galaxy property:', k, 'unit:', data_struct.dtype.fields[k][2], \
+        print('galaxy property:', k, 'unit:', data_struct.dtype.fields[k][2], \
               'data_type:', data_struct.dtype.fields[k][0], 'ID number:', \
                data_struct.dtype.fields[k][1]    
 
@@ -98,14 +98,14 @@ Get information about the MD-Galaxies output file of your choice
     while i<len(f.attrs.keys()):
         #in the keys of the file attributes information about name of the
         #semi-analytical model, the dark matter simulation, box size etc. can be read-in
-        print f.attrs.keys()[i], f.attrs.values()[i]
+        print(f.attrs.keys()[i], f.attrs.values()[i]
         output_file_info[f.attrs.keys()[i]] = f.attrs.values()[i]
         i+=1
    
     #you can then set those attributes to proper name to use further in your
     #script e.g. the redshift of the snapshot
     redshift     = output_file_info['redshift']
-    print 'redshift of this catalog is,' redshift
+    print('redshift of this catalog is,' redshift
     
     
 Example
@@ -121,14 +121,14 @@ Example
     f = hdf5.File(myfilename, "r")
   
 """
-
+from __future__ import print_function
 import numpy as np
 import h5py as hdf5
 
 def readMDGal(myfilename=None,
               mycol=[]):        
-    #print '#####################################################################'
-    #print 'read MultiDark-Galaxies HDF5 file format\n'
+    #print('#####################################################################'
+    #print('read MultiDark-Galaxies HDF5 file format\n'
     
     #Dictionary in alphabethical order of the galaxy properties available!
     #Please note that not every model has all properties available ...
@@ -218,11 +218,11 @@ def readMDGal(myfilename=None,
         #example for path+filename to read-in:
         myfilename  = common_path+'MDPL2_'+SAM_name+'_z_'+str("{0:.2f}".format(redshift))+'.hdf5'
         
-        #print 'the following galaxy properties have been selected for\n\tSAM:\t ', \
+        #print('the following galaxy properties have been selected for\n\tSAM:\t ', \
          #  SAM_name, '\n\tredshift: ', redshift, '\n\tfilename:', myfilename, '\n'
     else:
         pass
-        #print 'the following galaxy properties have been selected for:', myfilename
+        #print('the following galaxy properties have been selected for:', myfilename
     
     f = hdf5.File(myfilename, "r")
     
@@ -244,7 +244,7 @@ def readMDGal(myfilename=None,
     for col in mycol:
         try:
             
-            #print 'ID', col, '\tproperty name:', gal_properties['name'+str(col)].ljust(18),\
+            #print('ID', col, '\tproperty name:', gal_properties['name'+str(col)].ljust(18),\
                   #'unit:', str('['+f[gal_properties['name'+str(col)]].attrs['unit']+']').ljust(25), \
                   #'data type:', f[gal_properties['name'+str(col)]].dtype
                   
@@ -256,24 +256,24 @@ def readMDGal(myfilename=None,
             mytypes.update({gal_properties['name'+str(col)]: (f[gal_properties['name'+str(col)]].dtype,unit(f[gal_properties['name'+str(col)]].attrs['unit']))})                   
             
         except:
-            print 'galaxy property is not available for this SAM!'
+            print('galaxy property is not available for this SAM!')
             pass
 
     dt = np.dtype([(k, mytypes[k][0]) for k in mytypes.keys()])        
     #construct a structured array which will be filled with the chosen galaxy
     #properties
     
-    #print dt
+    #print(dt
 
     data_struct=np.zeros((f[gal_properties['name'+str(mycol[0])]].size ,), dtype=dt)                  
  
-    #print '\nprocessing ...\n'         
+    #print('\nprocessing ...\n'         
     #read all chosen galaxy properties to the structured array
     for name in data_struct.dtype.names:                  
-        #print 'name', name.ljust(18), str('['+f[name].attrs['unit']+']').ljust(25), \
+        #print('name', name.ljust(18), str('['+f[name].attrs['unit']+']').ljust(25), \
               #'ngal:', f[name].size, 
         data_struct[name][0:f[name].size] = f[name]
-        #print 'successfully read!'
+        #print('successfully read!'
         
     f.close()
     return data_struct

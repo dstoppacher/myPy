@@ -1,4 +1,4 @@
-# Load packages
+from __future__ import print_function
 import numpy as np
 import config as conf
 import outputData as oD
@@ -25,7 +25,7 @@ def angM0(load_from_file=False):
     obs_data_array[:,0]=x_data  
     obs_data_array[:,1]=2/3.0*x_data-3
     
-    #print obs_data_array[:,[0,1]]
+    #print(obs_data_array)[:,[0,1]]
 
     return obs_data_array, 'd=-3, $M^{2/3}$', False   
 
@@ -37,7 +37,7 @@ def angM(load_from_file=False):
     obs_data_array[:,0]=x_data  
     obs_data_array[:,1]=2/3.0*x_data-4
     
-    #print obs_data_array[:,[0,1]]
+    #print(obs_data_array)[:,[0,1]]
 
     return obs_data_array, 'd=-4, $M^{2/3}$', False     
 
@@ -49,7 +49,7 @@ def angM2(load_from_file=False):
     obs_data_array[:,0]=x_data  
     obs_data_array[:,1]=2/3.0*x_data-5
     
-    #print obs_data_array[:,[0,1]]
+    #print(obs_data_array)[:,[0,1]]
 
     return obs_data_array, 'd=-5, $M^{2/3}$', False  
 
@@ -88,7 +88,7 @@ def Behroozi10(load_from_file=False):
     obs_data_array[:,4] = data[:,2]
     obs_data_array[:,5] = data[:,3]
  
-    #print obs_data_array
+    #print(obs_data_array)
 
     return obs_data_array, 'Behroozi+10', False
 
@@ -103,7 +103,7 @@ def DEEP2_FireFly(load_from_file=True):
     obs_data_array[:,4] = data_array[:,1]-data_array[:,2]
     obs_data_array[:,5] = data_array[:,3]-data_array[:,1]
 
-    print obs_data_array
+    print(obs_data_array)
     
     return obs_data_array, 'DEEP2', False  
 
@@ -123,14 +123,14 @@ def Maudau14_sfr2z(load_from_file=False):
    
 
     for k in enumerate(data[:,0]):
-        #print 'k:', k[0], k[1], ' ',
+        #print('k:', k[0], k[1], ' ',
         z[k[0]] = cd.redshift_d_light(k[1] * cc.c_light_Mpc_Gyr, **cosmo)
-        #print obs_data_array[k[0],2]
+        #print(obs_data_array)[k[0],2]
                
     for k in enumerate(data[:,4]):
-        #print 'k:', k[0], k[1], ' ',
+        #print('k:', k[0], k[1], ' ',
         x_err[k[0]] = cd.redshift_d_light(k[1] * cc.c_light_Mpc_Gyr, **cosmo)
-        print obs_data_array[k[0],0], x_err[k[0]]
+        print(obs_data_array[k[0],0], x_err[k[0]])
 
     Vc_WMAP = cd.comoving_volume(z, **cosmo_WMAP)
      
@@ -159,12 +159,12 @@ def Driver18_sfr2z(load_from_file=False):
     
     cosmo = {'omega_M_0' : 0.3, 'omega_lambda_0' : 0.7, 'h' : 0.7}
     cosmo_WMAP = cd.set_omega_k_0(cosmo)
-    #print cosmo
+    #print(cosmo
     
     for k in enumerate(data[:,0]):
-        #print 'k:', k[0], k[1], ' ',
+        #print('k:', k[0], k[1], ' ',
         obs_data_array[k[0],0] = cd.redshift_d_light(k[1] * cc.c_light_Mpc_Gyr, **cosmo)
-        #print obs_data_array[k[0],0]
+        #print(obs_data_array)[k[0],0]
 
     Vc_WMAP = cd.comoving_volume(obs_data_array[:,0], **cosmo_WMAP)
      
@@ -190,7 +190,7 @@ def Behroozi13_sfr2z(load_from_file=False):
     obs_data_array[:,1] = data[:,1]
     obs_data_array[:,4] = data[:,2]
     obs_data_array[:,5] = data[:,3]
-    print obs_data_array
+    print(obs_data_array)
     return obs_data_array, 'Behroozi et al. (2013)', False
 
 
@@ -206,7 +206,7 @@ def Behroozi13c(load_from_file=False):
     obs_data_array[:,4] = obs_data_array[:,1] + data[:,3]
     obs_data_array[:,5] = obs_data_array[:,1] - data[:,2]    
 
-    #print obs_data_array
+    #print(obs_data_array)
 
     return obs_data_array, 'Behroozi+13', False
 
@@ -232,14 +232,13 @@ def Bernadi16_LF_CMASS(load_from_file=False):
     
     
     obs_data_array = np.zeros((plus_dy[:,0].size,7), dtype=np.float32)
-     
-    print data[:,0]
+
     
     obs_data_array[:,0] = data[:,0]+5*np.log10(0.7)-5*np.log10(0.6777)-(-2.5*np.log10(1.0+0.55))
     obs_data_array[:,1] = data[:,1]
     obs_data_array[:,4] = abs(10**data[:,1]-10**plus_dy[:,1])
     obs_data_array[:,5] = obs_data_array[:,4]  
-    print obs_data_array[:,[0,1,4,5]]
+    print(obs_data_array[:,[0,1,4,5]])
     
     return obs_data_array, 'Bernadi+16', False
 
@@ -267,7 +266,7 @@ def CARNage_cold_gas_fraction_Peeples11(load_from_file=True):
     obs_data_array[:,4] = data_array[:,4]
     obs_data_array[:,5] = data_array[:,5]
           
-    #print obs_data_array        
+    #print(obs_data_array)        
          
     return obs_data_array, 'Peeples & Shankar 11', False
 
@@ -308,8 +307,8 @@ def CARNage_mbh_mbulge_Kormendy13(load_from_file=False):
         obs_data_array[:,3] = data_array[:,2] + (data_array[:,3]/10**data_array[:,1])*0.43
         obs_data_array[:,4] = data_array[:,2] - (data_array[:,4]/10**data_array[:,1])*0.43
 
-        #print legend_obs        
-        #print obs_data_array        
+        #print(legend_obs        
+        #print(obs_data_array)        
         
         filename_out = mycomp+'anaconda/pro/OBS/Kormendy&Ho_mbh_mbulge_corrected.txt'
         myOutput.writeIntoFile(filename_out, 
@@ -337,8 +336,8 @@ def CARNage_mbh_mbulge_McConnell13(load_from_file=False):
         obs_data_array[:,3] = data_array[:,2] + (data_array[:,3]/10**data_array[:,1])*0.43
         obs_data_array[:,4] = data_array[:,2] - (data_array[:,4]/10**data_array[:,1])*0.43
 
-        #print legend_obs        
-        #print obs_data_array        
+        #print(legend_obs        
+        #print(obs_data_array)        
         
         filename_out = mycomp+'anaconda/pro/OBS/CARNage/CARNage_mbh_mbulge_McConnell13_corrected.txt'
         myOutput.writeIntoFile(filename_out, 
@@ -370,7 +369,7 @@ def CarnegieOBS_z0(load_from_file=True):
         obs_data_array[:,1] = 10**(np.log10(data_array[:,2])+3*np.log10(0.7))#+np.log10(carnage_small_h))
         obs_data_array[:,3] = 10**(np.log10(data_array[:,3])+3*np.log10(0.7))# #*carnage_small_h
         obs_data_array[:,4] = obs_data_array[:,3]        
-        #print obs_data_array     
+        #print(obs_data_array)     
  
         obs_data_array[:,0] = np.log10(((10**data_array[:,0]+10**data_array[:,1])/2.0)/(0.7**2))           
         obs_data_array[:,1] = np.log10(data_array[:,2]*(0.7**3))
@@ -400,8 +399,8 @@ def CarnegieOBS_z2(load_from_file=True):
     obs_data_array[:,3] = 10**(np.log10(data_array[:,3])+3*np.log10(0.7))# #*carnage_small_h
     obs_data_array[:,4] = obs_data_array[:,3] 
 
-    #print legend_obs
-    print obs_data_array    
+    #print(legend_obs
+    print(obs_data_array)    
 
     filename_out = mycomp+'anaconda/pro/OBS/CARNage_z2.txt'
     myOutput.writeIntoFile(filename_out, 
@@ -507,14 +506,14 @@ def Gruppioni15_z_200(load_from_file=False):
 #    obs_data_array[size_one_set:data[:,0].size,4] = data[size_one_set:data[:,0].size,y_col+1]
 #    obs_data_array[size_one_set:data[:,0].size,5] = data[size_one_set:data[:,0].size,y_col+1]    
     
-    print obs_data_array
+    print(obs_data_array)
     
     return obs_data_array, 'Gruppioni+15', False
 
 def Gruppioni15_cSFRD(load_from_file=False):
                 
     data = myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/OBS/Grupponi+15_Table1_cSFRD_UV+IR.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float32, skiprow=2)
-    print data
+    print(data)
     obs_data_array = np.zeros((data[:,0].size, 7), dtype=np.float)
 
     obs_data_array[:,0] = (data[:,0]+data[:,1])/2.0 +1     
@@ -524,7 +523,7 @@ def Gruppioni15_cSFRD(load_from_file=False):
     obs_data_array[:,4] = data[:,3]/data[:,2]*0.434
     obs_data_array[:,5] = data[:,3]/data[:,2]*0.434
     
-    print obs_data_array
+    print(obs_data_array)
     
     return obs_data_array, 'Gruppioni et al. (2015)', False
 
@@ -625,8 +624,8 @@ def load_catalog(path,
                                               'nr_entries': 15})
     
 
-    print '\n############################################\nLOADING REFERENCES \ OBSERVATIONS!\n############################################\n'
-    print 'name_x/y', name_x, '/', name_y, 'ngal:', data.shape, 'min/max x:', min(data[name_x]), '/', max(data[name_x]), 'min/max y:', min(data[name_y]), '/', max(data[name_y])
+    print(r'\n############################################\nLOADING REFERENCES \ OBSERVATIONS!\n############################################\n')
+    print('name_x/y', name_x, '/', name_y, 'ngal:', data.shape, 'min/max x:', min(data[name_x]), '/', max(data[name_x]), 'min/max y:', min(data[name_y]), '/', max(data[name_y]))
 
     return data
 
@@ -806,7 +805,7 @@ def adjust_data_for_plot(data,
         
         mask=np.where(np.isfinite(data['zcold']))
 
-        print 'HERE ssfr2zcold:', min(data['zcold']), max(data['zcold']), min(data['ssfr']), max(data['ssfr'])
+        print('HERE ssfr2zcold:', min(data['zcold']), max(data['zcold']), min(data['ssfr']), max(data['ssfr']))
                    
         return data[mask[:][0]]
 
@@ -843,7 +842,7 @@ def adjust_data_for_plot(data,
         mask=np.where(np.isfinite(data['mstar']))
         data=data[mask[:][0]]
         mask=np.where(np.isfinite(data['Mzgas']))
-        print min(data['Mzgas']), max(data['Mzgas'])
+        print(min(data['Mzgas']), max(data['Mzgas']))
         return data[mask[:][0]]
 
     def zgas_mcold(data):
@@ -902,7 +901,7 @@ def adjust_data_for_plot(data,
             data['mhalo']=np.log10(data['mbasic_200c'])            
         
         mask=np.where(np.isfinite(data['mhalo']))
-        #print min(data['mhalo']), max(data['mhalo']), min(data['ssfr']), max(data['ssfr'])
+        #print(min(data['mhalo']), max(data['mhalo']), min(data['ssfr']), max(data['ssfr'])
         
         return data[mask[:][0]]
 
@@ -931,7 +930,7 @@ def adjust_data_for_plot(data,
             data['mhalo']=np.log10(data['mbasic_200c'])            
         
         mask=np.where(np.isfinite(data['mhalo']))
-        #print min(data['mhalo']), max(data['mhalo']), min(data['ssfr']), max(data['ssfr'])
+        #print(min(data['mhalo']), max(data['mhalo']), min(data['ssfr']), max(data['ssfr'])
         
         return data[mask[:][0]]
 
@@ -943,7 +942,7 @@ def adjust_data_for_plot(data,
             data['mhalo']=np.log10(data['mbasic_200c'])            
         
         mask=np.where(np.isfinite(data['mhalo']))
-        #print min(data['mhalo']), max(data['mhalo']), min(data['ssfr']), max(data['ssfr'])
+        #print(min(data['mhalo']), max(data['mhalo']), min(data['ssfr']), max(data['ssfr'])
         
         return data[mask[:][0]]
 
@@ -958,7 +957,7 @@ def adjust_data_for_plot(data,
     def jbarcomp_mbar(data):
  
         try:
-            print 'jdisk vs mbar_disk'
+            print('jdisk vs mbar_disk')
             data=data[np.where(data['mcold_disk']>=0)[:][0]]
             data=data[np.where(data['mstar_disk']>=0)[:][0]]
             data['mstar']=np.log10(data['mstar_disk']+data['mcold_disk'])
@@ -966,7 +965,7 @@ def adjust_data_for_plot(data,
             mask=np.where(np.isfinite(data['angM_disk']))
             
         except:
-            print 'jbulge vs mbar_bulge'
+            print('jbulge vs mbar_bulge')
             data=data[np.where(data['mcold_spheroid']>=0)[:][0]]
             data=data[np.where(data['mstar_spheroid']>=0)[:][0]]
             data['mstar']=np.log10(data['mstar_spheroid']+data['mcold_spheroid'])
@@ -979,7 +978,7 @@ def adjust_data_for_plot(data,
         return data[mask[:][0]]
 
     def j_mstar(data):
-        #print 'HERE 980'
+        #print('HERE 980'
         data['angM_disk']=np.log10((data['angM_disk']+data['angM_spheroid'])/data['mstar'])
         data['mstar']=np.log10(data['mstar'])
         mask=np.where(np.isfinite(data['mstar']))                
@@ -1072,10 +1071,10 @@ def adjust_data_for_plot(data,
         func = choose.get(plot_type)
         
         if np.all(data['weight_tot']==-99.0) or np.all(data['weight_tot']==0.0):
-            print 'set weights to 1!'
+            print('set weights to 1!')
             data['weight_tot']=np.ones((data.size,), dtype=np.int8)
    
-            #print data['weight_tot']
+            #print(data['weight_tot']
         
         
         return func(data)
@@ -1091,7 +1090,7 @@ def adjust_data_for_plot(data,
 #    data = data[np.where(prop<=0.0)[:][0]] 
 
        
-    print '--> after selection: ngal:', data.shape, '\n'
+    print('--> after selection: ngal:', data.shape, '\n')
        
     return data 
  
@@ -1110,15 +1109,15 @@ def myCatalog3(load_from_file=False):
 
 def myCatalog4(load_from_file=False): 
     #return load_SAM_catalog(mycomp+'anaconda/pro/data/Galacticus_1Gpc_run2/Galacticus_1Gpc_run2_z_0.0_tarsel.hdf5', 'Gal2')   
-    return load_SAM_catalog(mycomp+'anaconda/pro/data/Galacticus_1Gpc/Galacticus_1Gpc_z_0.09_tarsel.hdf5', '>>$j_{disk}$')
+    return load_SAM_catalog(mycomp+'anaconda/pro/data/Galacticus_1Gpc/Galacticus_1Gpc_z_0.09_tarsel.hdf5', r'>>$j_{disk}$')
 
 def myCatalog5(load_from_file=False): 
     #return load_SAM_catalog(mycomp+'anaconda/pro/data/Galacticus_1Gpc_run2/Galacticus_1Gpc_run2_z_0.0_tarsel.hdf5', 'Gal2')   
-    return load_SAM_catalog(mycomp+'anaconda/pro/data/Galacticus_1Gpc/Galacticus_1Gpc_z_0.09_tarsel.hdf5', '>>$j_{bulge}$')
+    return load_SAM_catalog(mycomp+'anaconda/pro/data/Galacticus_1Gpc/Galacticus_1Gpc_z_0.09_tarsel.hdf5', r'>>$j_{bulge}$')
 
 def myCatalog6(load_from_file=False): 
     #return load_SAM_catalog(mycomp+'anaconda/pro/data/Galacticus_1Gpc_run2/Galacticus_1Gpc_run2_z_0.0_tarsel.hdf5', 'Gal2')   
-    return load_SAM_catalog(mycomp+'anaconda/pro/data/Galacticus_1Gpc/Galacticus_1Gpc_z_0.09_tarsel.hdf5', '<<$M_{*}/M_{vir}$')
+    return load_SAM_catalog(mycomp+'anaconda/pro/data/Galacticus_1Gpc/Galacticus_1Gpc_z_0.09_tarsel.hdf5', r'<<$M_{*}/M_{vir}$')
 
 def myCatalog7(load_from_file=False): 
     return load_SAM_catalog(mycomp+'anaconda/pro/data/Galacticus_1Gpc/Galacticus_1Gpc_z_0.09_tarsel.hdf5', 'e<0.7')
@@ -1263,21 +1262,21 @@ def load_SAM_catalog(filename,
 #    checknum=0
 #    name='orphan'
 #    for cut in cuts:
-#        print 'select ', name, 'by:', cut, ' -->',
+#        print('select ', name, 'by:', cut, ' -->',
 #        data_sorted = myData.selectData2Compute(data, 
 #                                         selected_col=name, 
 #                                         operator='>', 
 #                                         condition=cut)
-#        print 'num: ', data_sorted.shape
+#        print('num: ', data_sorted.shape
 #        checknum+=data_sorted.size
-#        print 'total num:', checknum
+#        print('total num:', checknum
 
 #    data = myData.selectData2Compute(data, 
 #                                     selected_col='mstar', 
 #                                     operator='>', 
 #                                     condition=5e10)
 
-    print 'legend:', legend,
+    print('legend:', legend, end='')
     if legend.find('$r_{bulge}$')!=-1:
             data['rdisk']=np.log10(data['rbulge']*1e3)
             data=data[np.where(np.isfinite(data['rdisk']))[:][0]]
@@ -1303,7 +1302,7 @@ def load_SAM_catalog(filename,
             data['b'][np.where(data['rdisk']<=data['rbulge'])[:][0]]=data['rdisk'][np.where(data['rdisk']<=data['rbulge'])[:][0]]
             
             data['ecc']=(1.0-(data['b']/data['a'])**2)**0.5            
-            #print 'min/max ecc:', min(data['ecc']), '/', max(data['ecc']) 
+            #print('min/max ecc:', min(data['ecc']), '/', max(data['ecc']) 
         
         if legend.startswith('e'):            
             data=data[np.where(data['ecc']<0.7)[:][0]]
@@ -1311,15 +1310,15 @@ def load_SAM_catalog(filename,
         frac_to_select=int(np.floor(data.size/100.0*15.0))                      
 
         if legend=='>>$j$':
-                print 'select: 20% >> j stellar'
+                print('select: 20% >> j stellar')
                 data['angM_disk']=np.log10((data['angM_disk']+data['angM_spheroid'])/data['mstar'])
                 data = data[np.argsort(data['angM_disk'])]
-                #print data['angM_disk'][0:100]
+                #print(data['angM_disk'][0:100]
                     
                 data=data[data.size-frac_to_select:data.size]
 
         if legend=='>>$j_{disk}$':
-                print 'select: 20% >> j disk'
+                print('select: 20% >> j disk')
                 
                 data['angM_disk']/=data['mstar']
                 
@@ -1329,7 +1328,7 @@ def load_SAM_catalog(filename,
                 data=data[start_size:data.size]
                 
         if legend=='>>$j_{bulge}$':
-                print 'select: 20% >> j bulge'
+                print('select: 20% >> j bulge')
                 
                 data['angM_spheroid']/=data['mstar']
                 
@@ -1338,7 +1337,7 @@ def load_SAM_catalog(filename,
                 data=data[data.size-frac_to_select:data.size]                
            
         if legend=='>>$J_{bulge}$':
-                #print 'section of selected!', frac_to_select
+                #print('section of selected!', frac_to_select
                 data = data[np.argsort(data['angM_spheroid'])]
                 
                 data=data[data.size-frac_to_select:data.size]
@@ -1348,7 +1347,7 @@ def load_SAM_catalog(filename,
                 data = data[np.argsort(data['angM_disk'])]
                      
                 data=data[data.size-frac_to_select:data.size]
-                #print data['angM_disk'][start_size:start_size+100]               
+                #print(data['angM_disk'][start_size:start_size+100]               
                 
         if legend=='<<$M_{*}/M_{vir}$':
                 data=data[np.where(data['orphan']==0)[:][0]]
@@ -1358,20 +1357,20 @@ def load_SAM_catalog(filename,
                 data['mhalo']=data['mstar']/data['mhalo']
                 
                 data = data[np.argsort(data['mhalo'])]
-                print data['mhalo'][0:100]                   
+                print(data['mhalo'][0:100])              
                 data=data[0:frac_to_select]
                 mL.property_stats(data,['mhalo','mstar'])
 
         if legend=='<<e':
                 data = data[np.argsort(data['ecc'])]
-                print data['ecc'][0:100]                   
+                print(data['ecc'][0:100])                  
                 data=data[0:frac_to_select]                    
     
     #data['a']=data['mAB_dA_total_g']-data['mAB_dA_total_i']
     #data['b']=data['mAB_dA_total_g']-data['mAB_dA_total_r']
     #mL.property_stats(data,['mhalo','mstar', 'mcold','angM_disk','angM_spheroid', 'ecc', 'rbulge','rdisk','mAB_dA_total_i','a','b'])
     
-    #print 'final shape:', data.shape, 'min/max x:', min(data['mAB_dA_total_i']), '/', max(data['mAB_dA_total_i']), 'min/max y:', min(data['rdisk']), '/', max(data['rdisk']),  min(data['rbulge']), '/', max(data['rbulge'])
+    #print('final shape:', data.shape, 'min/max x:', min(data['mAB_dA_total_i']), '/', max(data['mAB_dA_total_i']), 'min/max y:', min(data['rdisk']), '/', max(data['rdisk']),  min(data['rbulge']), '/', max(data['rbulge'])
 
     return adjust_data_for_plot(data, plot_type), legend, True
 
@@ -1452,11 +1451,11 @@ def CMASS_DR12(catname,
     
     try:        
         filename=mycomp+'anaconda/pro/myRun/histos/'+plot_key+'/'+plot_key+'_CMASS_z_'+redshift+'_tarsel_'+catname+'_'+info+'.txt'        
-        #print 'load CMASS DR12', filename, '\n'
+        #print('load CMASS DR12', filename, '\n'
         data_array = myData.readAnyFormat(config=False, mypath=filename, data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float, skiprow=2)         
     except:
         filename=mycomp+'anaconda/pro/myRun/histos/'+plot_key+'/'+plot_key+'_CMASS_SPALL_z_'+redshift+'_'+catname+'_'+info+'.txt'        
-        print filename
+        print(filename)
         data_array = myData.readAnyFormat(config=False, mypath=filename, data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float, skiprow=2)       
         
     obs_data_array = np.zeros((data_array[:,0].size,7), dtype=np.float32)
@@ -1467,7 +1466,7 @@ def CMASS_DR12(catname,
     obs_data_array[:,4] = (data_array[:,4]/data_array[:,1])*0.434
     obs_data_array[:,5] = (data_array[:,5]/data_array[:,1])*0.434
     
-    #print obs_data_array
+    #print(obs_data_array)
     
     return obs_data_array, legend, False
     
@@ -1495,8 +1494,8 @@ def CMASS_DR12_catalog(catname,
     obs_data_array['mstar']*=0.9125 #* (0.70/0.6777)**2
     #mask=np.where(np.isfinite(obs_data_array['mAB_dA_total_cut_dmesa']))
     #obs_data_array[mask[:][0]]
-    #print obs_data_array['weight_tot']
-    #print '--> after selection: ngal:', obs_data_array[mask[:][0]].shape, '\n'   
+    #print(obs_data_array)['weight_tot']
+    #print('--> after selection: ngal:', obs_data_array[mask[:][0]].shape, '\n'   
 
     return adjust_data_for_plot(obs_data_array, plot_type), legend, True   
 
@@ -1538,7 +1537,7 @@ def load_wp_CMASS_DR12(filename,
     obs_data_array[:,4] = data_array[:,2]/data_array[:,1]/0.6777*0.434
     obs_data_array[:,5] = obs_data_array[:,4]
     
-    #print obs_data_array[:,[0,1]]
+    #print(obs_data_array)[:,[0,1]]
 
     return obs_data_array, legend, False
 
@@ -1624,9 +1623,9 @@ def CMASS_dmesa_cut(load_from_file=False):
     obs_data_array[:,0]=x_data  
     obs_data_array[:,1]= 0.55+(x_data/8.0)
     
-    #print obs_data_array
+    #print(obs_data_array)
 
-    return obs_data_array, '$d_{\perp} > 0.55$', False
+    return obs_data_array, r'$d_{\perp} > 0.55$', False
 
 def CMASS_RS_doris_cut1(load_from_file=False):
     
@@ -1686,7 +1685,7 @@ def CMASS_dmesa_sliding_cut(load_from_file=False):
     M_i_min=19.48
     obs_data_array[:,1]= (M_i_min-19.86)/1.6 + 0.8 + x_data/8.0
     
-    print obs_data_array
+    print(obs_data_array)
 
     return obs_data_array, 'sliding cut, $i$='+str(M_i_min), False
 
@@ -2029,7 +2028,7 @@ def Elbaz11_function(load_from_file=False):
                   'paper': 'Elbaz et al. A&A 533, A119 (2011)', 
                   'little_h': 0.6777,
                   'IMF_corr': -0.24}
-    print mycomp+'anaconda/pro/OBS/CalibrationData/DATA/'+reference['filename']              
+    print(mycomp+'anaconda/pro/OBS/CalibrationData/DATA/'+reference['filename'])              
     data = myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/OBS/CalibrationData/DATA/'+reference['filename'], data_format='ASCII', nr_col=2, data_shape='shaped', delim=' ', mydtype=np.float32, skiprow=2)                   
 
     data[:,0]=10**(np.log10(data[:,0]/reference['little_h'])+reference['IMF_corr'])   
@@ -2051,7 +2050,7 @@ def Elbaz11_dots(load_from_file=False):
 
     data[:,0]=10**(np.log10(data[:,0]/reference['little_h'])+reference['IMF_corr'])   
     data[:,1]=data[:,1]/data[:,0]
-    print data
+    print(data)
     
     return data, reference['legend'], True
 
@@ -2112,7 +2111,7 @@ def Guo18_SMF_CMASS(load_from_file=True):
     obs_data_array[:,4] = obs_data_array[:,1] - (data_array[:,2]/data_array[:,1])*0.434
     obs_data_array[:,5] = obs_data_array[:,1] + (data_array[:,2]/data_array[:,1])*0.434
           
-    print obs_data_array        
+    print(obs_data_array)        
          
     return obs_data_array, 'Guo+18', False
 
@@ -2128,7 +2127,7 @@ def Henriques15_SMF_1_0(load_from_file=True):
     obs_data_array[:,3] = data_array[:,4]
     obs_data_array[:,4] = data_array[:,5]
           
-    print obs_data_array        
+    print(obs_data_array)        
          
     return obs_data_array, 'Compilation Henriques+15 z=1.0', False
 
@@ -2183,7 +2182,7 @@ def Maraston13_BOSS_CMASS_model(load_from_file=False):
         obs_data_array[:,0] = data_array[:,0]+np.log10(0.73/0.6777)+np.log10(0.6777)-0.03925 #Corrected from Kroupa to Charbier Lacey+16 from Violeta
         obs_data_array[:,1] = np.log10(data_array[:,1])-np.log10(0.7/0.6777)*3
         
-        #print 'mydata:', obs_data_array[:,[0,1]]
+        #print('mydata:', obs_data_array[:,[0,1]]
    
     return obs_data_array, legend_obs, False
 
@@ -2349,7 +2348,7 @@ def Montero16_LF_intrinic(band,
     obs_data_array[:,4] = obs_data_array[:,1] - LF.schechterM(obs_data_array[:,0], phiStar_error, alpha, LStar+LStar_error)/10**obs_data_array[:,1]*0.434
     obs_data_array[:,5] = obs_data_array[:,1] + LF.schechterM(obs_data_array[:,0], phiStar_error, alpha, LStar+LStar_error)/10**obs_data_array[:,1]*0.434
     
-    #print obs_data_array[:, [0,1,4,5]]
+    #print(obs_data_array)[:, [0,1,4,5]]
 
     return obs_data_array, 'Montero-Dorta+16', False
 
@@ -2376,17 +2375,13 @@ def Moustakas13_PRIMUS_z025(load_from_file=False):
     else:
 
         obs_data_array = myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/OBS/Moustakas+13_PRIMUS_Table4.txt', data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float, skiprow=2)
-        
-        print 10**obs_data_array[:,0]
-        print obs_data_array[:,1]
-        print obs_data_array[:,2]
 
         obs_data_array[:,0] = 10**obs_data_array[:,0]
         obs_data_array[:,1] = 10**obs_data_array[:,1]
         obs_data_array[:,3] = obs_data_array[:,1]/(obs_data_array[:,2]**0.5)
         obs_data_array[:,4] = obs_data_array[:,3]
        
-        print 'mydata:', obs_data_array      
+        print('mydata:', obs_data_array)      
        
         filename_out = mycomp+'anaconda/pro/OBS/'+str(legend_obs)+'.txt'
         myOutput.writeIntoFile(filename_out, 
@@ -2425,7 +2420,7 @@ def Moustakas13_SDSS_GALEX_z010(load_from_file=False):
         obs_data_array[:,4] = data_array[:,5]*0.43
         obs_data_array[:,5] = data_array[:,5]*0.43 
         
-        #print 'mydata:', obs_data_array
+        #print('mydata:', obs_data_array
        
         filename_out = mycomp+'anaconda/pro/OBS/Moustakas+13_SMF_all_Fig4_corrected.txt'
         myOutput.writeIntoFile(filename_out, 
@@ -2496,7 +2491,7 @@ def Ports_BOSS_DR12(load_from_file=False):
                                   operator='<', 
                                   condition=0.60)
                                   
-    print 'data after redshift selection!', data.shape
+    print('data after redshift selection!', data.shape)
     obs_data_array = np.zeros((data[:,0].size,7), dtype=np.float)      
     #mstar
     obs_data_array[:,0] = data[:,8]-0.24
@@ -2518,7 +2513,7 @@ def red_blue_cut(load_from_file=False):
 
     obs_data_array[:,1]=-x_data+2.35 
     
-    #print obs_data_array
+    #print(obs_data_array)
 
     return obs_data_array, '$g-i>2.35$', False
   
@@ -2534,7 +2529,7 @@ def Guo13_cut(load_from_file=False):
   
     obs_data_array[:,1]=0.679-0.082*(-24.69+20.0)  
     
-    #print obs_data_array
+    #print(obs_data_array)
 
     return obs_data_array, 'Guo+13', False
 
@@ -2549,7 +2544,7 @@ def Guo13_cut2(load_from_file=False):
   
     obs_data_array[:,1]=0.679-0.082*(-20.37+20.0)  
     
-    #print obs_data_array
+    #print(obs_data_array)
 
     return obs_data_array, 'Guo+13', False
 
@@ -2565,7 +2560,7 @@ def Rodriguez15BMstar2Mhalo(load_from_file=False):
     obs_data_array[:,4] = (data_array[:,4]/data_array[:,1])*0.434
     obs_data_array[:,5] = (data_array[:,5]/data_array[:,1])*0.434
     
-    #print obs_data_array
+    #print(obs_data_array)
     
     return obs_data_array, 'Rodriguez-Torres+16', False
 
@@ -2580,7 +2575,7 @@ def Rodriguez15SMF_CMASS(catname,
                          legend=''):
         
     filename=mycomp+'anaconda/pro/data/CMASS_SAMS/SM_DISTRIBUTIONS/MF_'+catname+'_cmassport_Planck_'+redshift+'_'+info+'.dat'        
-    print 'load CMASS from Rodirguez-Torres et al. (2015)', filename
+    print('load CMASS from Rodirguez-Torres et al. (2015)', filename)
 
     data_array = myData.readAnyFormat(config=False, mypath=filename, data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float, skiprow=0)
 
@@ -2620,7 +2615,7 @@ def Rodriguez16_SMHM_obs_plus_dy(load_from_file=False):
     obs_data_array[:,1] = (plus_dy[:,1]-minus_dy[:,1][-1::])
     obs_data_array[:,4] = np.log10(plus_dy[:,1])
     obs_data_array[:,5] = np.log10(minus_dy[:,1][::-1]) 
-    print obs_data_array[:,[0,1,4,5]]
+    print(obs_data_array)[:,[0,1,4,5]]
     
     return obs_data_array, 'Shan+17', False
 
@@ -2639,7 +2634,7 @@ def Rodriguez16_SMF_z055_plus_dy(load_from_file=False):
     obs_data_array[:,1] = np.log10((plus_dy[:,1]-minus_dy[:,1][-1::]))
     obs_data_array[:,4] = np.log10(plus_dy[:,1])
     obs_data_array[:,5] = np.log10(minus_dy[:,1][::-1]) 
-    print obs_data_array[:,[0,1,4,5]]
+    print(obs_data_array)[:,[0,1,4,5]]
     
     return obs_data_array, 'BigMD LC z=0.55', False
 
@@ -2670,14 +2665,14 @@ def Rodriguez15_CMASS_xi(load_from_file=False):
     obs_data_array[:,1] = data_array[:,1]*(data_array[:,0]*0.6777)**2
     obs_data_array[:,4] = data_array[:,2]*(data_array[:,0]*0.6777)**2
     obs_data_array[:,5] = obs_data_array[:,4]
-    #print obs_data_array
+    #print(obs_data_array)
         
     return obs_data_array, 'CMASS DR12', False
 
 def Rodriguez15_BigMD_LC_wp(load_from_file=False):
 
     data_array = myData.readAnyFormat(config=False, mypath=mycomp+'anaconda/pro/data/CMASS_SAMS/HAM_CLUSTERING/bigMD-cmass-dr12v4-RST-standHAM-Vpeak-errors.wp', data_format='ASCII', data_shape='shaped', delim=' ', mydtype=np.float, skiprow=0)
-    print data_array
+    print(data_array)
     obs_data_array = np.zeros((19,7), dtype=np.float32)
 
     data_size=data_array[:,0].size
@@ -2789,7 +2784,7 @@ def SDSS_ELG_z01(load_from_file=False):
 def ssfr2mstar_ref(reference,
                    data):                            
     
-    print reference['name'], 'data.shape:', data.shape, 'little-h:', reference['little_h'], 'IMF correction:', reference['IMF_corr']
+    print(reference['name'], 'data.shape:', data.shape, 'little-h:', reference['little_h'], 'IMF correction:', reference['IMF_corr'])
 
     myFuncs = mF.MyFunctions()
                                          
@@ -2803,7 +2798,7 @@ def ssfr2mstar_ref(reference,
                                             norm_by_binsize=False,
                                             equal_bins=False)
     
-    print mybinned_array
+    print(mybinned_array)
 
     obs_data_array = np.zeros((mybinned_array[:,0].size,7), dtype=np.float32)  
     #Errorbars in log(y) vs log(x) plot
@@ -2846,7 +2841,7 @@ def ssfr2mstar_SDSS_DR8(load_from_file=False):
 
     data[:,0]-=0.24
     
-    print data[0:10,:]
+    print(data[0:10,:])
     data[:,1]=data[:,1]/data[:,0]
           
     data = myData.selectData2Compute(data, 
@@ -2906,7 +2901,7 @@ def Tremonti_04_OH_mstar(load_from_file=False):
     obs_data_array[:,4] = obs_data_array[:,1]-data_array[:,5]
     obs_data_array[:,5] = obs_data_array[:,1]-data_array[:,5]
     
-    #print obs_data_array[:,0:5]
+    #print(obs_data_array)[:,0:5]
 
     return obs_data_array, 'SDSS z~0.1', False
 
@@ -2995,9 +2990,9 @@ def load_the_shit2(catname,
                    key=''):
 
     filename=mycomp+'/anaconda/pro/myRun/histos/'+plot_key+'/'+key+plot_key+'_'+catname+'_z_'+redshift+info+'.txt'        
-    print 'load binned-function:', filename
+    print('load binned-function:', filename)
     data_array = myData.readAnyFormat(config=False, mypath=filename, data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float32, skiprow=2)
-    #print data_array
+    #print(data_array
     #if plot_key.find('zgas')!=-1:
     #only take every second datopoint
     i=0
@@ -3029,7 +3024,7 @@ def load_the_shit2(catname,
             obs_data_array[:,4] = obs_data_array[:,1] + data_array[:,4]    
             obs_data_array[:,5] = obs_data_array[:,1] - data_array[:,5]
          
-    #print obs_data_array
+    #print(obs_data_array)
    
     return obs_data_array, legend, False      
 
@@ -3055,7 +3050,7 @@ def load_the_shit3(load_from_file=False):
 
     test = np.in1d(data_mass['hostid'],data_cmass['hostid'])
     data=data_mass[np.where(test==False)[:][0]]
-    print data
+    print(data)
     exit()
 
 def format_MTs_Rockstar(load_from_file=False):
@@ -3066,7 +3061,7 @@ def format_MTs_Rockstar(load_from_file=False):
     cluster_name='rtest2'#path[path.find('-r')+2: -4]
 
     for i, item in enumerate(IDs[:,2]):
-        #print item, i
+        #print(item, i
         IDs[i,2]=format(mL.expfactor_to_redshift(float(IDs[i,2])), '0.2f')
 
     myOutput.writeIntoFile(mycomp+'/anaconda/pro/data/ROCKSTAR/MDPL2_merger_tree_info_300-r'+cluster_name+'.txt',
@@ -3143,7 +3138,7 @@ def Reid14_do_fit():
 
     #data = np.linspace(11,15, 30) - np.log10(0.6777)
     data = np.arange(12,15.3458,0.1034)  
-    #print 'Reid+14:', data
+    #print('Reid+14:', data
     
     from scipy.special import erf as erf
     
@@ -3214,7 +3209,7 @@ def BigMDPL_LC_HOD_all(load_from_file=False):
     obs_data_array[:,1] = np.log10(data_array[:,3])
     obs_data_array[:,4] = (1.0/np.sqrt(data_array[:,6]))/(data_array[:,3])*0.434
     obs_data_array[:,5] = obs_data_array[:,4]
-    #print 'BigMD-LC:', obs_data_array[:,0]
+    #print('BigMD-LC:', obs_data_array[:,0]
     return obs_data_array, 'BigMD-LC', False 
 
 def BigMDPL_LC_HOD_cents(load_from_file=False):
@@ -3256,7 +3251,7 @@ def MD_LC_HOD_all(load_from_file=False):
     obs_data_array[:,1] = np.log10(data_array[:,3])
     obs_data_array[:,4] = (1.0/np.sqrt(data_array[:,6]))/(data_array[:,3])*0.434
     obs_data_array[:,5] = obs_data_array[:,4]
-    #print 'BigMD-LC:', obs_data_array[:,0]
+    #print('BigMD-LC:', obs_data_array[:,0]
     return obs_data_array, 'MD-LC', False 
 
 def MD_LC_HOD_cents(load_from_file=False):
@@ -3301,7 +3296,7 @@ def BigMDPL_LC_HOD_all2(load_from_file=False):
     obs_data_array[:,1] = np.log10(data_array[:,2]+data_array[:,3])
     #obs_data_array[:,4] = np.sqrt(data_array[:,2]+data_array[:,3])/(data_array[:,2]+data_array[:,3])*0.434
     #obs_data_array[:,5] = obs_data_array[:,4]
-    #print 'BigMD-LC:', obs_data_array[:,0]
+    #print('BigMD-LC:', obs_data_array[:,0]
     return obs_data_array, 'BigMD-LC', False 
 
 def BigMDPL_LC_HOD_cents2(load_from_file=False):
@@ -3386,7 +3381,7 @@ def White11_wp(load_from_file=False):
     obs_data_array[:,4] = obs_data_array[:,1] + (data_array[:,2]/data_array[:,1])*0.434
     obs_data_array[:,5] = obs_data_array[:,1] - (data_array[:,2]/data_array[:,1])*0.434
    
-    #print obs_data_array
+    #print(obs_data_array)
     return obs_data_array, 'White+11', False
 
 
@@ -3442,7 +3437,7 @@ def load_Zehavi11_wp(data_array, legend):
     obs_data_array[:,4] = (data_array[:,2]/data_array[:,1])*0.434
     obs_data_array[:,5] = obs_data_array[:,4]
    
-    #print obs_data_array
+    #print(obs_data_array)
     return obs_data_array, legend, False
 
 def ZFOURGE_150_z_250_SF(load_from_file=True):
@@ -3456,7 +3451,7 @@ def ZFOURGE_150_z_250_SF(load_from_file=True):
     obs_data_array[:,4] = -data_array[:,3]*0.434
     obs_data_array[:,5] = data_array[:,2]*0.434
 
-    print obs_data_array
+    print(obs_data_array)
     
     return obs_data_array, 'ZFOURGE/CANDLES', False  
 
@@ -3464,7 +3459,7 @@ def loadDiverse(load_from_file=False):
     
     redshift='0.09'            
     filename = mycomp+'anaconda/pro/OBS/HMF_MDPL2_Rockstar_z_'+redshift+'_M200c_Msun_Nhalos.txt'
-    print filename
+    print(filename)
     data = myData.readAnyFormat(config=False, mypath=filename, data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float64, skiprow=11)
     obs_data_array = np.zeros((data[:,0].size,7), dtype=np.float)
     obs_data_array[:,0] = 10**data[:,0]
@@ -3494,7 +3489,7 @@ def loadFileLF(reference, band):
                  
     filename = mycomp+'anaconda/pro/OBS/'+reference+'_best_fit_LF_'+band+'.txt'
     filename = mycomp+'anaconda/pro/OBS/'+reference+'_data_LF_'+band+'.txt'
-    print 'band:', band, filename   
+    print('band:', band, filename)   
     
     data=myData.readAnyFormat(config=False, mypath=filename, data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float64, skiprow=6)    
 
@@ -3505,7 +3500,7 @@ def loadFileLF(reference, band):
     obs_data_array[:,3] = data[:,5]
     obs_data_array[:,4] = data[:,5]
      
-    #print obs_data_array    
+    #print(obs_data_array)    
     
     return obs_data_array, reference, False
 
@@ -3629,12 +3624,12 @@ version={'0': 'tarsel_full_mstar_5e8_1e9',
           '5': 'tarsel_full_mstar_1e11'       
           }
 
-legend={'0': '$8.7 < \log$ $M_{_*} < 9.0$',
-          '1': '$9.0 < \log$ $M_{_*} < 9.7$',
-          '2': '$9.7 < \log$ $M_{_*} < 10.0$',
-          '3': '$10.0 < \log$ $M_{_*} < 10.7$',
-          '4': '$10.7 < \log$ $M_{_*} < 11.0$',
-          '5': '$\log$ $M_{_*} > 11.0$'       
+legend={'0': r'$8.7 < \log$ $M_{_*} < 9.0$',
+          '1': r'$9.0 < \log$ $M_{_*} < 9.7$',
+          '2': r'$9.7 < \log$ $M_{_*} < 10.0$',
+          '3': r'$10.0 < \log$ $M_{_*} < 10.7$',
+          '4': r'$10.7 < \log$ $M_{_*} < 11.0$',
+          '5': r'$\log$ $M_{_*} > 11.0$'       
           }
 
 redshift={'0': 0.0,
@@ -3671,7 +3666,7 @@ def loadFile(plot_key,
              legend):
                  
     filename = mycomp+'anaconda/pro/myRun/histos/'+plot_key+'/'+plot_key+'_'+catname+'_z_'+redshift+'_'+version+'.txt'
-    print filename
+    print(filename)
     obs_data_array = myData.readAnyFormat(config=False, mypath=filename, data_format='ASCII', data_shape='shaped', delim='\t', mydtype=np.float64, skiprow=2)
     
     obs_data_array[:,0] = np.log10(obs_data_array[:,0])

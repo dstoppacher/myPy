@@ -1,3 +1,4 @@
+from __future__ import print_function
 import numpy as np
 from astropy.io import fits
 import h5py as hdf5
@@ -11,7 +12,7 @@ from os import listdir
 from os.path import isfile, join
 #import read_data_Cholla as rdC
 
-myOutput = oD.OutputData(config=False)
+#myOutput = oD.OutputData(config=False)
 
 system_info = os.getcwd()
 start = system_info.find('anaconda')
@@ -99,7 +100,7 @@ class	ArangeData:
             import h5py as hdf5
             
             f=hdf5.File(path, 'r')
-            print '\nSimple read-in hdf5 data to structured array! --> \npath:', path
+            print('\nSimple read-in hdf5 data to structured array! --> \npath:', path)
             
             redshift    =f.attrs['redshift']
             scale_factor=f.attrs['scaleFactor']
@@ -127,33 +128,31 @@ class	ArangeData:
             return data, redshift, scale_factor
 
         def readANDConvert(convert):            
-            print '###################################################################################'
-            print 'reading and converting data formats ...'
+            print('###################################################################################\nreading and converting data formats ...')
 
             def readFITS():            
-                print '###################################################################################'
-                print 'reading fits ...'
+                print('###################################################################################\nreading fits ...')
 
                 #mypath='/home/doris/anaconda/pro/data/CMASS_SAMS/CMASS_CATALOGUES/LSS/cmass-dr12v4-allmasses-spall-complete.dat.fits'
                 hdulist = fits.open(mypath, memmap=True)                
                 #hdulist.info()
                 fits_header_map={}
 #                hdr = hdulist[0].header                   
-#                print repr(hdr)             
+#                print(repr(hdr)             
 #                hdr = hdulist[1].header 
-#                print repr(hdr)             
+#                print(repr(hdr)             
 #                hdr = hdulist[2].header 
-#                print repr(hdr)              
+#                print(repr(hdr)              
  
-                print hdulist
-                print hdulist[2].header
-                print hdulist[2].data
+                #print(hdulist
+                #print(hdulist[2].header
+                #print(hdulist[2].data
                 exit()
                 i=0
                 a=1
                 for entry in hdulist[2].header:
 #                    try:
-#                        print 'a:', a, hdulist[1].header[i], hdulist[1].data[hdulist[1].header[i]].shape                      
+#                        print('a:', a, hdulist[1].header[i], hdulist[1].data[hdulist[1].header[i]].shape                      
 #                        check_data_shape=False
 #                        fits_header_map.update({'name'+str(a-1): hdulist[1].header[i], hdulist[1].header[i]: hdulist[1].data[hdulist[1].header[i]]})
 #                        a+=1
@@ -163,30 +162,30 @@ class	ArangeData:
 #                            fits_header_map.update({'name'+str(a-1): hdulist[1].header[i], hdulist[1].header[i]: hdulist[1].data[hdulist[1].header[i]]})
 #                            a+=1
 #                        except:
-#                            print 'failed!'
+#                            print('failed!'
                     i+=1 
                 fits_header_map.update({'nr_entries': a})
                 
-                #print fits_header_map
-                #print my_cols2extract
+                #print(fits_header_map
+                #print(my_cols2extract
              
                 with hdf5.File(mycomp+'anaconda/pro/data/'+catname+'/'+catname+'_'+config_array[catname+'_output_filename_code']+'.hdf5', 'w') as hf:
                     i=0
                     while i<fits_header_map['nr_entries']-1:
-                       #print 'i:', i, fits_header_map['name'+str(i)]
+                       #print('i:', i, fits_header_map['name'+str(i)]
 
                         if np.any(my_cols2extract==fits_header_map['name'+str(i)]):
-                            print 'i:', i, 'fits name:', fits_header_map['name'+str(i)], fits_header_map[fits_header_map['name'+str(i)]].shape, 'hdf5 name:', name_mapping[fits_header_map['name'+str(i)]],                            
+                            print('i:', i, 'fits name:', fits_header_map['name'+str(i)], fits_header_map[fits_header_map['name'+str(i)]].shape, 'hdf5 name:', name_mapping[fits_header_map['name'+str(i)]], end='')                            
                             try:
-                                print fits_header_map[fits_header_map['name'+str(i)]][0,:]
+                                print(fits_header_map[fits_header_map['name'+str(i)]][0,:])
                                 #fits_header_map[fits_header_map['name'+str(i)]][0:2,0],
                                 dset = hf.create_dataset(name_mapping[fits_header_map['name'+str(i)]], (len(fits_header_map[fits_header_map['name'+str(i)]]),), dtype=np.float32)                                
                                 dset[0::] = fits_header_map[fits_header_map['name'+str(i)]][:,0]
                                 dset.attrs['colName'] = name_mapping[fits_header_map['name'+str(i)]]                                
-                                print '--> first element done!'                                
+                                print('--> first element done!')                                
                                 a=1
                                 while a<len(fits_header_map[fits_header_map['name'+str(i)]][0,:]) and check_data_shape==True:
-                                    print ' a:', a, 'name:', name_mapping[fits_header_map['name'+str(i)]+str(a)], fits_header_map[fits_header_map['name'+str(i)]][0:2,a]
+                                    print(' a:', a, 'name:', name_mapping[fits_header_map['name'+str(i)]+str(a)], fits_header_map[fits_header_map['name'+str(i)]][0:2,a])
     
                                     dset = hf.create_dataset(name_mapping[fits_header_map['name'+str(i)]+str(a)], (len(fits_header_map[fits_header_map['name'+str(i)]][:,a]),), dtype=np.float32)
                                     dset[0::] = fits_header_map[fits_header_map['name'+str(i)]][:,a]
@@ -195,7 +194,7 @@ class	ArangeData:
                             except:
                                 dset = hf.create_dataset(name_mapping[fits_header_map['name'+str(i)]], (len(fits_header_map[fits_header_map['name'+str(i)]]),), dtype=np.float32)
                                 if name_mapping[fits_header_map['name'+str(i)]].find('mstar')!=-1 or name_mapping[fits_header_map['name'+str(i)]].find('ssfr')!=-1: 
-                                    print '10**\n'
+                                    print('10**\n')
                                     if name_mapping[fits_header_map['name'+str(i)]]=='mstar_char': 
                                         dset[0::] = 10**(fits_header_map[fits_header_map['name'+str(i)]]-0.03925)
                                     else:
@@ -204,15 +203,14 @@ class	ArangeData:
                                     
                                 else:                                    
                                     dset[0::] = fits_header_map[fits_header_map['name'+str(i)]]
-                                    print '\n'
+                                    print('\n')
                                 dset.attrs['colName'] = name_mapping[fits_header_map['name'+str(i)]]
                         i+=1
                 
                 hdulist.close()
                 exit()
             def convert2HDF5():
-                print '###################################################################################'
-                print 'converting to HDF5 ...'
+                print('###################################################################################\nconverting to HDF5 ...')
     
                 mytypes={}
                 a=0
@@ -229,7 +227,7 @@ class	ArangeData:
                     self.data_array=np.zeros((nr_rows,), dtype=dt)
                     nr_entries=nr_col
                 
-                print 'myfilename:', myfilename
+                print('myfilename:', myfilename)
                 f = hdf5.File(myfilename, "r")
 
 
@@ -237,14 +235,14 @@ class	ArangeData:
                 
                         try:
                             if config_array[catname+'_UNIT_CODE']=='MD':
-                                print 'i:', i, name_conv_map[id_col_array['name'+str(i)]], '-->',
+                                print('i:', i, name_conv_map[id_col_array['name'+str(i)]], '-->', end='')
                                 name=name_conv_map[id_col_array['name'+str(i)]]
                             else:
                                 name=id_col_array['name'+str(i)]
                         except:
                             name=id_col_array['name'+str(i)]
         
-                        print id_col_array['name'+str(i)], 'size:', f[name].size, 'i:', i, 'id_col:', id_col_array[id_col_array['name'+str(i)]+'_col_id']
+                        print(id_col_array['name'+str(i)], 'size:', f[name].size, 'i:', i, 'id_col:', id_col_array[id_col_array['name'+str(i)]+'_col_id'])
                            
                         self.data_array[id_col_array['name'+str(i)]][0:f[name].size] = f[name]
                         
@@ -254,26 +252,23 @@ class	ArangeData:
                 count=0
                 while i<fits_header_map['nr_entries']-1:
                     if np.any(my_cols2extract==fits_header_map['name'+str(i)]):
-                        print fits_header_map['name'+str(i)], fits_header_map[fits_header_map['name'+str(i)]].shape, name_mapping[fits_header_map['name'+str(i)]]
+                        print(fits_header_map['name'+str(i)], fits_header_map[fits_header_map['name'+str(i)]].shape, name_mapping[fits_header_map['name'+str(i)]])
                         if count==0:
-                            print 'first:'
                             self.data_array = fits_header_map[fits_header_map['name'+str(i)]]                        
                             count=1
                         else:
-                            print 'hstack:'
                             self.data_array = np.column_stack((self.data_array, fits_header_map[fits_header_map['name'+str(i)]]))  
     
                     i+=1
                 
-                print self.data_array[0:10,:]
+                print(self.data_array[0:10,:])
 
             def caseSwitcher(convert):
 
                 choose = {
                     'FITS2HDF5': FITS2HDF5,
                     'HDF52HDF5': HDF52HDF5,
-                    'READ2ARRAY': READ2ARRAY,
-                    'CROSSMATCH': CROSSMATCH,
+                    'READ2ARRAY': READ2ARRAY
                     }
                     
                 func = choose.get(convert)
@@ -291,136 +286,26 @@ class	ArangeData:
             my_cols2extract = mL.multicolTestAlgorithm(config_array[catname+'_fits_map_names'], delimiter=';')
             my_cols2extract_mapping = mL.multicolTestAlgorithm(config_array[catname+'_fits_map_names_mapping'], delimiter=';')
             name_mapping={}
-            #print my_cols2extract
-            #print my_cols2extract_mapping
+            #print(my_cols2extract
+            #print(my_cols2extract_mapping
             i=0
             while i<len(my_cols2extract):
-                #print 'i:', i, my_cols2extract[i], my_cols2extract_mapping[i]
+                #print('i:', i, my_cols2extract[i], my_cols2extract_mapping[i]
                 name_mapping.update({my_cols2extract[i]: my_cols2extract_mapping[i]})
                 i+=1
             
             name_mapping.update({'nr_entries': i})
-            #print name_mapping
+            #print(name_mapping
            
             caseSwitcher(convert)
                  
             exit()
-
-        def crossmatch():
-            print '###################################################################################'
-            print 'Crossmatch two catalogs ...'
-
-            def set_uniqueID(data):
-                
-                data=mL.dim_expander_struct(data,
-                                   'haloid',
-                                   'uniqueID',
-                                   mydtype=np.dtype('S100'))
-                k=0
-                while k<data.size:
-                    data['uniqueID'][k]=str(data['haloid'][k])+str(data['hostid'][k])
-                    k+=1
-                
-                
-                data = np.sort(data, order=['haloid', 'hostid', 'mstar'])
-
-                unique_array, index, count = np.unique(data['uniqueID'],
-                                                        return_index=True,
-                                                        return_counts=True)
-                non_unique=index[np.where(count!=1)[:][0]]
-                print 'Numbers of non-unique IDs in data set:', non_unique.size
-    
-                for index in non_unique:
-                    data_index = np.where(data['uniqueID']==data['uniqueID'][index])
-                    #print data[['uniqueID','haloid','hostid','mstar','DEC','RA','Z']][data_index] 
-    
-                    for num_count, element in enumerate(data_index[:][0]):
-                        #print 'i:', num_count, 'index:', element, 'old ID:', data['uniqueID'][element], 
-                        data['uniqueID'][element]=str(data['uniqueID'][element])+str(num_count)+'-'
-                        #print 'new uniqueID', data['uniqueID'][element]
-
-                #check if uniqueIDs are set correctly                        
-                unique_array, index, count = np.unique(data['uniqueID'],
-                                            return_index=True,
-                                            return_counts=True)
-                
-                non_unique=index[np.where(count!=1)[:][0]]
-                if non_unique.size>0:
-                    print 'CROSSMATCH FAILED! found', non_unique.size, 'non-unique elements! Should be Zero!'
-                    exit()                        
-                
-                return data
-
-            myData = aD.ArangeData()
-            filename_list = myData.readAnyFormat(config=False, 
-                                        mydtype=np.str_, 
-                                        mypath=mycomp+'anaconda/pro/data/'+catname+'/'+catname+'_file_names.txt', 
-                                        data_shape='shaped', 
-                                        comment='#')
-                                        
-            print filename_list
-            k=0
-            data={}
-            while k<filename_list.size:
-                readHDF5(crossmatch='/'+filename_list[k]) 
-                data.update({'data_cross'+str(k): self.data_array})
-                k+=1
-
-            if data['data_cross0']['haloid'].size>=data['data_cross1']['haloid'].size:
-                data_basic=data['data_cross0']
-                data_check=data['data_cross1']
-            else:
-                data_basic=data['data_cross1']
-                data_check=data['data_cross0']
-                
-
-            data_basic=set_uniqueID(data_basic)
-            data_check=set_uniqueID(data_check)
-            
-            test, indices_basic, indices_check = np.intersect1d(data_basic['uniqueID'], data_check['uniqueID'], return_indices=True)        
-            data_basic=data_basic[indices_basic]
-            data_check=data_check[indices_check]
-
-            print 'number of object with special uniqueID:'
-            print 'data_basic:'
-            for element in data_basic['uniqueID']:
-                if element.find('-')!=-1:
-                    print element
-            
-             
-            if data_basic.size!=data_check.size:
-                print 'CROSSMATCH FAILED! Arrays have to have the same size after crossmatching!'
-                print 'basic:', data_basic.size, 'check:', data_check.size, 'test size:', test.size                
-                exit()            
-            q=0
-            for k, haloid in enumerate(data_basic['uniqueID']):
-                if haloid!=data_basic['uniqueID'][k] and data_basic['uniqueID'][k]!=data_check['uniqueID'][k]:
-                    q=+1
-            if q!=0:
-                print 'CROSSMATCH FAILED! Arrays to be crossmatch have mixed-up indices!'                
-                exit()         
-
-            self.data_array=create_structed_array()
-            
-            k=0
-            while k<int(id_col_array['nr_entries']):
-                #print id_col_array['name'+str(k)]
-                if np.all(data_basic[id_col_array['name'+str(k)]]!=-99):
-                    self.data_array[id_col_array['name'+str(k)]][:data_basic[id_col_array['name'+str(k)]].size]=data_basic[id_col_array['name'+str(k)]]
-                else:
-                    self.data_array[id_col_array['name'+str(k)]][:data_check[id_col_array['name'+str(k)]].size]=data_check[id_col_array['name'+str(k)]]
-
-                k+=1
-            
-            self.data_array = self.data_array[:data_basic['haloid'].size]
-            print 'self.data_array after read-in:', self.data_array.shape
            
         def readBINARY():
-            print '###################################################################################'
-            print 'reading BINARY FILES GALAXY CATALOUGE+MHALO ...'
+            print('###################################################################################\nreading BINARY FILES GALAXY CATALOUGE+MHALO ...')
  
-            #print 'mypath in the end:', mypath
-            print 'nr_entries:', int(id_col_array['nr_entries'])
+            #prin 'mypath in the end:', mypath
+            print('nr_entries:', int(id_col_array['nr_entries']))
             self.data_array=np.zeros((nr_rows, int(id_col_array['nr_entries'])), dtype=np.float64)
                        
             start = time()
@@ -466,7 +351,7 @@ class	ArangeData:
                     }
                     
                 func = choose.get(name)
-                #print 'func:', func
+                #print('func:', func
                 return func()
                 
             def Haloid():
@@ -538,11 +423,11 @@ class	ArangeData:
                         
             def skipThat():
                 return
-          
-            print 'mypath', mypath
+         
+            print('mypath', mypath)
             openfile = open(mypath,'rb')
             nhalos = np.fromstring(openfile.read(8), dtype = np.uint64)
-            #print 'nhalos:', nhalos[0]
+            #print('nhalos:', nhalos[0]
             
             dt = np.dtype([
                         ('galaxyhostid', np.uint64),
@@ -565,8 +450,8 @@ class	ArangeData:
                
                 count_new+=ngalaxies[0]
                 count_new = count_new.astype(np.uint32)
-                #print 'ngalaxies:', ngalaxies[0]
-                #print 'count_new:', count_new
+                #print('ngalaxies:', ngalaxies[0]
+                #print('count_new:', count_new
                 
                 a=0
                 while a<id_col_array['nr_entries']:
@@ -586,12 +471,9 @@ class	ArangeData:
             self.redshift=None
             self.scale_factor=None
 
-            print 'Time:', (time()-start)/60.0, 'min/', (time()-start), 'sec'
-
         def readBINARY_SAGE(mypath):
 
-            print '###################################################################################'
-            print 'reading BINARY FILES GALAXY CATALOUGE+MHALO ...'
+            print('###################################################################################\nreading BINARY FILES GALAXY CATALOUGE+MHALO ...')
  
             SAM_binary_filestruct_map = {}
             SAM_binary_filestruct_map['catname']                      = catname
@@ -612,18 +494,18 @@ class	ArangeData:
             i=0
             a=0
             while i<data.size:
-                #print 'i:', i, 'a:', a, data[i].find(snapid), catname+'_filename'+str(a), data[i]
+                #print('i:', i, 'a:', a, data[i].find(snapid), catname+'_filename'+str(a), data[i]
                 if data.size==1:
                     SAM_binary_filestruct_map[catname+'_filename'+str(a)] = mypath+'/'+str(data)
                     a+=1
                 else:
                     if data[i].find(snapid)==7 or data[i].find(snapid)==8:               
                         SAM_binary_filestruct_map[catname+'_filename'+str(a)] = mypath+'/'+data[i]
-                        #print 'chosen filename:', SAM_binary_filestruct_map[catname+'_filename'+str(a)]
+                        #print('chosen filename:', SAM_binary_filestruct_map[catname+'_filename'+str(a)]
                         a+=1
                 i+=1      
            
-            SAM_binary_filestruct_map[catname+'_nr_files'] = 50#a        
+            SAM_binary_filestruct_map[catname+'_nr_files'] = a        
 
             dt =    [
                     ('SnapNum'                      , np.int32),                    
@@ -641,7 +523,7 @@ class	ArangeData:
                     ('Vel'                          , (np.float32, 3)),             
                     ('spinParameter'                , (np.float32, 3)), #Spin             
                     ('Len'                          , np.int32),                    
-                    ('mhalo'                        , np.float32), #Mvir                 
+                    ('mhalo_200c'                        , np.float32), #Mvir                 
                     ('mhalo_cents'                  , np.float32), #CentralMvir                 
                     ('rvir'                         , np.float32), #Rvir                 
                     ('vvir'                         , np.float32), #Vvir                 
@@ -683,7 +565,7 @@ class	ArangeData:
             dt = np.dtype({'names':names, 'formats':formats}, align=True)
 #
 #            for name in names:
-#                print 'name:', name
+#                print('name:', name
 #                
 #            exit()
         
@@ -693,7 +575,7 @@ class	ArangeData:
         
             i=0
             while i<SAM_binary_filestruct_map[catname+'_nr_files']:
-                #print 'i:', i, SAM_binary_filestruct_map[catname+'_filename'+str(i)]
+                #print('i:', i, SAM_binary_filestruct_map[catname+'_filename'+str(i)]
                 openfile = open(SAM_binary_filestruct_map[catname+'_filename'+str(i)],'rb')
                 Ntrees = np.fromfile(openfile, np.dtype(np.int32), 1)  # Read number of trees in file
                 ngalaxies = np.fromfile(openfile, np.dtype(np.int32), 1)[0]  # Read number of gals in file.
@@ -702,16 +584,16 @@ class	ArangeData:
                 data_block = np.fromfile(openfile, dt, ngalaxies) # Read in the galaxy structures
 #                b=0
 #                while b<20:
-#                    print 'b:', b, data_block[0][b]
+#                    print('b:', b, data_block[0][b]
 #                    b+=1
 
 
                 
                 count_new+=ngalaxies
-                #print 'i:', i, 'ngalaxies:', ngalaxies, 'data_block.shape:', data_block.shape, 'count:', count, 'count_new:', count_new
+                #print('i:', i, 'ngalaxies:', ngalaxies, 'data_block.shape:', data_block.shape, 'count:', count, 'count_new:', count_new
                 a=0
                 while a<id_col_array['nr_entries']:
-                    #print 'a:', a, 'name:', id_col_array['name'+str(a)], 'id_col:', id_col_array['col_id'+str(a)]
+                    #print('a:', a, 'name:', id_col_array['name'+str(a)], 'id_col:', id_col_array['col_id'+str(a)]
                     if id_col_array['name'+str(a)]=='Z'\
                         or id_col_array['name'+str(a)]=='ssfr'\
                         or id_col_array['name'+str(a)]=='Tcons'\
@@ -723,31 +605,31 @@ class	ArangeData:
                         or id_col_array['name'+str(a)]=='regionName':
                         pass                        
                     elif id_col_array['name'+str(a)]=='sfr':
-                        #print 'here: sfr!'
+                        #print('here: sfr!'
                         self.data_array[id_col_array['name'+str(a)]][count:count_new] = self.data_array[id_col_array['name'+str(a)]+'_spheroid'][count:count_new]+self.data_array[id_col_array['name'+str(a)]+'_disk'][count:count_new]
                     elif id_col_array['name'+str(a)].find('x_pos')!=-1:
-                        #print 'x:', data_block['Pos'][:,0]
+                        #print('x:', data_block['Pos'][:,0]
                         self.data_array[id_col_array['name'+str(a)]][count:count_new] = data_block['Pos'][:,0]
                     elif id_col_array['name'+str(a)].find('y_pos')!=-1:
-                        #print 'y:', data_block['Pos'][:,1]
+                        #print('y:', data_block['Pos'][:,1]
                         self.data_array[id_col_array['name'+str(a)]][count:count_new] = data_block['Pos'][:,1]
                     elif id_col_array['name'+str(a)].find('z_pos')!=-1:
-                        #print 'z:', data_block['Pos'][:,2]
+                        #print('z:', data_block['Pos'][:,2]
                         self.data_array[id_col_array['name'+str(a)]][count:count_new] = data_block['Pos'][:,2]
                     elif id_col_array['name'+str(a)].find('x_vel')!=-1:
-                        #print 'x:', data_block['Pos'][:,0]
+                        #print('x:', data_block['Pos'][:,0]
                         self.data_array[id_col_array['name'+str(a)]][count:count_new] = data_block['Vel'][:,0]
                     elif id_col_array['name'+str(a)].find('y_vel')!=-1:
-                        #print 'y:', data_block['Pos'][:,1]
+                        #print('y:', data_block['Pos'][:,1]
                         self.data_array[id_col_array['name'+str(a)]][count:count_new] = data_block['Vel'][:,1]
                     elif id_col_array['name'+str(a)].find('z_vel')!=-1:
-                        #print 'z:', data_block['Pos'][:,2]
+                        #print('z:', data_block['Pos'][:,2]
                         self.data_array[id_col_array['name'+str(a)]][count:count_new] = data_block['Vel'][:,2]
                     elif id_col_array['name'+str(a)]=='spinParameter':
-                        #print 'z:', data_block['Pos'][:,2]
-                        #print 'spin[,[0,1,2]', data_block['spinParameter'][0:10,[0,1,2]]
+                        #print('z:', data_block['Pos'][:,2]
+                        #print('spin[,[0,1,2]', data_block['spinParameter'][0:10,[0,1,2]]
                         self.data_array[id_col_array['name'+str(a)]][count:count_new] = (data_block['spinParameter'][:,0]**2+data_block['spinParameter'][:,1]**2+data_block['spinParameter'][:,2]**2)**0.5 / (2.0**0.5 * data_block['rvir'] * data_block['vvir'])
-                        #print self.data_array[id_col_array['name'+str(a)]][count:count_new]
+                        #print(self.data_array[id_col_array['name'+str(a)]][count:count_new]
 #                    elif id_col_array['name'+str(a)]=='zgas_disk':
 #                        self.data_array[id_col_array['name'+str(a)]][count:count_new] = data_block['Mzgas_disk']/data_block['mcold_disk']
                     elif id_col_array['name'+str(a)]=='mstar_disk':
@@ -757,7 +639,7 @@ class	ArangeData:
                     elif id_col_array['name'+str(a)]=='mstar+IC':
                         self.data_array[id_col_array['name'+str(a)]][count:count_new] = data_block['mstar']                        
                     else:
-                        #print 'default!'
+                        #print('default!'
                         self.data_array[id_col_array['name'+str(a)]][count:count_new] = data_block[str(id_col_array['name'+str(a)])]
                     a+=1
 
@@ -777,47 +659,27 @@ class	ArangeData:
             
             self.redshift=np.float32(snapid)
             self.scale_factor = mL.redshift_to_expfactor(self.redshift)
-
-            print 'Time:', (time()-start)/60.0, 'min/', (time()-start), 'sec'
             
-            print self.data_array.shape, self.redshift, self.scale_factor
+            print(self.data_array.shape, self.redshift, self.scale_factor)
 
 
            
         def readASCII():
 
-#            print '###################################################################################'
-#            print 'read ASCII'
-#            print ' '
+#            print('###################################################################################'
+#            print('read ASCII'
+#            print(' '
         
                                      
-            if data_shape=='shaped':
-  
-                #print '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%'
-                #print 'reading ASCII SHAPED format...'
-                #print 'mypath:', mypath, data_format
-                
-                if data_format=='CATASCII':
-                    print 'read CATASCII ...'
-                    data = np.genfromtxt(mypath, dtype=mydtype, delimiter=delim, comments=comment)
-                    if mydtype_after_read!=False:  data.astype(np.float64)
-                        
-                    self.data_array=arrangeCATASCII(data, data[:,0].size)
-
-                else:
-                    self.data_array = np.loadtxt(mypath, dtype=mydtype, delimiter=delim, comments=comment, skiprows=skiprow)
-
+            if data_shape=='shaped':  
+              
+                self.data_array = np.genfromtxt(mypath, dtype=mydtype, delimiter=delim, comments=comment, skip_header=skiprow, encoding=None)
                     
             else:
 
-                #print '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%'
-                #print 'reading ASCII UNSHAPED format...'
-                
-               
-
                 self.data_array = np.zeros((nr_rows, nr_col), dtype=np.float32)                
 
-                #print 'DATA FORMAT:', data_format, 'nr col:', nr_col, 'id_col:', id_col, mypath, 'rows 2 read:', nr_rows
+                #print('DATA FORMAT:', data_format, 'nr col:', nr_col, 'id_col:', id_col, mypath, 'rows 2 read:', nr_rows)
                 
                 check_path = os.path.exists(mypath)
                 
@@ -831,11 +693,11 @@ class	ArangeData:
                         
                         for line in f:
                                 
-                                #if mypath==self.config_array['mydir'][0]+'62.5Mpc_SAG_AHF.txt': print 'line_count:', line_count
+                                #if mypath==self.config_array['mydir'][0]+'62.5Mpc_SAG_AHF.txt': print('line_count:', line_count
                                 if line_count<nr_rows:
                                     data = np.fromstring(line, dtype=np.double, sep='\n')#, count=2)#,  missing_values="0", filling_values="0")#, usecols=(self.config_array['id_col1'], self.config_array['id_col2']))
                                     j = 0
-                                    #print 'i start:', i
+                                    #print('i start:', i
                                     if data.size==mydat_off and i!=0: 
                                         self.data_array[i-1,:]=self.data_array[i,:]
                                         i-=1
@@ -857,90 +719,9 @@ class	ArangeData:
                                     line_count+=1 
                                     a+=1
 
-                    self.data_array=arrangeCATASCII(self.data_array, line_count)                    
-                    
-
-
-            if data_format=='ASCII_SPLITTED_CAT':
-                print 'count:', file_count
-                readASCIIFromSplittedCat(self.data_array, file_count)
-
-        def arrangeCATASCII(data,
-                            line_count):
-        
-            data_array_ascii_all_cols = np.resize(data,(line_count,data[0,:].size))
-
-            print 'nr_cols2read:', id_col_array['nr_cols2read'], 'rows:', line_count, 'snapid:', snapid, 'catname:', catname, int(id_col_array['nr_entries']) 
-
-            mytypes={}
-            a=0
-            while a<int(id_col_array['nr_entries']):
-                mytypes.update({id_col_array['name'+str(a)]: id_col_array['data_type'+str(a)]})                    
-                a+=1
- 
-            dt = np.dtype([(k, mytypes[k]) for k in mytypes.keys()])
-
-            data=np.zeros((line_count,), dtype=dt)   
-            
-            #data=np.zeros((line_count,  id_col_array['nr_entries']), dtype=np.float64)
-            
-            file_struc_info=hdf5lib.catascii(catname, snapid, path_to_directory=mypath)
-            print id_col_array
-            print file_struc_info
-            
-            
-            i=0
-            while i<int(id_col_array['nr_entries']):
-                try:
-                    print id_col_array['name'+str(i)], 'i:', i, 'id_col:', id_col_array[id_col_array['name'+str(i)]+'_col_id'], file_struc_info[catname+'_'+id_col_array['name'+str(i)]]         
-                    data[id_col_array['name'+str(i)]] = data_array_ascii_all_cols[:, int(file_struc_info[catname+'_'+id_col_array['name'+str(i)]])]
-                except:
-                    print id_col_array['name'+str(i)], 'i:', i, 'not excisting ...'
-
-                i+=1
-
-            return data
-
-        def readASCIIFromSplittedCat(data,
-                                     count):
-                     
-            myOutput = oD.OutputData(config=False)
-
-            data = self.selectData2Compute(data,
-                                      selected_col=1,
-                                      operator='>',
-                                      condition=1e9)
-            
-            filename = mycomp+'anaconda/pro/data/'+catname+'_mhalo_mstar.txt'
-            
-            if count==0:
-                
-                myOutput.writeIntoFile(filename,
-                                       data,
-                                       myheader= catname+' (1) Mhalo [Msun h-1] >1e9 Msun, (2) Mstar [Msun h-1] >1e9 Msun',
-                                       data_format="%0.5f",
-                                       mydelimiter='\t',
-                                       append_mytext=False)
-                                       
-                self.data_array_splitted_cat = data
-            else:
-            
-                myOutput.writeIntoFile(filename,
-                                       data,
-                                       data_format="%0.5f",
-                                       mydelimiter='\t',
-                                       append_mytext=True)
-                                       
-                print self.data_array_splitted_cat.shape, 'before'                   
-                self.data_array_splitted_cat = np.append(self.data_array_splitted_cat, data, axis=0)
-                print self.data_array_splitted_cat.shape, 'after'             
-
         def read_MDGalaxies():
             
-            print '###################################################################################'
-            print 'read MultiDark-Galaxies HDF5 file format'
-            print ' '
-            #print id_col_array
+            print('###################################################################################\nread MultiDark-Galaxies HDF5 file format\n')
             
             #Galaxy properties availalble
             gal_props =['GalaxyType','HaloMass','HostHaloID',\
@@ -952,49 +733,45 @@ class	ArangeData:
                         'rbulge','rdisk','rhalf_mass']      
 
             cols=[] 
-            print 'file_count:', file_count
 
             myfilename=config_array[catname+'_use_store_registerpath']+'MDPL2_Galacticus_z_'+str(format(scale_factor_map[catname+'_redshift'+str(file_count)], '0.2f'))+'.hdf5'
-            print 'myfilename:', myfilename
+            print('myfilename:', myfilename)
                 
             data,self.redshift, self.scale_factor = read_simple_hdf52struct_array(myfilename)  
 
-            #print np.info(data)
+            #print(np.info(data)
             self.data_array=create_structed_array(set_nr_rows=data.size)       
             
             
             for a, item in enumerate(self.data_array.dtype.names):
                 try:
-                    print 'a:', a, 'item:', item, name_conv_map[item]
+                    print('a:', a, 'item:', item, name_conv_map[item])
                     self.data_array[item] = data[name_conv_map[item]]
                 except:
-                    print 'DOES NOT EXIST here set to default!', item
+                    print('DOES NOT EXIST here set to default!', item)
                     if item.find('AB')!=-1:
-                        print '--> magnitudes ... set to 0.0!'
+                        print('--> magnitudes ... set to 0.0!')
                         self.data_array[item] = 0.0
                     else:
-                        print '--> ... set to -99!'
+                        print('--> ... set to -99!')
                         self.data_array[item] = -99
 
                 
-            #print name_conv_map
-            print np.info(self.data_array)                                                     
+            #print(name_conv_map
+            print(np.info(self.data_array))                                                     
 
-                                                            
         def readHDF5(crossmatch=''):
             
-            print '###################################################################################'
-            print 'read HDF5'
-            print ' '
-            #print id_col_array
+            print('###################################################################################\nread HDF5')
 
             mytypes={}
             a=0
-            while a<int(id_col_array['nr_entries']):                
+            while a<int(id_col_array['nr_entries']):  
+                #print('a:', a, id_col_array['name'+str(a)], id_col_array['data_type'+str(a)])
                 mytypes.update({id_col_array['name'+str(a)]: id_col_array['data_type'+str(a)]})                    
                 a+=1
 
-            #print mytypes
+            #print(mytypes)
  
             dt = np.dtype([(k, mytypes[k]) for k in mytypes.keys()])
 
@@ -1004,9 +781,9 @@ class	ArangeData:
             except:
                 self.data_array=np.zeros((nr_rows,), dtype=dt)
                 nr_entries=nr_col
-            #print 'HERE!'
+            #print('HERE!'
             #myfilename='/store/erebos/doris/Galacticus_1Gpc_z_0.09_CUT3_Contreras+13_mcold.hdf5'
-            print 'myfilename:', myfilename
+            print('myfilename:', myfilename)
             
             f = hdf5.File(myfilename+crossmatch, "r")
                 
@@ -1014,57 +791,58 @@ class	ArangeData:
             self.cat_attributes = {}                           
             i=0
             while i<len(f.attrs.keys()):
-                #print f.attrs.keys()[i], f.attrs.values()[i]
-                self.cat_attributes[f.attrs.keys()[i]] = f.attrs.values()[i]
+                #print(list(f.attrs.keys())[i], list(f.attrs.values())[i])
+                self.cat_attributes[list(f.attrs.keys())[i]] = list(f.attrs.values())[i]
                 i+=1
-            print '+++++++++++++++++++++++++++\n'
+            print('+++++++++++++++++++++++++++\n')
             try:
                 self.redshift = self.cat_attributes['redshift']
                 self.scale_factor = self.cat_attributes['scaleFactor']
             except:
                 self.redshift=False
                 self.scale_factor=False
-            
+
             i=0
+
             while i<nr_entries:
                 try:                   
-                    try:
-                        if config_array[catname+'_UNIT_CODE']=='MD':
-                            print 'i:', i, name_conv_map[id_col_array['name'+str(i)]], '-->',
-                            #print '('+name_conv_map[id_col_array['name'+str(i)]]+','+
-                            name=name_conv_map[id_col_array['name'+str(i)]]
-                        else:
-                            name=id_col_array['name'+str(i)]
-                    except:
+                #     try:
+                    if config_array[catname+'_UNIT_CODE']=='MD':
+                        #print('i:', i, name_conv_map[id_col_array['name'+str(i)]], '-->', end=' ')
+                        #print('('+name_conv_map[id_col_array['name'+str(i)]]+','+
+                        name=name_conv_map[id_col_array['name'+str(i)]]
+                    else:
                         name=id_col_array['name'+str(i)]
+                    # except:
+                    #     name=id_col_array['name'+str(i)]
     
-                    print id_col_array['name'+str(i)], 'size:', f[name].size, 'i:', i, 'id_col:', id_col_array[id_col_array['name'+str(i)]+'_col_id'],
+                    print(id_col_array['name'+str(i)], 'size:', f[name].size, 'i:', i, 'id_col:', id_col_array[id_col_array['name'+str(i)]+'_col_id'], end='')
 
                     self.data_array[id_col_array['name'+str(i)]][0:f[name].size] = f[name]
-                    print 'default!'
+                    print(' --> default!')
                     
                     mysave_colname=name
                 
                 except:
-                    print '-->', id_col_array['name'+str(i)], '/', name, 'i:', i, 'not excisting ...'
+                    print('-->', id_col_array['name'+str(i)], '/', name, 'i:', i, 'not excisting ...')
                                                                       
                     if id_col_array['name'+str(i)]=='Z':
-                        print '--> enter redshift in column: Z!'
+                        print('--> enter redshift in column: Z!')
                         self.data_array[id_col_array['name'+str(i)]] = self.redshift
 
                     elif id_col_array['name'+str(i)].find('AB')!=-1:
-                        print '--> magnitudes ... set to 0.0!'
+                        print('--> magnitudes ... set to 0.0!')
                         try:
                             self.data_array[id_col_array['name'+str(i)]][0::] = 0.0
                         except:
                             self.data_array[id_col_array['name'+str(i)]] = 0.0
                     elif id_col_array['name'+str(i)].find('sample_key')!=-1:
-                        print '--> string ... DO NOTHING!'
+                        print('--> string ... DO NOTHING!')
                     elif id_col_array['name'+str(i)].find('flag')!=-1:
-                        print '--> flag ... set to FALSE/0!'
+                        print('--> flag ... set to FALSE/0!')
                         self.data_array[id_col_array['name'+str(i)]]   = 0                     
                     else:
-                        print 'here set to -99!', id_col_array['name'+str(i)]
+                        print('here set to -99!', id_col_array['name'+str(i)])
                         try:
                             self.data_array[id_col_array['name'+str(i)]][0::] = -99
                         except:
@@ -1072,43 +850,31 @@ class	ArangeData:
                 i+=1
             
 
-            #print 'mysave_colname', mysave_colname
             self.data_array = self.data_array[:f[mysave_colname].size]
-            print 'self.data_array after read-in:', self.data_array.shape, 'redshift:', self.redshift, 'scale factor:', self.scale_factor
-            #print self.data_array[0:3]
+            print('self.data_array after read-in:', self.data_array.shape, 'redshift:', self.redshift, 'scale factor:', self.scale_factor)
+            #print(self.data_array[0:3]
 
 
         def readROCKSTAR_ASCII(halocat_code):
-            print '###################################################################################'
-            print 'read ROCSTAR ASCII FORMAT for'
-            print 'catname: ', catname, 'snapid:', snapid
-            #print 'mypath:', mypath
+            print('###################################################################################\nread ROCkSTAR ASCII FORMAT for catname: ', catname, 'snapid:', snapid)
+
             path = mypath+'out_'+str(snapid)+'.list'
-            print 'path:', path
+            print('path:', path)
     
-            import pandas as pd
+
             #Properties from Rockstar CHOLLA 50Mpc run
             #ID DescID Mvir Vmax Vrms Rvir Rs Np X Y Z VX VY VZ JX JY JZ Spin rs_klypin Mvir_all M200b M200c M500c M2500c Xoff Voff spin_bullock 
             #b_to_a c_to_a A[x] A[y] A[z] b_to_a(500c) c_to_a(500c) A[x](500c) A[y](500c) A[z](500c) T/|U| M_pe_Behroozi M_pe_Diemer Halfmass_Radius
 
-
-     
-            self.data_array = mL.df_to_sarray(data)
-            self.redshift=False
-            self.scale_factor=False
-            #exit()
-            #print self.data_array['mhalo_500c']
-            #print np.info(self.data_array)           
 
         def readEAGLE_ASCII(key):
                     
             import pandas as pd
             
             if key=='full':
-                print '###################################################################################'
-                print 'read EAGLE ASCII FORMAT\n catname: ', catname, 'snapid:', snapid
+                print('###################################################################################read EAGLE ASCII FORMAT\n catname: ', catname, 'snapid:', snapid)
                 mypath=mycomp+'anaconda/pro/data/EAGLE_100Mpc/original_catalogs/EAGLE_100Mpc_full_catalog.dat'
-                print 'mypath:', mypath
+                print('mypath:', mypath)
     
                 data=pd.read_csv(mypath, skiprows=1, \
                                   names=['fofID', 'haloid', 'hostid', 'galaxyID', 'nSubhalos',  'mhalo_fof', 'mhalo_200c', 'r200c',\
@@ -1127,10 +893,10 @@ class	ArangeData:
 
             elif key=='full_trees':
                 
-                print '###################################################################################'
-                print 'read EAGLE ASCII FULT MERGER TREE FORM DATA BASE\n catname: ', catname, 'snapid:', snapid
+                print('###################################################################################')
+                print('read EAGLE ASCII FULT MERGER TREE FORM DATA BASE\n catname: ', catname, 'snapid:', snapid)
                 mypath=mycomp+'anaconda/pro/data/EAGLE_ev_100Mpc/EAGLE_ev_100Mpc_full_centrals_main_progenitor_trees.txt'
-                print 'mypath:', mypath
+                print('mypath:', mypath)
     
                 data= pd.read_csv(mypath, skiprows=1,\
                                   names=['fofID',  'progFofID',  'redshift',  'haloid',  'hostid',  'galaxyID',  'lastProgID',  'topLeafID',\
@@ -1141,7 +907,8 @@ class	ArangeData:
                                          'rhalf_stars',  'rhalf_gas',  'mgas_SF',  'mgas_NSF',  'spinGasNSF_x',  'spinGasNSF_y',  'spinGasNSF_z',\
                                          'spinGasSF_x',  'spinGasSF_y',  'spinGasSF_z',  'spinStars_x',  'spinStars_y',  'spinStars_z',\
                                          'z_mean_birth_stars',  'age_mean_stars',  'x_vel',  'y_vel',  'z_vel'],\
-                                         sep=',')                      
+                                         sep=',')
+
          
                  
             elif key=='Patricia1':
@@ -1177,10 +944,10 @@ class	ArangeData:
     
             """           
                 
-                print '###################################################################################'
-                print 'read EAGLE ASCII FORMAT\n catname: ', catname, 'snapid:', snapid
-                mypath=mycomp+'anaconda/pro/data/EAGLE_100Mpc/REF100_generaltable_z0-header.dat'
-                print 'mypath:', mypath
+                print('###################################################################################')
+                print('read EAGLE ASCII FORMAT\n catname: ', catname, 'snapid:', snapid)
+                mypath=mycomp+'anaconda/pro/data/EAGLE_100Mpc/original_catalogs/REF100_generaltable_z0-header.dat'
+                print('mypath:', mypath)
                                        
                 data= pd.read_csv(mypath, skiprows=19,\
                                    names=['jsub','np_disk_1.5ropt','np_stars_1.5ropt','np_gas_1.5ropt','sfr','mstar_1.5ropt','DvT_stars_c0.4','DvT_gas_c0.4','ropt','mhalo_200c','r200c',\
@@ -1225,10 +992,10 @@ class	ArangeData:
             
              """           
                  
-                 print '###################################################################################'
-                 print 'read EAGLE ASCII FORMAT\n catname: ', catname, 'snapid:', snapid
+                 print('###################################################################################')
+                 print('read EAGLE ASCII FORMAT\n catname: ', catname, 'snapid:', snapid)
                  mypath=mycomp+'anaconda/pro/data/EAGLE_100Mpc/REF25_generaltable_z0.dat'
-                 print 'mypath:', mypath
+                 print('mypath:', mypath)
             
                  data= pd.read_csv(mypath, skiprows=1,\
                                    names=['jsub','np_disk_1.5ropt','np_stars_1.5ropt','np_gas_1.5ropt','sfr','mstar_1.5ropt','DvT_stars_c0.4','DvT_gas_c0.5','ropt','mhalo_200c','r200c',\
@@ -1239,10 +1006,10 @@ class	ArangeData:
                  """Catalog with Mgas and environment send January 2023
              """           
                  
-                 print '###################################################################################'
-                 print 'read EAGLE ASCII FORMAT\n catname: ', catname, 'snapid:', snapid
+                 print('###################################################################################')
+                 print('read EAGLE ASCII FORMAT\n catname: ', catname, 'snapid:', snapid)
                  mypath=mycomp+'anaconda/pro/data/EAGLE_100Mpc/Catalogue_Galaxies_Doris_January2023.dat'
-                 print 'mypath:', mypath
+                 print('mypath:', mypath)
             
                  data= pd.read_csv(mypath, skiprows=1,\
                                    names=['haloid', 'hostid', 'envr', 'lastMajorM', 'lastMinorM',\
@@ -1334,10 +1101,10 @@ class	ArangeData:
     
             """           
                 
-                print '###################################################################################'
-                print 'read EAGLE ASCII FORMAT KINEMATIC CATALOG\n catname: ', catname, 'snapid:', snapid
+                print('###################################################################################')
+                print('read EAGLE ASCII FORMAT KINEMATIC CATALOG\n catname: ', catname, 'snapid:', snapid)
                 mypath=mycomp+'anaconda/pro/data/EAGLE_100Mpc/EAGLE_L100N1504_ForSilvio.dat'
-                print 'mypath:', mypath
+                print('mypath:', mypath)
     
                 data= pd.read_csv(mypath, skiprows=1,\
                                   names=['fofID','hostid','mstar','rhalf_stars_2D',\
@@ -1352,9 +1119,10 @@ class	ArangeData:
                                          'VvS_r502D_random_ltc', 'VvS_2r502D_random_ltc', 'VvS_r502D_edgeOn_ltc', 'VvS_2r502D_edgeOn_ltc', 'lastTimeCentral',\
                                          'x_pos', 'y_pos', 'z_pos', 'x_vel', 'y_vel', 'z_vel',\
                                          'rcenter2r200c', 'sDensity_N10', 'sDensity_N7', 'sDensity_N5', 'lastMerger', 'ratio_lastM', 'rhalf_stars_3D', 'rhalf_sfr_3D'],\
-                                         sep=' ')         
+                                         sep=' ')
+                    
             else:
-                print 'No key set! --> Go back to main!'
+                print('No key set! --> Go back to main!')
                 exit()
 
 
@@ -1363,12 +1131,42 @@ class	ArangeData:
             #import numpy.lib.recfunctions as rcfuncs
             #self.data_array = rcfuncs.append_fields([self.data_array], ['orphan','nsats'] ,[np.zeros(self.data_array.size,),np.zeros(self.data_array.size,)], usemask=False)
 
-            self.data_array=self.data_array[np.where(self.data_array['redshift']<0.0001)[0][:]]
-            #print 'ncentrals:', self.data_array.size
+            #self.data_array=self.data_array[np.where(self.data_array['redshift']<0.0001)[0][:]]
+            self.data_array=self.data_array[np.where(self.data_array['hostid']==0)[0][:]]
+            #print('ncentrals:', self.data_array.size
             #self.data_array['fofID']-=28000000000000
             #rint self.data_array
-            print np.info(self.data_array)
-            #exit()                   
+            print(np.info(self.data_array))
+            #exit() 
+
+        def readASCII_TTH():
+            """300 Properties.txt
+                """           
+            import pandas as pd
+            print('###################################################################################')
+            print('read Galacticus 300 ASCII FORMAT\n catname: ', catname, 'snapid:', snapid)
+            mypath=mycomp+'anaconda/pro/data/300/March2025/SFH_Properties/SFH_Properties_300_z_0.00__props.txt'
+            print('mypath:', mypath)
+       
+            data= pd.read_csv(mypath, skiprows=2,\
+                              names=['regionID', 'haloid', 'hostid', 'parentIndex', 'orphan', 'nsats', 'x_pos', 'y_pos', 'z_pos',\
+                                     'mhalo', 'mstar', 'SHMR', 'mcold', 'mhot', 'mbh', 'mhot_outflow', 'Mzgas', 'Mzstar', 'Mzhot_halo', 
+                                     'Mzhot_outflowHalo', 'zcold', 'zstar', 'sfr', 'ssfr', 'Tcons', 'bheff', 'rhalf_mass', 'rhotHalo',
+                                     'cgf', 'jbar', 'jhotHalo', 'joutHotHalo', 'L_SDSS_dA_total_g', 'L_SDSS_dA_total_r', 'L_SDSS_dA_total_i',
+                                     'mAB_dA_total_g', 'mAB_dA_total_r', 'mAB_dA_total_i',
+                                     'MAB_dA_total_g', 'MAB_dA_total_r', 'MAB_dA_total_i', 
+                                     'mAB_dA_total_cut_r_i', 'mAB_dA_total_cut_g_r', 'mAB_dA_total_cut_g_i'],
+                              sep=' ')   
+ 
+            self.data_array = mL.df_to_sarray(data)
+            
+            import numpy.lib.recfunctions as rcfuncs
+            self.data_array = rcfuncs.append_fields([self.data_array], ['redshift','flag_Del', 'flag_Seb', 'haloidz0', 'DelSHMR', 'Delz', 'Delcol', 'z50Mhalo', 'z50Mstar', 'fbar'],\
+                                                    [np.zeros(self.data_array.size,),self.data_array['orphan'],self.data_array['orphan'],self.data_array['haloid'],np.zeros(self.data_array.size,),np.zeros(self.data_array.size,),np.zeros(self.data_array.size,),np.zeros(self.data_array.size,),np.zeros(self.data_array.size,),np.zeros(self.data_array.size,)], usemask=False)
+
+
+            self.data_array[['flag_Del','flag_Seb', 'haloidz0']] = -99
+            #print(self.data_array.size, len(self.data_array[0]))              
 
         def readCHOLLAHDF5(halocat_code):
             
@@ -1382,7 +1180,6 @@ class	ArangeData:
                 domain = {}
                 domain['global'] = {}
                 domain['global']['dx'] = dx
-                domain['global']['dy'] = dy
                 domain['global']['dz'] = dz
                 for k in range(np_z):
                     for j in range(np_y):
@@ -1425,7 +1222,7 @@ class	ArangeData:
                 nprocs = proc_grid[0] * proc_grid[1] * proc_grid[2]
                 ids_x, ids_y, ids_z = [], [], []
                 
-                print 'subrid x/y/z:', subgrid_x, subgrid_y, subgrid_z
+                print('subrid x/y/z:', subgrid_x, subgrid_y, subgrid_z)
                 
                 for proc_id in range(nprocs):
                     domain_local = domain[proc_id]
@@ -1450,8 +1247,8 @@ class	ArangeData:
                 
                 # Find the ids to load 
                 ids_to_load = select_ids_to_load( subgrid, domain, proc_grid )
-                print 'ids to load:', ids_to_load
-                print 'Loading Snapshot: {0}'.format(nSnap)
+                print('ids to load:', ids_to_load)
+                print('Loading Snapshot: {0}'.format(nSnap))
                 
                 #Find the boundaries of the volume to load
                 domains = { 'x':{'l':[], 'r':[]}, 'y':{'l':[], 'r':[]}, 'z':{'l':[], 'r':[]}, }
@@ -1494,20 +1291,20 @@ class	ArangeData:
                         head = inFile.attrs
                         
                         if added_header == False:
-                            print ' Loading: '+inDir+inFileName 
-                            #print ' Available Fields:  ', available_fields
+                            print(' Loading: '+inDir+inFileName) 
+                            #print(' Available Fields:  ', available_fields
                             for h_key in list(head.keys()):
                                 if h_key in ['dims', 'dims_local', 'offset', 'bounds', 'domain', 'dx', ]: continue
                                 data_out[h_key] = head[h_key][0]
                                 if h_key == 'current_z':
-                                    print ' current_z: {0}'.format( data_out[h_key])
+                                    print(' current_z: {0}'.format( data_out[h_key]))
                                     self.redshift = float(format(data_out[h_key], '0.6f'))
-                                    #print 'here: redshift', self.redshift
+                                    #print('here: redshift', self.redshift
                                     
                                 if h_key == 'current_a':
-                                    #print ' current_a: {0}'.format( data_out[h_key])
+                                    #print(' current_a: {0}'.format( data_out[h_key])
                                     self.scale_factor = float(format(data_out[h_key], '0.6f'))
-                                    #print 'here: scale factor', self.scale_factor
+                                    #print('here: scale factor', self.scale_factor
                             added_header = True
                             
                         if show_progess:
@@ -1551,7 +1348,7 @@ class	ArangeData:
                     else:
                         data_all = np.concatenate( data_all )
                         data_out[data_type][field] = data_all
-                        if show_progess: print ' '
+                        if show_progess: print(' ')
                 return data_out
 
             def read_and_write_attributes(file_struc_info, res):
@@ -1575,7 +1372,7 @@ class	ArangeData:
                     #path='/store/multidark/NewMD_3840_Planck1/Galacticus/latest/job0/the_trees_0_1000000_0_results.hdf5'
                     #path='/data3/users/abenson/the_trees_0_1000000_0_results.hdf5'               
                     f = hdf5.File(path, "r")
-                    print path
+                    print(path)
                     if path.find('pchw18')!=-1:
                         stats=(path[path.find('pchw18')+7:len(path)]).ljust(9)+'\t'
                     else:
@@ -1586,9 +1383,9 @@ class	ArangeData:
     
     
                     for k in ['Current_a','Current_z', 'dt', 'dx', 'n_fields','n_step','offset','t','dims','dims_local','bounds','n_procs']:
-                        print 'k:', k, 
+                        print('k:', k, end='')
                         try:
-                            print f.attrs[k][0]
+                            print(f.attrs[k][0])
                             new_stats= str(f.attrs[k][0])+'\t'+str(f.attrs[k][1])+'\t'+str(f.attrs[k][2])+'\t'
                             new_stats= str(f.attrs[k])+'\t'
                         except:
@@ -1599,12 +1396,10 @@ class	ArangeData:
                                     new_stats= str(format(f.attrs[k][0],'0.5f'))+'\t'
                             except:
                                 new_stats='\t'
-                                print ''
+                               
                         stats+=new_stats
-                    #print '+++++++++++++++++++++++++++\n'
                     
                     stats=stats[:-1]
-                    #print stats
         
                     myOutput.writeIntoFile(
                                output_filename_grid,
@@ -1627,42 +1422,40 @@ class	ArangeData:
                     f = hdf5.File(path, "r")
                     
                     if i==0:
-                        print '\n1) Attributes\n-------------------------'
+                        print('\n1) Attributes\n-------------------------')
                         for k in range(0,len(f.attrs.keys()),1):
-                            print '\t', f.attrs.keys()[k], ':\t\t', f.attrs.values()[k][0]
+                            print('\t', f.attrs.keys()[k], ':\t\t', f.attrs.values()[k][0])
                             
 
-                    print '\n+++++++++++++++++++++\nSCANNING FILE FORMAT of ...', path,'\n'    
-                    print '\n2) Data\n-------------------------'                
+                    print('\n+++++++++++++++++++++\nSCANNING FILE FORMAT of ...', path,'\n')    
+                    print('\n2) Data\n-------------------------')                
                     for name in f:
-                        print 'name:\t', name,
+                        print('name:\t', name, end='')
                         try:
-                            print 'size:\t', f[name].size, 
-                            print f[name],
+                            print('size:\t', f[name].size, end='') 
+                            print(f[name], end='')
                             try:
-                                print 'min/max:\t', format(min(f[name][:]), '0.2f'), '/', format(max(f[name][:]), '0.2f')
+                                print('min/max:\t', format(min(f[name][:]), '0.2f'), '/', format(max(f[name][:]), '0.2f'))
                             except:
                                 for k in [0,1,2]:
-                                    print ''
                                     for g in [0,1,2]:
-                                        #print 'k:', k, 'g:', g,
-                                        #print '\tdim: [:,'+str(k)+'][:,0]', format(min(f[name][:,k][:,0]), '0.5f'), '/', format(max(f[name][:,k][:,0]), '0.5f')
-                                        #print '\tdim: [:,0][:,'+str(g)+']', format(min(f[name][:,0][:,g]), '0.5f'), '/', format(max(f[name][:,0][:,g]), '0.5f')
-                                        print '\tsize:', f[name][:,k][:,g].size, '\tdim: [:,'+str(k)+'][:,'+str(g)+']', format(min(f[name][:,k][:,g]), '0.2f'), '/', format(max(f[name][:,k][:,g]), '0.2f')
+                                        #print('k:', k, 'g:', g,
+                                        #print('\tdim: [:,'+str(k)+'][:,0]', format(min(f[name][:,k][:,0]), '0.5f'), '/', format(max(f[name][:,k][:,0]), '0.5f')
+                                        #print('\tdim: [:,0][:,'+str(g)+']', format(min(f[name][:,0][:,g]), '0.5f'), '/', format(max(f[name][:,0][:,g]), '0.5f')
+                                        print('\tsize:', f[name][:,k][:,g].size, '\tdim: [:,'+str(k)+'][:,'+str(g)+']', format(min(f[name][:,k][:,g]), '0.2f'), '/', format(max(f[name][:,k][:,g]), '0.2f'))
                                     
                         except:
-                            print '--> failed!'
-                    print '\n'
+                            print('--> failed!')
+                    print('\n')
                     i+=1
                 
                 exit()
 
 
-            print '###################################################################################'
-            print 'read CHOLLA HDF5'
-            print ' '
-            print 'HDF5', 'catname:', catname
-            print 'HDF5 begin: mypath:', mypath
+            print('###################################################################################')
+            print('read CHOLLA HDF5')
+            print('HDF5', 'catname:', catname)
+            print('HDF5 begin: mypath:', mypath)
 
 
             file_struc_info= hdf5lib.CHOLLA_50Mpc_HDF5_filestruct(catname, snapid, path_to_directory=mypath)
@@ -1689,8 +1482,8 @@ class	ArangeData:
             else:
                 i_break='False'
 
-            print 'start_fileID:', start_fileID, 'end_fileID:', end_fileID, 'start i:', i,'i break:', i_break, 'nr files2read:', file_struc_info[catname+'_nr_files']
-            #print file_struc_info
+            print('start_fileID:', start_fileID, 'end_fileID:', end_fileID, 'start i:', i,'i break:', i_break, 'nr files2read:', file_struc_info[catname+'_nr_files'])
+
 
             if catname.find('512')!=-1:
                 res=512
@@ -1733,7 +1526,7 @@ class	ArangeData:
             for col in colname_map:
                 fields+= [col]
                 
-            #print fields
+            #print(fields
             #fields=['density']
             precision = np.float32
             Lbox = 50000		#kpc/h
@@ -1744,31 +1537,29 @@ class	ArangeData:
             subgrid = [ [0, res], [0, res], [0, res] ] #Size of the volume to load
             data = load_snapshot_data_distributed(n_snapshot, inDir, data_type, fields, subgrid, precision, proc_grid,	box_size, grid_size, show_progess=True)
 
-            print data
+            print(data)
 
             for k in data[data_type].keys():
-                print 'k:',
+                print('k:', end='')
                 try:
-                    print k, data[data_type][k].size
+                    print(k, data[data_type][k].size)
                     self.data_array[colname_map[k]][0:data[data_type][k].size]=data[data_type][k]
                 except:
-                    print '--> wrong format for structured array!'
+                    print('--> wrong format for structured array!')
             
             self.data_array = self.data_array[:data[data_type][k].size]
-            #print np.info(self.data_array)
-            #print self.data_array[0:3]
+            #print(np.info(self.data_array)
+            #print(self.data_array[0:3]
 
-            print 'self.data_array after read-in:', self.data_array.shape, 'redshift:', self.redshift, 'scale factor:', self.scale_factor
+            print('self.data_array after read-in:', self.data_array.shape, 'redshift:', self.redshift, 'scale factor:', self.scale_factor)
 
             #exit()
 
         def readHydroHDF5(key):      
 
-            print '###################################################################################'
-            print 'read Hydro HDF5'
-            print ' '
-            print 'HDF5', 'catname:', catname
-            print 'HDF5 begin: mypath:', mypath
+            print('###################################################################################')
+            print('read Hydro HDF5\n')
+            print('HDF5', 'catname:', catname, 'mypath:', mypath)
             
             def caseSwitcher(item):
 
@@ -1817,10 +1608,10 @@ class	ArangeData:
                 
             f = hdf5.File(file_struc_info[catname+'_filename0'], "r")
 
-            print f.values()
+            print(f.values())
             
             for item in f.keys():
-                print 'env:', item, f[item].values()[0]
+                print('env:', item, f[item].values()[0])
 
 
             snapidzred.sort(order=['snapid'], axis=0)
@@ -1830,27 +1621,27 @@ class	ArangeData:
             
             for env in f.keys():
                 for rowNr in rowNrs:
-                    print env,'\t', rowNr, '\t', f[env+'/Group'][rowNr],'\t', format(f[env+'/M200'][rowNr], '0.6e'), format(f[env+'/Mstar30kpc'][rowNr], '0.6e'), format(f[env+'/TimeGalaxy50'][rowNr], '0.4f'), format(f[env+'/MBH'][rowNr], '0.6e')
+                    print(env,'\t', rowNr, '\t', f[env+'/Group'][rowNr],'\t', format(f[env+'/M200'][rowNr], '0.6e'), format(f[env+'/Mstar30kpc'][rowNr], '0.6e'), format(f[env+'/TimeGalaxy50'][rowNr], '0.4f'), format(f[env+'/MBH'][rowNr], '0.6e'))
             
             #exit()
             
-            # print 'haloid:', f[env+'/Group'][rowNr], f[env+'/Subgroup'][rowNr], 'rVoid:', f[env+'/Rvoid'][rowNr], 'r2rVoid:', f[env+'/DtoVoid'][rowNr]
-            # print 't50_stars:', f[env+'/TimeGalaxy50'][rowNr], 't70_stars:', f[env+'/TimeGalaxy70'][rowNr]
-            # print 'mstar_30kpc(z0):', f[env+'/Mstar30kpc'][rowNr], 'evol:', f[env+'/Mstar_ev'][rowNr]
-            # print 'm200c(z0):', f[env+'/M200'][rowNr], 'evol:', f[env+'/M200_ev'][rowNr]
-            # print 'mbh(z0):', f[env+'/MBH'][rowNr], 'evol:', f[env+'/BHmass_ev'][rowNr]
-            # print 'mgas_30kpc(z0):', f[env+'/Mgas30kpc'][rowNr], 'evol:',f[env+'/Mgas_ev'][rowNr] 
+            # print('haloid:', f[env+'/Group'][rowNr], f[env+'/Subgroup'][rowNr], 'rVoid:', f[env+'/Rvoid'][rowNr], 'r2rVoid:', f[env+'/DtoVoid'][rowNr]
+            # print('t50_stars:', f[env+'/TimeGalaxy50'][rowNr], 't70_stars:', f[env+'/TimeGalaxy70'][rowNr]
+            # print('mstar_30kpc(z0):', f[env+'/Mstar30kpc'][rowNr], 'evol:', f[env+'/Mstar_ev'][rowNr]
+            # print('m200c(z0):', f[env+'/M200'][rowNr], 'evol:', f[env+'/M200_ev'][rowNr]
+            # print('mbh(z0):', f[env+'/MBH'][rowNr], 'evol:', f[env+'/BHmass_ev'][rowNr]
+            # print('mgas_30kpc(z0):', f[env+'/Mgas30kpc'][rowNr], 'evol:',f[env+'/Mgas_ev'][rowNr] 
             
             # from scipy import interpolate
             # func = interpolate.interp1d(f[env+'/Mstar_ev'][rowNr]/f[env+'/Mstar30kpc'][rowNr], snapidzred['z'])
             
-            # print '\t z 50%/70%:', format(func(0.5), '0.2f'), '/', format(func(0.7), '0.2f')
-            # print '\t LBT t50/t70:', cd.lookback_time(func(0.5), z0=0.0, **fidcosmo)/3.1536e+16, '/', cd.lookback_time(func(0.7), z0=0.0, **fidcosmo)/3.1536e+16 #seconds to Gyrs     
+            # print('\t z 50%/70%:', format(func(0.5), '0.2f'), '/', format(func(0.7), '0.2f')
+            # print('\t LBT t50/t70:', cd.lookback_time(func(0.5), z0=0.0, **fidcosmo)/3.1536e+16, '/', cd.lookback_time(func(0.7), z0=0.0, **fidcosmo)/3.1536e+16 #seconds to Gyrs     
 
-            #print snapidzred
+            #print(snapidzred
             exit()
    
-            #print snapidzred['z']
+            #print(snapidzred['z']
             
             last_valid_item='haloid'
             size_before=0
@@ -1861,12 +1652,12 @@ class	ArangeData:
 
                     if item=='envr':
                         
-                        print 'SET ENVR FLAG:', a, 'env:', env, 'last_valid_item:', last_valid_item
+                        print('SET ENVR FLAG:', a, 'env:', env, 'last_valid_item:', last_valid_item)
                         self.data_array[item][size_before:size_before+f[file_struc_info[catname+'_'+env+'_'+last_valid_item]][:].size] = a        
                  
                     else:
-                        print 'env:', env, 'a:', a, 'item:', item, file_struc_info[catname+'_'+env+'_'+item], 'size_before:', size_before, 'size:', f[file_struc_info[catname+'_'+env+'_'+item]][:].size 
-                        #print f[file_struc_info[catname+'_'+env+'_'+item]][:]
+                        print('env:', env, 'a:', a, 'item:', item, file_struc_info[catname+'_'+env+'_'+item], 'size_before:', size_before, 'size:', f[file_struc_info[catname+'_'+env+'_'+item]][:].size) 
+                        #print(f[file_struc_info[catname+'_'+env+'_'+item]][:]
                         self.data_array[item][size_before:size_before+f[file_struc_info[catname+'_'+env+'_'+item]][:].size] = f[file_struc_info[catname+'_'+env+'_'+item]][:]
                         last_valid_item=item                     
 
@@ -1874,25 +1665,23 @@ class	ArangeData:
                 
             
             self.data_array = self.data_array[:size_before]
-            #print np.info(self.data_array)
+            #print(np.info(self.data_array)
             #self.data_array.sort(order=['haloid'], axis=0)
-            #print self.data_array[['haloid', 'envr', 'mhalo_200c', 'mstar_30kpc', 't50_stars', 't70_stars', 'sfr_30kpc']][0:100]
+            #print(self.data_array[['haloid', 'envr', 'mhalo_200c', 'mstar_30kpc', 't50_stars', 't70_stars', 'sfr_30kpc']][0:100]
                   
             
             self.redshift=False
             self.scale_factor=False
             
-            #print np.info(self.data_array)
+            #print(np.info(self.data_array)
             #exit()
-            print 'self.data_array after read-in:', self.data_array.shape, 'redshift:', self.redshift, 'scale factor:', self.scale_factor            
+            print('self.data_array after read-in:', self.data_array.shape, 'redshift:', self.redshift, 'scale factor:', self.scale_factor)            
 
 
         def readSAMHDF5(halocat_code):
-            print '###################################################################################'
-            print 'read SAMHDF5'
-            print ' '
-            print 'HDF5', 'catname:', catname
-            print 'HDF5 begin: mypath:', mypath
+            print('###################################################################################')
+            print('read SAMHDF5')
+            print('HDF5', 'catname:', catname,'HDF5 begin: mypath:', mypath)
 
             def caseSwitcher(catname):
 
@@ -1942,32 +1731,32 @@ class	ArangeData:
                 return file_struc_info
 
             def handle_multirow_dataset(nr_cols, a, size_before, new_size):
-                print ' ... loading handle_multirow_dataset ... ',
+                print(' ... loading handle_multirow_dataset ... ', end='')
                 try:
                     redshift = mL.expfactor_to_redshift(f[file_struc_info[file_struc_info['catname']+'_path_to_scale_factor']][:])
                 except:
-                    print 'nothing to do ...'
+                    print('nothing to do ...')
                 b=0
                 while b<nr_cols:
-                    print 'b:', b, 'a:', a, 'name:', myid_col_array['name'+str(a)], 'nr_cols:', nr_cols                               
+                    print('b:', b, 'a:', a, 'name:', myid_col_array['name'+str(a)], 'nr_cols:', nr_cols)                               
                     if catname.startswith('LGALAXIES')!=-1:
                         new_size=size_before+f[file_struc_info[file_struc_info['catname']+'_index']][:,0].size
-                        print 'size_before', size_before, 'new_size:', new_size
+                        print('size_before', size_before, 'new_size:', new_size)
                         
                         if myid_col_array['name'+str(a)]=='haloid':
-                            print 'multirow haloid!'
+                            print('multirow haloid!')
                             self.data_array['haloid'][size_before:new_size]=f[file_struc_info[file_struc_info['catname']+'_index']][:,b]
-                            print self.data_array['haloid'][size_before:new_size].shape, 'min:', min(self.data_array['haloid'][size_before:new_size]), 'max:', max(self.data_array['haloid'][size_before:new_size]), 'nr of gal with id==-99,', len(np.where(self.data_array['haloid'][size_before:new_size]==-99)[:][0])
-                            print self.data_array['haloid'][size_before:new_size][(np.where(self.data_array['haloid'][size_before:new_size]!=-99)[:][0])], 'length of list:', len(np.where(self.data_array['haloid'][size_before:new_size]!=-99)[:][0])
+                            print(self.data_array['haloid'][size_before:new_size].shape, 'min:', min(self.data_array['haloid'][size_before:new_size]), 'max:', max(self.data_array['haloid'][size_before:new_size]), 'nr of gal with id==-99,', len(np.where(self.data_array['haloid'][size_before:new_size]==-99)[:][0]))
+                            print(self.data_array['haloid'][size_before:new_size][(np.where(self.data_array['haloid'][size_before:new_size]!=-99)[:][0])], 'length of list:', len(np.where(self.data_array['haloid'][size_before:new_size]!=-99)[:][0]))
                         elif myid_col_array['name'+str(a)]=='Z':  
-                            print 'multirow Z!'                              
+                            print('multirow Z!')                              
                             self.data_array['Z'][size_before:new_size]=redshift[b]
                         else:
-                            print 'multirow default!'
+                            print('multirow default!')
                             self.data_array[myid_col_array['name'+str(a)]][size_before:new_size] = f[file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(a)])]][:,b]
                         size_before=new_size
                     else:
-                        print 'default!'
+                        print('default!')
                         self.data_array[myid_col_array['name'+str(a)]][size_before:new_size] = f[file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(a)])]][:,b]
                     b+=1
 
@@ -2002,7 +1791,7 @@ class	ArangeData:
             else:
                 i_break='False'
 
-            print 'start_fileID:', start_fileID, 'end_fileID:', end_fileID, 'start i:', i,'i break:', i_break, 'nr files2read:', file_struc_info[catname+'_nr_files']
+            print('start_fileID:', start_fileID, 'end_fileID:', end_fileID, 'start i:', i,'i break:', i_break, 'nr files2read:', file_struc_info[catname+'_nr_files'])
 
             while i<int(file_struc_info[catname+'_nr_files']):           
                                 
@@ -2012,66 +1801,66 @@ class	ArangeData:
                 #path='/store/multidark/NewMD_3840_Planck1/Galacticus/latest/job0/the_trees_0_1000000_0_results.hdf5'
                 #path='/data3/users/abenson/the_trees_0_1000000_0_results.hdf5'
                 f = hdf5.File(path, "r")
-                #print 'i:', i, 'filename:', path
+                #print('i:', i, 'filename:', path)
 
                 #List snapshots for SMDPL-Galacticus 400Mpc
 #                l=1
 #                while l<=96:
 #                    try:
-#                        print 'snapshot: ', l, '\ta:', format(f['/Outputs/Output'+str(l)].attrs.get('outputExpansionFactor'), '.4f'), '\tz:', format(mL.expfactor_to_redshift(f['/Outputs/Output'+str(l)].attrs.get('outputExpansionFactor')), '.2f')
+#                        print('snapshot: ', l, '\ta:', format(f['/Outputs/Output'+str(l)].attrs.get('outputExpansionFactor'), '.4f'), '\tz:', format(mL.expfactor_to_redshift(f['/Outputs/Output'+str(l)].attrs.get('outputExpansionFactor')), '.2f')
 #                    except:
-#                        print 'failed'
+#                        print('failed'
 #                    l+=1
 #                exit()
             
 #                p=0
 #                while p<(f['Arr/GalaxyID'][0].size):
-#                    print f['Arr/GalaxyID'][0][:]
+#                    print(f['Arr/GalaxyID'][0][:]
 #                    p+=1
 #                exit()
-#                print f.keys()
+#                print(f.keys()
 #                for key in f.keys():
-#                    print key, '\n-----------------\n'
+#                    print(key, '\n-----------------\n'
 #
 #
 #
 #                exit()
 
 #                SAG                
-                # for name in f:
-                #     count_att=0
-                #     print 'name:', name.ljust(20), 
-                #     for att in f[name].attrs:
-                #         print 'description:', f[name].attrs.get('Description')
-                #         count_att=1
-                #     if count_att==0:
-                #         count_att2=0
-                #         print '\n',
-                #         for key in f[name].keys():
-                #             print '        ', key.ljust(17), 
-                #             for att in f[name+'/'+key].attrs:
-                #                 print'description:', f[name+'/'+key].attrs.get('Description')
-                #                 count_att2=1
-                #             if count_att2==0:
-                #                 print '\n',
-                #                 for key2 in f[name+'/'+key].keys():
-#                                     print '           ', key2.ljust(14), 'description:', f[name+'/'+key+'/'+key2].attrs.get('Description')
+#                 for name in f:
+#                     count_att=0
+#                     print('name:', name.ljust(20), 
+#                     for att in f[name].attrs:
+#                         print('description:', f[name].attrs.get('Description')
+#                         count_att=1
+#                     if count_att==0:
+#                         count_att2=0
+#                         print('\n',
+#                         for key in f[name].keys():
+#                             print('        ', key.ljust(17), 
+#                             for att in f[name+'/'+key].attrs:
+#                                 print'description:', f[name+'/'+key].attrs.get('Description')
+#                                 count_att2=1
+#                             if count_att2==0:
+#                                 print('\n',
+#                                 for key2 in f[name+'/'+key].keys():
+#                                     print('           ', key2.ljust(14), 'description:', f[name+'/'+key+'/'+key2].attrs.get('Description')
 # #                                    
 #                 exit()                                    
                 #Galacticus
-#                 path='Outputs/Output79/nodeData/'
-#                 print f.keys()
-#                 for key in f.keys():
-#                     print key, '\n-----------------\n'
-#                     for keykey in f[key].keys():
-#                         print keykey, ':\t', f[key].attrs.get(keykey)
-#                         #path='Outputs/Output96/nodeData/'
-#                     print '++++++++++++++++++++\n'
+                # path='Outputs/Output79/nodeData/'
+                # print(f.keys()
+                # for key in f.keys():
+                #     print(key, '\n-----------------\n'
+                #     for keykey in f[key].keys():
+                #         print(keykey, ':\t', f[key].attrs.get(keykey)
+                #         #path='Outputs/Output96/nodeData/'
+                #     print('++++++++++++++++++++\n'
                     
 
 # #
 #                 for name in f[path]:
-#                     print 'name:', name.ljust(20)
+#                     print('name:', name.ljust(20)
 
 #                 exit()                      
                             
@@ -2080,15 +1869,15 @@ class	ArangeData:
 
                     
 #                 for name in f[path].attrs.items():            
-#                     print name[0].ljust(60), name[1]
+#                     print(name[0].ljust(60), name[1]
 
 #                 for name in f[path].keys():            
-#                     print name
+#                     print(name
 #                     for key in f[path+'/'+name].attrs.items():
-#                         print '\t', key[0].ljust(20), key[1]                                             
+#                         print('\t', key[0].ljust(20), key[1]                                             
 
 #                 exit()
-                   
+                #print(f['Outputs/Output79/nodeData/spheroidLuminositiesStellar:SDSS_i:observed:z0.0000:dustAtlas'])    
                     
                 if halocat_code=='False' and file_struc_info['catname'].find('SAGE')==-1:
                     if file_struc_info['catname'].find('SAGE')!=-1:
@@ -2098,7 +1887,7 @@ class	ArangeData:
                         self.scale_factor = f[file_struc_info[catname+'_path_to_snapid']].attrs.get(file_struc_info[catname+'_redshift_attribute'])
                         self.redshift = mL.expfactor_to_redshift(self.scale_factor)                     
                     else:
-                        #print 'else:'
+                        #print('else:'
                         if myid_col_array['name'+str(0)]!='Z':
                             try:
                                 self.redshift = f.attrs.get(file_struc_info[catname+'_redshift_attribute'])[0]
@@ -2108,13 +1897,13 @@ class	ArangeData:
                             try:
                                 self.redshift = f.attrs.get(file_struc_info[catname+'_redshift_attribute'])[1]
                             except:
-                                print 'no redshift attribute found'
+                                print('no redshift attribute found')
                         try:
                             self.scale_factor = mL.redshift_to_expfactor(self.redshift)
                         except:
                             self.scale_factor=None
                     
-                    #print 'self.redshift:', self.redshift, str(format(self.redshift, '.4f'))
+                    #print('self.redshift:', self.redshift, str(format(self.redshift, '.4f'))
 
                     #set "redshift" as part of the filename to read in Galacticus Luminosities
                     try:
@@ -2122,12 +1911,12 @@ class	ArangeData:
                     except:
                         redshift = False
 
-                    #print 'snapdid', snapid, 'self.i:', file_count, 'z:', self.redshift, 'scale_factor:', self.scale_factor
+                    #print('snapdid', snapid, 'self.i:', file_count, 'z:', self.redshift, 'scale_factor:', self.scale_factor)
                 else:
                     if file_struc_info['catname'].find('LG')!=-1:
                         self.scale_factor=f[file_struc_info[file_struc_info['catname']+'_path_to_scale_factor']][62-(62-45)-file_count]
                         self.redshift=mL.expfactor_to_redshift(self.scale_factor)
-                        print 'file_count:', file_count, 'a:', self.scale_factor,'z:', self.redshift
+                        print('file_count:', file_count, 'a:', self.scale_factor,'z:', self.redshift)
    
                     else:
                         self.redshift=False
@@ -2148,7 +1937,7 @@ class	ArangeData:
                             size=f[file_struc_info[file_struc_info['catname']+'_'+myid_col_array['name'+str(1)]]].size
                             first_prop=myid_col_array['name'+str(1)]
                         except:
-                            print 'Des homma net!\nTake another property as the first to chose from the file, the first and second set are both not exiting!'
+                            print('Des homma net!\nTake another property as the first to chose from the file, the first and second set are both not exiting!')
                             exit()
                 else:
                     size=f[file_struc_info[file_struc_info['catname']+'_'+myid_col_array['name'+str(1)]]].size             
@@ -2156,45 +1945,45 @@ class	ArangeData:
                 new_size=size+size_before
 
                 if size_before==0 and np.sum(f[file_struc_info[file_struc_info['catname']+'_'+str(first_prop)]].shape)>size and file_struc_info['catname'].startswith('LGALAXIES')==False:
-                    print 'expand array!'
+                    print('expand array!')
                     self.data_array = np.expand_dims(self.data_array, axis=1)
                     
                 
-                #print 'here:', str(myid_col_array['name'+str(0)]), np.sum(f[file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(0)])]].shape), size, np.sum(f[file_struc_info[file_struc_info['catname']+'_'+str(first_prop)]].shape)     
+                #print('here:', str(myid_col_array['name'+str(0)]), np.sum(f[file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(0)])]].shape), size, np.sum(f[file_struc_info[file_struc_info['catname']+'_'+str(first_prop)]].shape)     
                 check_size=size
                 
-                #print 'size_before:', size_before, 'datasize:', size,  'size_new:', size_before+size, 'check_size:', new_size            
+                #print('size_before:', size_before, 'datasize:', size,  'size_new:', size_before+size, 'check_size:', new_size            
 
                 a=0
                 while a<int(myid_col_array['nr_entries']):
-                    #print 'a:', a, myid_col_array['name'+str(a)], 'col_id:', myid_col_array['col_id'+str(a)]#, np.prod(f[file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(a)])]].shape)
+                    #print('a:', a, myid_col_array['name'+str(a)], 'col_id:', myid_col_array['col_id'+str(a)]#, np.prod(f[file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(a)])]].shape)
                     if myid_col_array['name'+str(a)].startswith('L_'):
-                        #print 'here 1337', myid_col_array['name'+str(a)],
+                        #print('here 1337', myid_col_array['name'+str(a)], end=' ')
                         file_struc_info[file_struc_info['catname']+'_'+myid_col_array['name'+str(a)]] = file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(a)])+'_part1']+redshift+file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(a)])+'_part2']                   
-                        #print 'Lum:', file_struc_info[file_struc_info['catname']+'_'+myid_col_array['name'+str(a)]]
+                        #print('Lum:', file_struc_info[file_struc_info['catname']+'_'+myid_col_array['name'+str(a)]])
                     
 
                     if check_size<np.sum(f[file_struc_info[file_struc_info['catname']+'_'+str(first_prop)]].shape) and i==0 and catname.startswith('LG')==-1:
                         self.data_array = np.expand_dims(self.data_array, axis=1)
-                        #print 'new shape:', self.data_array.shape, 'check_size:', check_size, np.sum(f[file_struc_info[file_struc_info['catname']+'_mstarsph']].shape)
+                        #print('new shape:', self.data_array.shape, 'check_size:', check_size, np.sum(f[file_struc_info[file_struc_info['catname']+'_mstarsph']].shape)
                         check_size+=1
                         
                     if myid_col_array['name'+str(a)] == 'ngalaxies':
-                        #print 'ngalaxies at i:', i, f[file_struc_info[file_struc_info['catname']+'_ngalaxies']]
+                        #print('ngalaxies at i:', i, f[file_struc_info[file_struc_info['catname']+'_ngalaxies']]
                         self.data_array['name'+str(a)][size_before:new_size] = size
 
                     elif myid_col_array['name'+str(a)]=='x_pos' and (catname.startswith('LGALAXIES') or catname.startswith('Illustris')):
-                        print 'LGALAXIES/Illustris positions ...'
+                        print('LGALAXIES/Illustris positions ...')
                         self.data_array[myid_col_array['name'+str(a)]][size_before:new_size]=f[file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(a)])]][:,0] 
                         self.data_array['y_pos'][size_before:new_size]=f[file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(a)])]][:,1]                       
                         self.data_array['z_pos'][size_before:new_size]=f[file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(a)])]][:,2]
                         
-                        #print self.data_array[myid_col_array['name'+str(a)]][0:10]
-                        #print self.data_array['y_pos'][0:10]
-                        #print self.data_array['z_pos'][0:10]
+                        #print(self.data_array[myid_col_array['name'+str(a)]][0:10]
+                        #print(self.data_array['y_pos'][0:10]
+                        #print(self.data_array['z_pos'][0:10]
  
                     elif myid_col_array['name'+str(a)]=='x_vel' and catname.startswith('LGALAXIES'):
-                        print 'LGALAXIES velocities ...'
+                        print('LGALAXIES velocities ...')
                         self.data_array[myid_col_array['name'+str(a)]][size_before:new_size]=f[file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(a)])]][:,0] 
                         self.data_array['y_vel'][size_before:new_size]=f[file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(a)])]][:,1]                       
                         self.data_array['z_vel'][size_before:new_size]=f[file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(a)])]][:,2]                       
@@ -2203,7 +1992,7 @@ class	ArangeData:
                         self.data_array[myid_col_array['name'+str(a)]][size_before:new_size] = f[file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(a)])]][size_before:new_size,file_count]
 
                     elif myid_col_array['name'+str(a)]=='Z' and catname.startswith('SAGE')==False:
-                        #print 'manage redshift!', myid_col_array['name'+str(a)], int(myid_col_array['col_id'+str(a)])
+                        #print('manage redshift!', myid_col_array['name'+str(a)], int(myid_col_array['col_id'+str(a)])
                         self.data_array[myid_col_array['name'+str(a)]][size_before:new_size]=format(float(self.redshift), '.2f')                                
                     else:
                                                                                 
@@ -2213,23 +2002,23 @@ class	ArangeData:
                                 pass
                             elif catname=='SAG_1Gpc' or catname.find('run2')!=-1 or catname.find('v2')!=-1 or catname.find('Galacticus')!=-1: 
                                 self.data_array[myid_col_array['name'+str(a)]][size_before:new_size] = f[file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(a)])+'_disk']][:] + f[file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(a)])+'_spheroid']][:]
-                                #print str(myid_col_array['name'+str(a)]), 'here disk+sph!'
+                                #print(str(myid_col_array['name'+str(a)]), 'here disk+sph!'
                             else:
-                                #print 'else'
-                                #print 'size_before', size_before, 'new_size:', new_size, file_struc_info['catname'], file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(a)])]
+                                #print('else'
+                                #print('size_before', size_before, 'new_size:', new_size, file_struc_info['catname'], file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(a)])]
                                 self.data_array[myid_col_array['name'+str(a)]][size_before:new_size] = f[file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(a)])]]
 
                         elif str(myid_col_array['name'+str(a)]).startswith('MA') or str(myid_col_array['name'+str(a)]).startswith('mA') or str(myid_col_array['name'+str(a)]).startswith('mag') or str(myid_col_array['name'+str(a)]).startswith('Mag'):
-                            #print 'mag!',
+                            #print('mag!',
                             if catname.startswith('Galacticus'):# or catname.startswith('LGALAXIES'):                             
                                 pass
                             elif (catname.startswith('SAG_') or catname.startswith('LGALAXIES')) and str(myid_col_array['name'+str(a)]).startswith('MA'):
-                                #print 'MAB'
+                                #print('MAB'
                                 self.data_array[myid_col_array['name'+str(a)]][size_before:new_size] = f[file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(a)])]]
-                                #print min(self.data_array[myid_col_array['name'+str(a)]][size_before:new_size]), max(self.data_array[myid_col_array['name'+str(a)]][size_before:new_size])                        
+                                #print(min(self.data_array[myid_col_array['name'+str(a)]][size_before:new_size]), max(self.data_array[myid_col_array['name'+str(a)]][size_before:new_size])                        
                             
                             elif catname.startswith('SAGE'):
-                                #print 'here:!'
+                                #print('here:!'
                                 self.data_array[myid_col_array['name'+str(a)]][size_before:new_size] = f[file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(a)])]]                                
                         #elif str(myid_col_array['name'+str(a)]).startswith('L_') and str(myid_col_array['name'+str(a)]).startswith('isk', len(myid_col_array['name'+str(a)])-5, len(myid_col_array['name'+str(a)])-2)==False and str(myid_col_array['name'+str(a)]).startswith('oid', len(myid_col_array['name'+str(a)])-5, len(myid_col_array['name'+str(a)])-2)==False and str(myid_col_array['name'+str(a)]).startswith('tal', len(myid_col_array['name'+str(a)])-5, len(myid_col_array['name'+str(a)])-2)==True:
                         elif str(myid_col_array['name'+str(a)]).startswith('L_') and myid_col_array['name'+str(a)].find('total')!=-1:
@@ -2237,21 +2026,21 @@ class	ArangeData:
                                 try:
                                     self.data_array[myid_col_array['name'+str(a)]][size_before:new_size] = f[file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(a)])]][:]
                                 except:
-                                    #print 'no total Luminosity found! try ...'
+                                    #print('no total Luminosity found! try ...'
                                     try:
-                                        #print 'Lum sph+disk!', myid_col_array['name'+str(a)], 'filter_name:', filter_name, file_struc_info[file_struc_info['catname']+'_'+myid_col_array['name'+str(a)][0:myid_col_array['name'+str(a)].find('total')]+'disk_'+filter_name], '+', file_struc_info[file_struc_info['catname']+'_'+myid_col_array['name'+str(a)][0:myid_col_array['name'+str(a)].find('total')]+'spheroid_'+filter_name],
-                                        #print 'Lum sph+disk!', myid_col_array['name'+str(a)], 'filter_name:', filter_name#, file_struc_info['catname']+'_'+myid_col_array['name'+str(a)][0:myid_col_array['name'+str(a)].find('total')]+'disk_'+filter_name, '+', file_struc_info['catname']+'_'+myid_col_array['name'+str(a)][0:myid_col_array['name'+str(a)].find('total')]+'spheroid_'+filter_name,
-                                        #print file_struc_info['catname']+'_'+myid_col_array['name'+str(a)][0:myid_col_array['name'+str(a)].find('total')]+'disk_'+filter_name
-                                        #print f[file_struc_info[file_struc_info['catname']+'_'+myid_col_array['name'+str(a)][0:myid_col_array['name'+str(a)].find('total')]+'disk_'+filter_name]][0:10]
-                                        #print file_struc_info['catname']+'_'+myid_col_array['name'+str(a)][0:myid_col_array['name'+str(a)].find('total')]+'spheroid_'+filter_name
-                                        #print f[file_struc_info[file_struc_info['catname']+'_'+myid_col_array['name'+str(a)][0:myid_col_array['name'+str(a)].find('total')]+'disk_'+filter_name]][0:10], '+', f[file_struc_info[file_struc_info['catname']+'_'+myid_col_array['name'+str(a)][0:myid_col_array['name'+str(a)].find('total')]+'spheroid_'+filter_name]][0:10]
+                                        #print('Lum sph+disk!', myid_col_array['name'+str(a)], 'filter_name:', filter_name, file_struc_info[file_struc_info['catname']+'_'+myid_col_array['name'+str(a)][0:myid_col_array['name'+str(a)].find('total')]+'disk_'+filter_name], '+', file_struc_info[file_struc_info['catname']+'_'+myid_col_array['name'+str(a)][0:myid_col_array['name'+str(a)].find('total')]+'spheroid_'+filter_name],
+                                        #print('Lum sph+disk!', myid_col_array['name'+str(a)], 'filter_name:', filter_name#, file_struc_info['catname']+'_'+myid_col_array['name'+str(a)][0:myid_col_array['name'+str(a)].find('total')]+'disk_'+filter_name, '+', file_struc_info['catname']+'_'+myid_col_array['name'+str(a)][0:myid_col_array['name'+str(a)].find('total')]+'spheroid_'+filter_name,
+                                        #print(file_struc_info['catname']+'_'+myid_col_array['name'+str(a)][0:myid_col_array['name'+str(a)].find('total')]+'disk_'+filter_name
+                                        #print(f[file_struc_info[file_struc_info['catname']+'_'+myid_col_array['name'+str(a)][0:myid_col_array['name'+str(a)].find('total')]+'disk_'+filter_name]][0:10]
+                                        #print(file_struc_info['catname']+'_'+myid_col_array['name'+str(a)][0:myid_col_array['name'+str(a)].find('total')]+'spheroid_'+filter_name
+                                        #print(f[file_struc_info[file_struc_info['catname']+'_'+myid_col_array['name'+str(a)][0:myid_col_array['name'+str(a)].find('total')]+'disk_'+filter_name]][0:10], '+', f[file_struc_info[file_struc_info['catname']+'_'+myid_col_array['name'+str(a)][0:myid_col_array['name'+str(a)].find('total')]+'spheroid_'+filter_name]][0:10]
 
                                         self.data_array[myid_col_array['name'+str(a)]][size_before:new_size] = f[file_struc_info[file_struc_info['catname']+'_'+myid_col_array['name'+str(a)][0:myid_col_array['name'+str(a)].find('total')]+'disk_'+filter_name]][:] + f[file_struc_info[file_struc_info['catname']+'_'+myid_col_array['name'+str(a)][0:myid_col_array['name'+str(a)].find('total')]+'spheroid_'+filter_name]][:]
-                                        #print '-->CHECK!'
+                                        #print('-->CHECK!'
                                     except:
-                                        print 'i:', i, 'filename:', path, 'z=', self.redshift 
-                                        print 'no spheroid or disk galaxy parts found ...!', 
-                                        print 'a:', a, myid_col_array['name'+str(a)], 'col_id:', myid_col_array['col_id'+str(a)]
+                                        pass
+                                        #print('i:', i, 'filename:', path, 'z=', self.redshift) 
+                                        #print('no spheroid or disk galaxy parts found ...!\na:', a, myid_col_array['name'+str(a)], 'col_id:', myid_col_array['col_id'+str(a)])
 
                             
                         try:
@@ -2264,7 +2053,7 @@ class	ArangeData:
                                 handle_multirow_dataset(nr_cols, a, size_before, new_size)
                             
                         else:
-                            #print 'name:', myid_col_array['name'+str(a)], 'size_before:', size_before, 'new_size:', new_size, 'datasize:', file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(a)])]
+                            #print('name:', myid_col_array['name'+str(a)], 'size_before:', size_before, 'new_size:', new_size, 'datasize:', file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(a)])]
                             self.data_array[myid_col_array['name'+str(a)]][size_before:new_size] = f[file_struc_info[file_struc_info['catname']+'_'+str(myid_col_array['name'+str(a)])]]
 
                     a+=1
@@ -2273,8 +2062,9 @@ class	ArangeData:
             #self.data_array = np.resize(self.data_array,(new_size, int(myid_col_array['nr_cols2read'])))
             self.data_array = self.data_array[:new_size]
             if catname.startswith('SAG_'): self.data_array = np.reshape(self.data_array, (len(self.data_array),))
-            #print self.data_array
-            print 'self.data_array after read-in:', self.data_array.shape
+
+            print('self.data_array after read-in:', self.data_array.shape)
+
 
         def caseSwitcher(data_format):
 
@@ -2292,7 +2082,6 @@ class	ArangeData:
                 'HDF52HDF5': HDF52HDF5,
                 'READ2ARRAY': READ2ARRAY,
                 'FITS2HDF5': FITS2HDF5,
-                'CROSSMATCH': CROSSMATCH,
                 'ROCKSTAR_ASCII': ROCKSTAR_ASCII,
                 'EAGLE_ASCII_Silvio': EAGLE_ASCII,
                 'EAGLE_ASCII_Patricia1': EAGLE_ASCII,
@@ -2302,6 +2091,7 @@ class	ArangeData:
                 'EAGLE_ASCII_full': EAGLE_ASCII,
                 'EAGLE_ASCII_full_trees': EAGLE_ASCII,
                 'EAGLE_ASCII': EAGLE_ASCII,
+                'TTH_ASCII': TTH_ASCII
                 }
                 
             func = choose.get(data_format)
@@ -2321,7 +2111,7 @@ class	ArangeData:
  
         def HYDROHDF5():
             key = catname[0:catname.find('ev')+2]
-            print 'key', key  
+            print('key', key)  
             readHydroHDF5(key)
             
         def MDGalaxies():
@@ -2329,8 +2119,11 @@ class	ArangeData:
 
         def EAGLE_ASCII():
             key = data_format[data_format.find('ASCII')+6::]
-            print 'key', key       
+            print('key', key)      
             readEAGLE_ASCII(key)
+            
+        def TTH_ASCII():    
+            readASCII_TTH()
 
         def ROCKSTAR_ASCII():
             readROCKSTAR_ASCII(halocat_code) 
@@ -2349,46 +2142,36 @@ class	ArangeData:
 
         def FITS2HDF5():
             readANDConvert(data_format)
-
-        def CROSSMATCH():
-            crossmatch()
             
-        #print 'mypath_softlink:', mypath_softlink
-        #print 'myfilename:', myfilename
-        #print data_format
-        #print 'mypath:', mypath
+        #print('mypath_softlink:', mypath_softlink
+        #print('myfilename:', myfilename
+        #print(data_format
+        #print('mypath:', mypath
         check_path = os.path.exists(mypath)
-        #print 'check_path:', check_path
+        #print('check_path:', check_path
         #check_path_softlink = os.path.exists(mypath_softlink)
         
         if config!=False:
 
             if mypath!=mypath_softlink:
                 mypath=mypath_softlink   
-            elif data_format('SAMHDF5'):
+            elif data_format == 'SAMHDF5':
                 mypath+=myfilename
             
             if data_format=='BINARY':
-                mypath+=myfilename
-                
-            if data_format=='CATASCII':
                 mypath+=myfilename
                 
             if data_format.find('FITS')!=-1:
                 mypath+=myfilename
 
            
-        #print 'mypath:', mypath, 'myfilename:', myfilename        
+        #print('mypath:', mypath, 'myfilename:', myfilename        
                     
         if check_path==False:# and check_path_softlink==False:
             
-            print '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-            print ' '
-            print mypath, 'NOT EXISTS'
-            print ' '
-            print '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+            print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n', mypath, 'NOT EXISTS!\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
 
-        #print 'config:', config
+        #print('config:', config)
      
         caseSwitcher(data_format)
 
@@ -2403,40 +2186,40 @@ class	ArangeData:
             operator='>',
             condition=0.0):
 
-        #print 'data shape before selection:', data.shape
+        #print('data shape before selection:', data.shape
         if single==True:
-            #print 'single=yes'
+            #print('single=yes'
             data = np.expand_dims(data, axis=1)
-            print 'new data shape: ', data.shape
-        #print 'selected_col', selected_col    
+            print('new data shape: ', data.shape)
+        #print('selected_col', selected_col    
         if selected_col=='*':
-            #print '*', condition
+            #print('*', condition
             mask = np.where(data.any(axis=1) > condition)
             
         else:
-            #print 'condition:', 'operator:', operator, 'selected col:', selected_col, 'condition:', condition
+            #print('condition:', 'operator:', operator, 'selected col:', selected_col, 'condition:', condition
             if operator =='>':
-                #print operator, '>'
+                #print(operator, '>'
                 mask = np.where(data[selected_col] > condition)
             elif operator =='<':
-                #print operator, '<'
+                #print(operator, '<'
                 mask = np.where(data[selected_col] < condition)
             elif operator =='>=':
-                #print operator, '>='
+                #print(operator, '>='
                 mask = np.where(data[selected_col] >= condition)
             elif operator =='<=':
-                #print operator, '<='
+                #print(operator, '<='
                 mask = np.where(data[selected_col] <= condition)
             elif operator =='==':
-                #print operator, '='
+                #print(operator, '='
                 mask = np.where(data[selected_col] == condition)
             elif operator =='!=':
-                #print operator, '='
+                #print(operator, '='
                 mask = np.where(data[selected_col] != condition)
 
         #self.selected_data = data[mask[:][0]]
 
-        #print 'data after selection:', data[mask[:][0]].shape
+        #print('data after selection:', data[mask[:][0]].shape
 
         return data[mask[:][0]]
 
