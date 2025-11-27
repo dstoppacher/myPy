@@ -130,7 +130,7 @@ echo 'keyword_change14= default'	 			>> $2
 echo 'title_fontsize= 20'				 	 >> $2
 #default 32
 echo 'axis_label_fontsize_x= 32'				 	 >> $2
-echo 'axis_label_fontsize_y= 32'				 	 >> $2
+echo 'axis_label_fontsize_y= 26'				 	 >> $2
 #default 26
 echo 'text_fontsize= 28'					>> $2
 #default 30				 	 
@@ -208,7 +208,7 @@ echo 'plot_lines_min_max_population= no'		 	 >> $2
 set OII_ls_set = 'False'
 set plotXY_key = 'sfr2z'
 set hod_plot_key = 'False'
-set use_cb_colors = 0
+set use_cb_colors = 6
 echo 'legend_ncols= 1'			>> $2
 echo 'legend_fancy= False'		>> $2
 ######################################################################################################################################################
@@ -359,7 +359,7 @@ echo '16= no'		>> $18
 
 #subplot type: 		MATPLOT_PLOTTYPE
 #if you want a contour or histo plot, change the 'key'
-set key = 'contour'
+set key = 'default'
 if ($24 =~ *hist*) then
 	echo '0= barplot' 	>> $19
 	echo '1= barplot' 	>> $19
@@ -1216,8 +1216,8 @@ else if ($1 == plotXY && ($plotXY_key == 'SMF' || $plotXY_key == 'HMF' || $plotX
 ############################################################################################################################################################################
 ############################################################################################################################################################################
 else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
-	set no_x = noxf
-	set no_y = noyf
+	set no_x = no
+	set no_y = no
 	echo 'no_first_xticks= False'        		>> $2
 	set share_y = 'no'
 	set no_top = False
@@ -1226,7 +1226,7 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 	echo 'legend_fontsize= 32'				 	 >> $2
 	echo 'text_fontsize= 32'				 	 >> $2
 	echo 'plot_legend= no'			>> $2
-	echo 'print_redshift= True'				 	 >> $2
+	echo 'print_redshift= False'				 	 >> $2
 	echo 'no_xticks= False'        		>> $2
 	#echo 'no_first_xticks= True'        		>> $2
 	#echo 'no_last_yticks= True'        		>> $2
@@ -1239,9 +1239,6 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 
 	set yerr = 3
 	echo 'fill_no_facecolor= False' 				>> $2
-
-
-
 
 	#echo 'print_redshift2= (b)'				>> $2
 	echo 'z_print_position_x2= 0.19'		>> $2
@@ -1476,21 +1473,6 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 
 		echo 'vline_xpos= 0.7,1.38,2.12,3.54'					 >> $2
 
-	else if ($key == 'plotXYsumSFR') then
-		echo 'y_title= $\sum$ SFR [$M_{\odot}$ $yr^{-1}$ $Mpc^{-3}$]'  >> $2
-		echo 'y_range_min= 0.03'			 		 	 >> $2 
-		echo 'y_range_max= 90'			 			 >> $2
-		echo 'y_range_min= 1e-6'			 		 	 >> $2 
-		echo 'y_range_max= 0.005'			 			 >> $2
-
-		echo 'error_bars_y= no'					 >> $2
-		echo 'error_bars_y_sub= no'					 >> $2
-
-		echo 'log_scale_y= yes'						 >> $2
-		echo 'log_scale_y_sub= yes'					 >> $2
-		echo 'z_print_position_x= 0.28'		>> $2
-		echo 'z_print_position_y= 0.75'		>> $2
-
 	else if ($key == 'plotXY_ssfr') then
 		echo 'y_title=  sSFR [$yr^{-1}$]'  >> $2
 		echo 'y_range_min= 3e-13'			 		 	 >> $2
@@ -1507,12 +1489,12 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 		echo 'z_print_position_y= 0.25'		>> $2
 
 		#knots
-		echo 'vline_xpos= 1.12,0.97,0.7,1.38,2.12,3.54'					 >> $2
+		#echo 'vline_xpos= 1.12,0.97,0.7,1.38,2.12,3.54'					 >> $2
 		#filaments
-		#echo 'vline_xpos= 1.05,0.96,0.7,1.38,2.12,3.54'					 >> $2
+		echo 'vline_xpos= 1.05,0.96,0.7,1.38,2.12,3.54'					 >> $2
 
 		echo 'hline_ypos= 1e-11'  										>> $2
-		echo 'print_redshift2= (b)'				>> $2
+		#echo 'print_redshift2= (b)'				>> $2
 
 	else if ($key == 'plotXY_mhalo') then
 		echo 'y_title= $M_{vir}$ [$M_{\odot}$]'  >> $2
@@ -1708,7 +1690,7 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 		echo 'log_scale_y_sub= yes'					 >> $2
 		echo 'z_print_position_x= 0.28'		>> $2
 		echo 'z_print_position_y= 0.80'		>> $2
-		echo 'vline_xpos= 0.7,1.38,2.12,3.54'					 >> $2
+		#echo 'vline_xpos= 0.7,1.38,2.12,3.54'					 >> $2
 
 	else if ($key == 'plotXY_g-i') then
 		echo 'y_title= $g-i$'  >> $2
@@ -2235,6 +2217,29 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 		echo 'minor_ticks_y_space= 1'			>> $2
 		echo 'no_first_last_yticks= True'			>> $2
 
+	else if ($key == plotXY_sumSFR) then
+
+		echo 'y_title= $\sum$SFR/N$_{gal}$/Volume [$M_{\odot}$ $yr^{-1}$ $Mpc^{-3}$]'  >> $2
+		echo 'y_title= SFRD/N$_{gal}$ [$M_{\odot}$ $yr^{-1}$ $Mpc^{-3}$]'  >> $2
+
+		echo 'y_range_min= 1e-11'			 		 	 >> $2 
+		echo 'y_range_max=  2e-8'			 			 >> $2
+		echo 'log_scale_y= yes'						 >> $2
+		echo 'log_scale_y_sub= yes'					 >> $2
+
+		echo 'z_print_position_x= 0.73'		>> $2
+		echo 'z_print_position_y= 0.25'		>> $2
+
+		echo 'vline_xpos= 0.7,1.38,2.12,3.54'					 >> $2
+		#echo 'hline_ypos= 1e-8,1e-9,1e-10'					 >> $2
+
+		echo 'print_redshift2= (d)'				>> $2
+
+		#knots
+		#echo 'vline_xpos= 1.12,0.97,0.7,1.38,2.12,3.54'					 >> $2
+		#filaments
+		#echo 'vline_xpos= 1.05,0.96,0.7,1.38,2.12,3.54'					 >> $2
+
 	else
 		echo 'y_title= cSFR density [$M_{\odot}$ $yr^{-1}$ $Mpc^{-3}$]'  >> $2
 
@@ -2570,8 +2575,8 @@ else if ($1 == plotXY && $plotXY_key == 'sfr2z') then
 			echo 'keyword_change5= plot_legend4,low-$Z_{Cold}$' 	>> $2
 			echo 'keyword_change6= plot_legend5,high-$Z_{Cold}$' 	>> $2
 
-			echo 'keyword_change2= plot_legend1,low-$Z_{Cold}$' 	>> $2
-			echo 'keyword_change3= plot_legend2,high-$Z_{Cold}$' 	>> $2
+			#echo 'keyword_change2= plot_legend1,low-$Z_{Cold}$' 	>> $2
+			#echo 'keyword_change3= plot_legend2,high-$Z_{Cold}$' 	>> $2
 
 			#echo 'keyword_change1= plot_legend0,all knots' 	>> $2
 			#echo 'keyword_change2= plot_legend1,low-$Z_{Cold}$ knots' 	>> $2
@@ -2657,17 +2662,17 @@ else if ($1 == plotXY && $plotXY_key == 'zevol') then
 	set no_top = False
 	set xIsz = 'True'
 
-	set sample = 2
+	set sample = final
 	set key = $24
 
 	set yerr = 3
 
 	echo '0= yes'		>> $21
-	echo '1= no'		>> $21
-	echo '2= no'		>> $21
+	echo '1= yes'		>> $21
+	echo '2= yes'		>> $21
 	echo '3= yes'		>> $21
-	echo '4= no'		>> $21
-	echo '5= no'		>> $21
+	echo '4= yes'		>> $21
+	echo '5= yes'		>> $21
 	echo '6= yes'		>> $21
 	echo '7= no'		>> $21
 	echo '8= no'		>> $21
@@ -2688,7 +2693,7 @@ else if ($1 == plotXY && $plotXY_key == 'zevol') then
 	echo 'lw_offset= 0'				 		 >> $2
 	echo 'text_fontsize= 26'					>> $2
 	echo 'legend_fontsize= 20'				 	 >> $2
-	echo 'print_redshift= yes'				 	 >> $2
+	echo 'print_redshift= no'				 	 >> $2
 
 	set small_plot = 'False'
 
@@ -4916,7 +4921,7 @@ if ($1 =~ analyse* || $1 =~ plotX*) then
 	#greysafecols = ['#809BC8', '#FF6666', '#FFCC66', '#64C204']f
 
 	#Choose nr of colours-code which should be color-blind (cb) friendly created: choose 0, if you do not want any cb friendly color
-	set use_cb_colors = 0
+	set use_cb_colors = 5
 	echo 'use_cb_colors= '$use_cb_colors	>> $2
 
 	if ($1 =~ analyse*) then
@@ -5237,7 +5242,7 @@ if ($1 =~ analyse* || $1 =~ plotX*) then
 
 	else if ($use_cb_colors == 6) then
 
-		echo '0= :'	>> $13	
+		echo '0= '	>> $13	
 		echo '1= -'	>> $13						
 		echo '2= -'	>> $13
 		echo '3= --'	>> $13
@@ -5839,5 +5844,6 @@ endif
 #echo '0= '	>> $13
 #echo '0= .'	>> $15
 #echo '0= w'	>> $16
-#echo 'HERE: sample' $sample 'use_cb_colors:' $use_cb_colors
+echo 'HERE: sample' $sample 'use_cb_colors:' $use_cb_colors
 echo 'Plot config .... DONE!'
+echo 'no_first_xticks= False'

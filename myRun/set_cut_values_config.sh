@@ -22,7 +22,7 @@ end
 
 set i=1
 foreach item ($2)
-	if ("$array[$i]" != 99) then
+	if ("$array[$i]" != 999) then
 
 		#set the columns how the should be named in the output-file
 		#if False: DS code will be used
@@ -172,7 +172,7 @@ foreach item ($2)
 		set cut_value_min		= 'min'
 		#echo 'i:' $i $item "$array[$i]"
 		 		 
-		if ($item == mhalo) set cut_value_min		= 5e10
+		#if ($item == mhalo) set cut_value_min		= 5e10
 		#if ($item == hostid) set cut_value_min		= -2
 
 		#if ($item == mstar) set cut_value_min	 	= 5e7
@@ -243,7 +243,8 @@ foreach item ($2)
 		if ($5 == 'DS' || $5 =~ MD*) then
 		#units without any little-h according to Doris datapipline mass [Msun], sfr [Msun/yr], pos [comMpc], mean_age_stars [Gyr], radii [kpc]
 			if ($item =~ *_a) set unit			= 'Mpc'
-			if ($item =~ *_a*) set unit			= 'Mpc'		 		 
+			if ($item =~ *_a*) set unit			= 'Mpc'
+			if ($item =~ accra*) set unit			= 'Msunyr-1'
 			if ($item =~ mhal*) set unit			= 'Msun'
 			if ($item =~ mpseud*) set unit			= 'Msun'
 			if ($item =~ mbasi*) set unit			= 'Msun'
@@ -265,6 +266,8 @@ foreach item ($2)
 			if ($item =~ t50*) set unit				= 'Gyr'
 			if ($item =~ t70*) set unit				= 'Gyr'
 			if ($item =~ delta_t*) set unit			= 'Gyr'
+			if ($item =~ delta_age*) set unit			= 'Gyr'
+			if ($item =~ delta_vdis*) set unit			= 'kms-1'
 			if ($item =~ t*) set unit			= 'Gyr'					
 			if ($item =~ *pos) set unit			= 'comvMpc'
 			if ($item =~ *pos_subhalo) set unit			= 'comvMpc'
@@ -288,6 +291,7 @@ foreach item ($2)
 			if ($item =~ SB_nu*) set unit			= 'magpc-2'
 			if ($item =~ F_*) set unit			= 'Jy'
 			if ($item =~ mag*) set unit			= 'mag'
+			if ($item == jsub) set unit			= 'idnumber'
 
 
 			if ($4 == A || $4 =~ A* || $4 == C) then
@@ -360,6 +364,7 @@ foreach item ($2)
 		if ($item =~ zho*) set unit		= 'abFrac'
 		if ($item == cgf) set unit		= '-'
 		if ($item == fbar) set unit		= '-'
+		if ($item == fpart) set unit		= '-'
 		if ($item == bheff) set unit		= '-'
 		if ($item =~ *vs*) set unit		= 'frac'
 		if ($item == BvT) set unit		= 'frac'
@@ -458,8 +463,7 @@ foreach item ($2)
 		if ($item =~ SB_nu*) set format			= '%0.6f'
 
 		if ($item =~ z50*) set format			= '%0.4f'
-		if ($item == Delta_z50) set format		= '%0.4f'
-		if ($item == regionName) set format			= '%s'
+		if ($item =~ Del*) set format		= '%0.6f'
 
 		#default values:
 		if ($4 == F || $4 == B || $4 == Ff || $4 == Bb || $4 == I || $4 == R || $4 == C256 || $4 == C512) then
@@ -467,7 +471,7 @@ foreach item ($2)
 		else
 			set data_type			= 'float64'
 		endif 				 		 
-
+		if ($item =~ E*) set data_type			= 'float64'
 		if ($item =~ n*) set data_type			= 'int32'
 		if ($item =~ np_*) set data_type		= 'int64'
 		if ($item =~ *nhal*) set data_type		= 'int32'
@@ -485,6 +489,7 @@ foreach item ($2)
 		if ($item == pop) set data_type		= 'int8'
 		if ($item =~ flag*) set data_type		= 'int8'
 		if ($item == envr) set data_type		= 'int8'
+		if ($item == regionID) set data_type		= 'int32'
 		if ($item == CMASS_sample_key) set data_type = 'S30'
 		if ($item == flag_mass_bin) set data_type = 'S10'
 		if ($item == flag_mstar_bin) set data_type = 'S10'
@@ -492,7 +497,6 @@ foreach item ($2)
 		if ($item == flag_age_bin) set data_type = 'S10'
 		if ($item == flag_sfe_bin) set data_type = 'S10'
 		if ($item == flag_SHMR_bin) set data_type = 'S10'
-		if ($item == regionName) set data_type = 'S10'
 
 
 		set corr_type		= 'no_corr'
@@ -724,10 +728,11 @@ foreach item ($2)
 		endif
 	
 
-		if ($item == 'mhalo_sat' | $item =~ satellite* ) then
+		#if ($item == 'mhalo_sat' | $item =~ *Index | $item == 'mhalo_cents' | $item == 'Mzgas' | $item == 'mcold') then
 # || $item == mbasic || $item =~ L_SDSS_*_sph* || $item =~ L_SDSS_* || $item =~ M*_disk || $item =~ M*_spheroid || $item =~ m*_disk || $item =~ m*_spheroid || $item =~ s*_disk || $item =~ s*_spheroid || $item =~ satell* || $item =~ angMd*) then
 		#if ( $item == 'mhalo_sat' || $item == mbasic || $item =~ *Index || $item == sfr || $item == mstar || $item == 'Mzstar' || $item == 'Mzgas') then
 		#if ($item =~ spin* || $item =~ *_vel) then
+		if ($item =~ zgas* ) then
 			set exclude		= 'yes'
 		else
 			set exclude		= 'no'

@@ -3,7 +3,7 @@
 set data_offset_histos 		= 7
 set data_offset_bin 		= 10
 set data_offset_cSFRD 		= 5
-set data_offset_sfr2z 		= 98
+set data_offset_sfr2z 		= 125
 set data_offset_ngal 		= 10
 set data_offset_CUTE 		= 6
 set data_offset_analyseTargetSelection 		= 10
@@ -348,7 +348,6 @@ if ("$plot_array[$i]" == 1) then
 
 	set k=1
 	foreach item ($6)
-
 		if ("$col_array[$k]" != 99) then
 
 			if ($item =~ mstar) then
@@ -380,11 +379,11 @@ if ("$plot_array[$i]" == 1) then
 endif
 @ i++
 
-if ("$plot_array[$i]" == 1) then
-	echo "$name_array[$i]" 'plot_'"$name_array[$i]"'_config.txt '0 0 $obs_analyse 		>> $1
-	echo '-: -' >> $3
-endif
-@ i++
+#if ("$plot_array[$i]" == 1) then
+#	echo "$name_array[$i]" 'plot_'"$name_array[$i]"'_config.txt '0 0 $obs_analyse 		>> $1
+#	echo '-: -' >> $3
+#endif
+#@ i++
 
 #if ("$plot_array[$i]" == 1) then
 	#echo "$name_array[$i]" 'plot_'"$name_array[$i]"'_config.txt '0 $data_offset_analyseTargetSelection $obs_analyse		>> $1
@@ -472,6 +471,7 @@ endif
 @ i++
 
 if ("$plot_array[$i]" == 1) then
+	#echo 'here cSFRD' "$plot_array[$i]"
       	echo "$name_array[$i]"' plot_'"$name_array[$i]"'_config.txt '$nbins_cSFRD $data_offset_cSFRD $obs_cSFRD>> $1
 
 	echo 'histo_min_'"$name_array[$i]"'_mstar: '$h_min_sfr2z_mstar >> $3
@@ -482,6 +482,7 @@ endif
 @ i++
 
 if ("$plot_array[$i]" == 1) then
+	#echo 'here sfr2z'
       	echo "$name_array[$i]"' plot_'"$name_array[$i]"'_config.txt '$nbins_sfr2z $data_offset_sfr2z $obs_sfr2z>> $1
 
 	echo 'histo_min_'"$name_array[$i]"'_mstar: '$h_min_sfr2z_mstar >> $3

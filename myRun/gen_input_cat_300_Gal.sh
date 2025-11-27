@@ -43,7 +43,7 @@ set IMF = 'Chabrier03'
 #+++++++++++++++++++++++++++++++++++++++++++
 set my_annotation = 'catalog from Patricia crossmatch with them from Yetli'
 #set my_annotation = 'catalog from Yetli with envr'
-set my_annotation = '300 Massive Central Galaxy catalog adding new properties'
+set my_annotation = '300 Massive Central Galaxy catalog adding new properties magnitude test'
 
 #Select with unit system should be used
 #DS: the system standard units are chosen which are mass [Msun], sfr [Msun/yr], pos [comMpc], mean_age_stars [Gyr]
@@ -65,7 +65,7 @@ set set_header_Topcat_format = 'yes'
 set tarsel_code_default = ''
 set tarsel_code_default = ''
 
-set tarsel_code_Galacticus = ''
+set tarsel_code_Galacticus = 'default'
 set tarsel_code_SAG = ''
 set tarsel_code_SAGE = ''
 
@@ -75,13 +75,13 @@ set tarsel_code_SAGE = ''
 set add_tarsel_code = ''
 
 
-set output_filename_code_Galacticus = '300_April2024'
+set output_filename_code_Galacticus = '300_March2025_part2'
 set output_filename_code_SAG = ''
 set output_filename_code_SAGE = ''
 
 #NOTE standard: [plot_key]_[catname+boxsize]_z_[redshift(0.2f)].[fileformat]
 #set output_filename_code_default = 'SFH_300_main_cents'
-set output_filename_code_default = 'test'
+set output_filename_code_default = ''
 
 #CHANGE IMF:
 set change_IMF = 'Kroupa_Croton+16'
@@ -101,7 +101,7 @@ set end_fileID 	= False
 
 #choose a selection name which describes the current selection you want to apply
 #+++++++++++++++++++++++++++++++++++++++++++
-set selection_name = ''
+set selection_name = 'False'
 
 set plot_custom_array = ('')
 
@@ -125,7 +125,7 @@ else
 endif
 
 #If create_subcat == True, than a subsample of the catalog will be extracted, or the list of MYSNAPS will be worked trough like '0.0 0.1 0.5' (usefull e.g. with plotXY)
-set create_subcat = False
+set create_subcat = True
 set convert_sph_to_cart_coords = False
 set PLOT_CUM = 'Truee'
 set set_home_mode = Truee
@@ -185,8 +185,8 @@ if ($HDF5_read_code == 'SAMHDF5' || $HDF5_read_code == 'BINARY_SAGE') then
 		#set MYSNAPS_1Gpc	= '79 75 70 67 65 60 57 52 50 47 45 42 40 38 36 34 32 30 28 26 24 22 20 18 16 14 13 12 11 10 9 8 7 6 5 4 3 2 1'
 
 		#SFH 300
-		set MYSNAPS_1Gpc	= '79'
-# 78 77 76 75 74 73 72 71 70 69 68 67 66 65 64 63 62 61 60 59 58 57 56 55 54 53 52 51 50 49 48 47 46 45 44 43 42 41 40 39 38 37 36 35 34 33 32 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5'
+		#set MYSNAPS_1Gpc	= '79 78 77 76 75 74 73 72 71 70 69 68 67 66 65 64 63 62 61 60 59 58 57 56 55 54 53 52 51 50 49 48 47 46 45 44 43 42 41 40 39 38 37 36 35 34 33 32 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5'
+		set MYSNAPS_1Gpc	= '16 15 14 13 12 11 10 9 8 7 6 5'
 		#all Galacticus
 		#set MYSNAPS_1Gpc	= '59 58 57 56 55'
 # 54 53 52 51 50 49 48 47 46 45 44 43 42 41 40 39 38 37 36 35 34 33 32 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5'
@@ -342,14 +342,14 @@ set calc_fast_histo		= True
 
 set plotXY				= 0
 set plotOnly			= 0
-set filterData			= 1
+set filterData			= 0
 set analyseTargetSelection	= 0
 
 set SMF 				= 0
 set SFRF 				= 0
 set sSFRF				= 0
 set cSFRD				= 0
-set sfr2z				= 0
+set sfr2z				= 1
 set sfr2mstar			= 0
 set ssfr2mstar			= 0
 set oh2mstar			= 0
@@ -623,6 +623,7 @@ set halo_z_vel_disp	= 99
 
 #Standard properties
 set ngalaxies		= 99
+set nsats		= 67
 set haloid		= 5				
 set hostid		= 1	
 set orphan		= 3				
@@ -634,7 +635,7 @@ set mbasic		= 99
 set mbasic_200c		= 99
 
 #300
-set regionName		= 6
+set regionID		= 6
 
 #Environment
 set env_512		= 99
@@ -948,9 +949,9 @@ set L_SDSS_dA_total_z	= 99
 #Magnitudes Standard
 #----------------------------------------
 set mAB_dA_total_u	= 99
-set mAB_dA_total_g	= 99
-set mAB_dA_total_r	= 99
-set mAB_dA_total_i	= 99
+set mAB_dA_total_g	= 64
+set mAB_dA_total_r	= 65
+set mAB_dA_total_i	= 66
 set mAB_dA_total_z	= 99
 
 set MAB_dA_total_u	= 99
@@ -1118,9 +1119,9 @@ set halo_col_name_array = (halo_nhalos halo_haloid halo_hostid halo_desIndex hal
 
 set halo_col_array = ($halo_nhalos $halo_haloid $halo_hostid $halo_desIndex $halo_nodemass $halo_vmax $halo_rsca $halo_angmom $halo_spin $halo_redshift $halo_x_pos $halo_y_pos $halo_z_pos $halo_x_vel $halo_y_vel $halo_z_vel $halo_x_vel_disp $halo_y_vel_disp $halo_z_vel_disp)
 
-set col_name_array = (ngalaxies haloid hostid satelliteNodeIndex parentIndex orphan mhalo vmax vpeak spinParameter NFW_con zgas_spheroid zgas_disk zstar_disk zstar_spheroid zhot_halo mcold_spheroid mcold_disk mcold mbh mstar_spheroid mstar_disk mstar mhot Mzgas_spheroid Mzgas_disk Mzgas Mzstar_spheroid Mzstar_disk Mzstar Mzhot_halo sfr_spheroid sfr_disk sfr x_pos y_pos z_pos x_vel y_vel z_vel L_SDSS_spheroid_u L_SDSS_spheroid_g L_SDSS_spheroid_r L_SDSS_spheroid_i L_SDSS_spheroid_z L_SDSS_dA_spheroid_u L_SDSS_dA_spheroid_g L_SDSS_dA_spheroid_r L_SDSS_dA_spheroid_i L_SDSS_dA_spheroid_z L_SDSS_disk_u L_SDSS_disk_g L_SDSS_disk_r L_SDSS_disk_i L_SDSS_disk_z L_SDSS_dA_disk_u L_SDSS_dA_disk_g L_SDSS_dA_disk_r L_SDSS_dA_disk_i L_SDSS_dA_disk_z L_SDSS_u L_SDSS_g L_SDSS_r L_SDSS_i L_SDSS_z L_SDSS_dA_u L_SDSS_dA_g L_SDSS_dA_r L_SDSS_dA_i L_SDSS_dA_z L_SDSS_dA_total_u L_SDSS_dA_total_g L_SDSS_dA_total_r L_SDSS_dA_total_i L_SDSS_dA_total_z mag_u mag_g mag_r mag_i mag_z mAB_u mAB_g mAB_r mAB_i mAB_z mAB_total_u mAB_total_g mAB_total_r mAB_total_i mAB_total_z mAB_dA_u mAB_dA_g mAB_dA_r mAB_dA_i mAB_dA_z mAB_dA_total_u mAB_dA_total_g mAB_dA_total_r mAB_dA_total_i mAB_dA_total_z MAB_dA_total_u MAB_dA_total_g MAB_dA_total_r MAB_dA_total_i MAB_dA_total_z MAB_total_u MAB_total_g MAB_total_r MAB_total_i MAB_total_z mAs_u mAs_g mAs_r mAs_i mAs_z mAs_dA_u mAs_dA_g mAs_dA_r mAs_dA_i mAs_dA_z mAs_dA_total_u mAs_dA_total_g mAs_dA_total_r mAs_dA_total_i mAs_dA_total_z mAB_total_cut_r_i mAB_total_cut_dmesa mAB_total_cut_g_r mAB_total_cut_i_lt_dmesa 'mAB_dA_total_cut_r_i' 'mAB_dA_total_cut_g_r' 'mAB_dA_total_cut_g_i' 'mAB_dA_total_cut_u_g' 'mAB_dA_total_cut_u_i' 'mAB_dA_total_cut_i_z' mAB_dA_total_cut_dmesa mAB_dA_total_cut_cmesa mAB_dA_total_cut_cpar mAB_dA_total_cut_i_lt_dmesa mAB_dA_total_cut_i_lt_dmesa_sparse mAB_dA_total_cut_r_lt_cpar mAs_dA_total_cut_r_i mAs_dA_total_cut_dmesa mAs_dA_total_cut_g_r mAs_dA_total_cut_i_lt_dmesa RA DEC Z age mean_age_stars mhalo_sat OH_gas_disk OH_gas_bulge OH_gas_disk_bulge weight_tot OII_3727_ext OII_3727 OII_3729_ext OII_3729 nodeIndex satelliteIndex siblingIndex satelliteMergeTime isolated timeLastIsolated firstProgenitorID npros Mag_dA_total_B rhalf_bulge rhalf_disk rbulge rdisk rhalf_mass mstar_IC OII_cont_3727_ext OII_cont_3727 OII_cont_3729_ext OII_cont_3729 sfr_int_spheroid sfr_quies_int mhalo_200c mbasic mbasic_200c mhalo_cents_200c mhalo_cents 'mstar+IC' ssfr env_512 env_1024 zcold lastProID mainLeafID fofID bhcount vbulge vdisk age_sfr_int_disk sfr_int_disk sfr_int_spheroid age_sfr_int_spheroid sfr_int_spheroid mean_age_stars_disk mean_age_stars_spheroid cgf angM_spheroid angM_disk Tcons fbar bheff BvT Mzgas_HI Mzgas_HII envr lastMinorM lastMajorM DvT_stars DvT_stars_alt DvT_gas np_stars np_gas np_disk ropt rhalf_stars r200c sfr_int_gas bh_acc_rate mstar_alt mAB_total_cut_g_i rhalf_gas pop CMASS_sample_key SHMR nr_sample_keys flag_CMASS_l flag_CMASS_h flag_CMASS_p flag_CMASS_a flag_CMASS_r flag_CMASS_b flag_CMASS_lz flag_CMASS_hz flag_CMASS_lzr flag_CMASS_hzr zcold_zstar zstar flag_sample flag_CMASS_lsm flag_CMASS_hsm flag_CMASS_lhm flag_CMASS_hhm jbar jdisk jbulge rhotHalo angM_outflowHotHalo regionName joutHotHalo mhot_outflow jhotHalo angM_hotHalo Mzhot_outflowHalo)
+set col_name_array = (ngalaxies haloid hostid satelliteNodeIndex parentIndex orphan mhalo vmax vpeak spinParameter NFW_con zgas_spheroid zgas_disk zstar_disk zstar_spheroid zhot_halo mcold_spheroid mcold_disk mcold mbh mstar_spheroid mstar_disk mstar mhot Mzgas_spheroid Mzgas_disk Mzgas Mzstar_spheroid Mzstar_disk Mzstar Mzhot_halo sfr_spheroid sfr_disk sfr x_pos y_pos z_pos x_vel y_vel z_vel L_SDSS_spheroid_u L_SDSS_spheroid_g L_SDSS_spheroid_r L_SDSS_spheroid_i L_SDSS_spheroid_z L_SDSS_dA_spheroid_u L_SDSS_dA_spheroid_g L_SDSS_dA_spheroid_r L_SDSS_dA_spheroid_i L_SDSS_dA_spheroid_z L_SDSS_disk_u L_SDSS_disk_g L_SDSS_disk_r L_SDSS_disk_i L_SDSS_disk_z L_SDSS_dA_disk_u L_SDSS_dA_disk_g L_SDSS_dA_disk_r L_SDSS_dA_disk_i L_SDSS_dA_disk_z L_SDSS_u L_SDSS_g L_SDSS_r L_SDSS_i L_SDSS_z L_SDSS_dA_u L_SDSS_dA_g L_SDSS_dA_r L_SDSS_dA_i L_SDSS_dA_z L_SDSS_dA_total_u L_SDSS_dA_total_g L_SDSS_dA_total_r L_SDSS_dA_total_i L_SDSS_dA_total_z mag_u mag_g mag_r mag_i mag_z mAB_u mAB_g mAB_r mAB_i mAB_z mAB_total_u mAB_total_g mAB_total_r mAB_total_i mAB_total_z mAB_dA_u mAB_dA_g mAB_dA_r mAB_dA_i mAB_dA_z mAB_dA_total_u mAB_dA_total_g mAB_dA_total_r mAB_dA_total_i mAB_dA_total_z MAB_dA_total_u MAB_dA_total_g MAB_dA_total_r MAB_dA_total_i MAB_dA_total_z MAB_total_u MAB_total_g MAB_total_r MAB_total_i MAB_total_z mAs_u mAs_g mAs_r mAs_i mAs_z mAs_dA_u mAs_dA_g mAs_dA_r mAs_dA_i mAs_dA_z mAs_dA_total_u mAs_dA_total_g mAs_dA_total_r mAs_dA_total_i mAs_dA_total_z mAB_total_cut_r_i mAB_total_cut_dmesa mAB_total_cut_g_r mAB_total_cut_i_lt_dmesa 'mAB_dA_total_cut_r_i' 'mAB_dA_total_cut_g_r' 'mAB_dA_total_cut_g_i' 'mAB_dA_total_cut_u_g' 'mAB_dA_total_cut_u_i' 'mAB_dA_total_cut_i_z' mAB_dA_total_cut_dmesa mAB_dA_total_cut_cmesa mAB_dA_total_cut_cpar mAB_dA_total_cut_i_lt_dmesa mAB_dA_total_cut_i_lt_dmesa_sparse mAB_dA_total_cut_r_lt_cpar mAs_dA_total_cut_r_i mAs_dA_total_cut_dmesa mAs_dA_total_cut_g_r mAs_dA_total_cut_i_lt_dmesa RA DEC Z age mean_age_stars mhalo_sat OH_gas_disk OH_gas_bulge OH_gas_disk_bulge weight_tot OII_3727_ext OII_3727 OII_3729_ext OII_3729 nodeIndex satelliteIndex siblingIndex satelliteMergeTime isolated timeLastIsolated firstProgenitorID npros Mag_dA_total_B rhalf_bulge rhalf_disk rbulge rdisk rhalf_mass mstar_IC OII_cont_3727_ext OII_cont_3727 OII_cont_3729_ext OII_cont_3729 sfr_int_spheroid sfr_quies_int mhalo_200c mbasic mbasic_200c mhalo_cents_200c mhalo_cents 'mstar+IC' ssfr env_512 env_1024 zcold lastProID mainLeafID fofID bhcount vbulge vdisk age_sfr_int_disk sfr_int_disk sfr_int_spheroid age_sfr_int_spheroid sfr_int_spheroid mean_age_stars_disk mean_age_stars_spheroid cgf angM_spheroid angM_disk Tcons fbar bheff BvT Mzgas_HI Mzgas_HII envr lastMinorM lastMajorM DvT_stars DvT_stars_alt DvT_gas np_stars np_gas np_disk ropt rhalf_stars r200c sfr_int_gas bh_acc_rate mstar_alt mAB_total_cut_g_i rhalf_gas pop CMASS_sample_key SHMR nr_sample_keys flag_CMASS_l flag_CMASS_h flag_CMASS_p flag_CMASS_a flag_CMASS_r flag_CMASS_b flag_CMASS_lz flag_CMASS_hz flag_CMASS_lzr flag_CMASS_hzr zcold_zstar zstar flag_sample flag_CMASS_lsm flag_CMASS_hsm flag_CMASS_lhm flag_CMASS_hhm jbar jdisk jbulge rhotHalo angM_outflowHotHalo regionID joutHotHalo mhot_outflow jhotHalo angM_hotHalo Mzhot_outflowHalo nsats)
 
-set col_array = ($ngalaxies $haloid $hostid $satelliteNodeIndex $parentIndex $orphan $mhalo $vmax $vpeak $spinParameter $NFW_con $zgas_spheroid $zgas_disk $zstar_disk $zstar_spheroid $zhot_halo $mcold_spheroid $mcold_disk $mcold $mbh $mstar_spheroid $mstar_disk $mstar $mhot $Mzgas_spheroid $Mzgas_disk $Mzgas $Mzstar_spheroid $Mzstar_disk $Mzstar $Mzhot_halo $sfr_spheroid $sfr_disk $sfr $x_pos $y_pos $z_pos $x_vel $y_vel $z_vel $L_SDSS_spheroid_u $L_SDSS_spheroid_g $L_SDSS_spheroid_r $L_SDSS_spheroid_i $L_SDSS_spheroid_z $L_SDSS_dA_spheroid_u $L_SDSS_dA_spheroid_g $L_SDSS_dA_spheroid_r $L_SDSS_dA_spheroid_i $L_SDSS_dA_spheroid_z $L_SDSS_disk_u $L_SDSS_disk_g $L_SDSS_disk_r $L_SDSS_disk_i $L_SDSS_disk_z $L_SDSS_dA_disk_u $L_SDSS_dA_disk_g $L_SDSS_dA_disk_r $L_SDSS_dA_disk_i $L_SDSS_dA_disk_z $L_SDSS_u $L_SDSS_g $L_SDSS_r $L_SDSS_i $L_SDSS_z $L_SDSS_dA_u $L_SDSS_dA_g $L_SDSS_dA_r $L_SDSS_dA_i $L_SDSS_dA_z $L_SDSS_dA_total_u $L_SDSS_dA_total_g $L_SDSS_dA_total_r $L_SDSS_dA_total_i $L_SDSS_dA_total_z $mag_u $mag_g $mag_r $mag_i $mag_z $mAB_u $mAB_g $mAB_r $mAB_i $mAB_z $mAB_total_u $mAB_total_g $mAB_total_r $mAB_total_i $mAB_total_z $mAB_dA_u $mAB_dA_g $mAB_dA_r $mAB_dA_i $mAB_dA_z $mAB_dA_total_u $mAB_dA_total_g $mAB_dA_total_r $mAB_dA_total_i $mAB_dA_total_z $MAB_dA_total_u $MAB_dA_total_g $MAB_dA_total_r $MAB_dA_total_i $MAB_dA_total_z $MAB_total_u $MAB_total_g $MAB_total_r $MAB_total_i $MAB_total_z $mAs_u $mAs_g $mAs_r $mAs_i $mAs_z $mAs_dA_u $mAs_dA_g $mAs_dA_r $mAs_dA_i $mAs_dA_z $mAs_dA_total_u $mAs_dA_total_g $mAs_dA_total_r $mAs_dA_total_i $mAs_dA_total_z $mAB_total_cut_r_i $mAB_total_cut_dmesa $mAB_total_cut_g_r $mAB_total_cut_i_lt_dmesa $mAB_dA_total_cut_r_i $mAB_dA_total_cut_g_r $mAB_dA_total_cut_g_i $mAB_dA_total_cut_u_g $mAB_dA_total_cut_u_i $mAB_dA_total_cut_i_z $mAB_dA_total_cut_dmesa $mAB_dA_total_cut_cmesa $mAB_dA_total_cut_cpar $mAB_dA_total_cut_i_lt_dmesa $mAB_dA_total_cut_i_lt_dmesa_sparse $mAB_dA_total_cut_r_lt_cpar $mAs_dA_total_cut_r_i $mAs_dA_total_cut_dmesa $mAs_dA_total_cut_g_r $mAs_dA_total_cut_i_lt_dmesa $RA $DEC $Z $age $mean_age_stars $mhalo_sat $OH_gas_disk $OH_gas_bulge $OH_gas_disk_bulge $weight_tot $OII_3727_ext $OII_3727 $OII_3729_ext $OII_3729 $nodeIndex $satelliteIndex $siblingIndex $satelliteMergeTime $isolated $timeLastIsolated $firstProgenitorID $npros $Mag_dA_total_B $rhalf_bulge $rhalf_disk $rbulge $rdisk $rhalf_mass $mstar_IC $OII_cont_3727_ext $OII_cont_3727 $OII_cont_3729_ext $OII_cont_3729 $sfr_int_spheroid $sfr_int_quies $mhalo_200c $mbasic $mbasic_200c $mhalo_cents_200c $mhalo_cents $mstarPlusIC $ssfr $env_512 $env_1024 $zcold $lastProID $mainLeafID $fofID $bhcount $vbulge $vdisk $age_sfr_int_disk $sfr_int_disk $sfr_int_spheroid $age_sfr_int_spheroid $sfr_int_spheroid $mean_age_stars_disk $mean_age_stars_spheroid $cgf $angM_spheroid $angM_disk $Tcons $fbar $bheff $BvT $Mzgas_HI $Mzgas_HII $envr $lastMinorM $lastMajorM $DvT_stars $DvT_stars_alt $DvT_gas $np_stars $np_gas $np_disk $ropt $rhalf_stars $r200c $sfr_int_gas $bh_acc_rate $mstar_alt $mAB_total_cut_g_i $rhalf_gas $pop $CMASS_sample_key $SHMR $nr_sample_keys $flag_CMASS_l $flag_CMASS_h $flag_CMASS_p $flag_CMASS_a $flag_CMASS_r $flag_CMASS_b $flag_CMASS_lz $flag_CMASS_hz $flag_CMASS_lzr $flag_CMASS_hzr $zcold_zstar $zstar $flag_sample $flag_CMASS_lsm $flag_CMASS_hsm $flag_CMASS_lhm $flag_CMASS_hhm $jbar $jdisk $jbulge $rhotHalo $angM_outflowHotHalo $regionName $joutHotHalo $mhot_outflow $jhotHalo $angM_hotHalo $Mzhot_outflowHalo)
+set col_array = ($ngalaxies $haloid $hostid $satelliteNodeIndex $parentIndex $orphan $mhalo $vmax $vpeak $spinParameter $NFW_con $zgas_spheroid $zgas_disk $zstar_disk $zstar_spheroid $zhot_halo $mcold_spheroid $mcold_disk $mcold $mbh $mstar_spheroid $mstar_disk $mstar $mhot $Mzgas_spheroid $Mzgas_disk $Mzgas $Mzstar_spheroid $Mzstar_disk $Mzstar $Mzhot_halo $sfr_spheroid $sfr_disk $sfr $x_pos $y_pos $z_pos $x_vel $y_vel $z_vel $L_SDSS_spheroid_u $L_SDSS_spheroid_g $L_SDSS_spheroid_r $L_SDSS_spheroid_i $L_SDSS_spheroid_z $L_SDSS_dA_spheroid_u $L_SDSS_dA_spheroid_g $L_SDSS_dA_spheroid_r $L_SDSS_dA_spheroid_i $L_SDSS_dA_spheroid_z $L_SDSS_disk_u $L_SDSS_disk_g $L_SDSS_disk_r $L_SDSS_disk_i $L_SDSS_disk_z $L_SDSS_dA_disk_u $L_SDSS_dA_disk_g $L_SDSS_dA_disk_r $L_SDSS_dA_disk_i $L_SDSS_dA_disk_z $L_SDSS_u $L_SDSS_g $L_SDSS_r $L_SDSS_i $L_SDSS_z $L_SDSS_dA_u $L_SDSS_dA_g $L_SDSS_dA_r $L_SDSS_dA_i $L_SDSS_dA_z $L_SDSS_dA_total_u $L_SDSS_dA_total_g $L_SDSS_dA_total_r $L_SDSS_dA_total_i $L_SDSS_dA_total_z $mag_u $mag_g $mag_r $mag_i $mag_z $mAB_u $mAB_g $mAB_r $mAB_i $mAB_z $mAB_total_u $mAB_total_g $mAB_total_r $mAB_total_i $mAB_total_z $mAB_dA_u $mAB_dA_g $mAB_dA_r $mAB_dA_i $mAB_dA_z $mAB_dA_total_u $mAB_dA_total_g $mAB_dA_total_r $mAB_dA_total_i $mAB_dA_total_z $MAB_dA_total_u $MAB_dA_total_g $MAB_dA_total_r $MAB_dA_total_i $MAB_dA_total_z $MAB_total_u $MAB_total_g $MAB_total_r $MAB_total_i $MAB_total_z $mAs_u $mAs_g $mAs_r $mAs_i $mAs_z $mAs_dA_u $mAs_dA_g $mAs_dA_r $mAs_dA_i $mAs_dA_z $mAs_dA_total_u $mAs_dA_total_g $mAs_dA_total_r $mAs_dA_total_i $mAs_dA_total_z $mAB_total_cut_r_i $mAB_total_cut_dmesa $mAB_total_cut_g_r $mAB_total_cut_i_lt_dmesa $mAB_dA_total_cut_r_i $mAB_dA_total_cut_g_r $mAB_dA_total_cut_g_i $mAB_dA_total_cut_u_g $mAB_dA_total_cut_u_i $mAB_dA_total_cut_i_z $mAB_dA_total_cut_dmesa $mAB_dA_total_cut_cmesa $mAB_dA_total_cut_cpar $mAB_dA_total_cut_i_lt_dmesa $mAB_dA_total_cut_i_lt_dmesa_sparse $mAB_dA_total_cut_r_lt_cpar $mAs_dA_total_cut_r_i $mAs_dA_total_cut_dmesa $mAs_dA_total_cut_g_r $mAs_dA_total_cut_i_lt_dmesa $RA $DEC $Z $age $mean_age_stars $mhalo_sat $OH_gas_disk $OH_gas_bulge $OH_gas_disk_bulge $weight_tot $OII_3727_ext $OII_3727 $OII_3729_ext $OII_3729 $nodeIndex $satelliteIndex $siblingIndex $satelliteMergeTime $isolated $timeLastIsolated $firstProgenitorID $npros $Mag_dA_total_B $rhalf_bulge $rhalf_disk $rbulge $rdisk $rhalf_mass $mstar_IC $OII_cont_3727_ext $OII_cont_3727 $OII_cont_3729_ext $OII_cont_3729 $sfr_int_spheroid $sfr_int_quies $mhalo_200c $mbasic $mbasic_200c $mhalo_cents_200c $mhalo_cents $mstarPlusIC $ssfr $env_512 $env_1024 $zcold $lastProID $mainLeafID $fofID $bhcount $vbulge $vdisk $age_sfr_int_disk $sfr_int_disk $sfr_int_spheroid $age_sfr_int_spheroid $sfr_int_spheroid $mean_age_stars_disk $mean_age_stars_spheroid $cgf $angM_spheroid $angM_disk $Tcons $fbar $bheff $BvT $Mzgas_HI $Mzgas_HII $envr $lastMinorM $lastMajorM $DvT_stars $DvT_stars_alt $DvT_gas $np_stars $np_gas $np_disk $ropt $rhalf_stars $r200c $sfr_int_gas $bh_acc_rate $mstar_alt $mAB_total_cut_g_i $rhalf_gas $pop $CMASS_sample_key $SHMR $nr_sample_keys $flag_CMASS_l $flag_CMASS_h $flag_CMASS_p $flag_CMASS_a $flag_CMASS_r $flag_CMASS_b $flag_CMASS_lz $flag_CMASS_hz $flag_CMASS_lzr $flag_CMASS_hzr $zcold_zstar $zstar $flag_sample $flag_CMASS_lsm $flag_CMASS_hsm $flag_CMASS_lhm $flag_CMASS_hhm $jbar $jdisk $jbulge $rhotHalo $angM_outflowHotHalo $regionID $joutHotHalo $mhot_outflow $jhotHalo $angM_hotHalo $Mzhot_outflowHalo $nsats)
 
 set total_col_name_array=()
 set total_col_array=()
@@ -1903,7 +1904,7 @@ foreach MODEL (`ls -d $PATH_TO_SOFTLINKS/*`)
 				if ($NAME =~ *500*) 		echo 'box_size= 500.0' 	>> $CONFIGFILE
 				if ($NAME =~ *1Gpc*) 		echo 'box_size= 1000.0' >> $CONFIGFILE
 
-				
+
 				if ($SNAPIDZ_MAPPING == 'True') then
 
 					set INPUTFILENAME_PART1 = `ls $MODEL/*$SNAPID* | head -1 | awk -F$SNAPID '{print $1}'`		
@@ -1921,7 +1922,7 @@ foreach MODEL (`ls -d $PATH_TO_SOFTLINKS/*`)
 						set INPUTFILENAME_PART1 = $key
 					endif
 
-					set INPUTFILENAME_PART2 = ''
+					set INPUTFILENAME_PART2 = 'False'
 				endif				
 
 				#Take care of proper naming SNAPIDZRED.txt files:
@@ -1934,10 +1935,10 @@ foreach MODEL (`ls -d $PATH_TO_SOFTLINKS/*`)
 						echo $SNAPID, $INPUTFILENAME_PART1
 
 					#else if ($SNAPNAME =~ *$CUSTOM_SNAPNAME* ) then
-						#echo 'MDPL: no snapidzred.txt file existing'
-						#set INPUTFILENAME_PART1 = $INPUTFILENAME_PART1 
-						#set INPUTFILENAME_PART2 = `basename $INPUTFILENAME_PART2`
-						#echo $SNAPID, $INPUTFILENAME_PART1
+					#	echo 'MDPL: no snapidzred.txt file existing'
+					#	set INPUTFILENAME_PART1 = $INPUTFILENAME_PART1 
+					#	set INPUTFILENAME_PART2 = `basename $INPUTFILENAME_PART2`
+					#	echo $SNAPID, $INPUTFILENAME_PART1
 
 					else if (-e `ls $PATH_TO_CATALOG$NAME/*.lst`) then
 						cp $PATH_TO_CATALOG$NAME/*.lst $PATH_TO_CATALOG$NAME/snapidzred.txt

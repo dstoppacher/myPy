@@ -21,7 +21,7 @@ echo ' '
 #Set the name of the simulation: e.g. MDPL, Bolshoi, etc.!
 #+++++++++++++++++++++++++++++++++++++++++++
 set simulation_name = 'MDPL2'
-#set simulation_name = 'Gadget3'
+set simulation_name = 'Gadget3'
 
 #Set the number of particles as x for x^3 for total numbers of particles in simulation: e.g. 1504 for EAGLE 1504^3!
 #+++++++++++++++++++++++++++++++++++++++++++
@@ -41,9 +41,10 @@ set IMF = 'Chabrier03'
 
 #Set any note to they output-file!
 #+++++++++++++++++++++++++++++++++++++++++++
-set my_annotation = 'catalog from Patricia crossmatch with them from Yetli'
-#set my_annotation = 'catalog from Yetli with envr'
-set my_annotation = '300 Massive Central Galaxy catalog adding new properties'
+set my_annotation = 'catalog from Patricia (with and without rhalf_gas) crossmatched with them from Yetli with envr info'
+set my_annotation = 'EAGLE data base centrals catalog crossmatched with various from Patricia Yetli Silvio including effective radius of the gas and angular momentum of gas and stars'
+set my_annotation = 'catalog from Yetli with envr'
+set my_annotation = 'EAGLE data base properties crossmatched with Patricia3 - for Silvio - Yetli ev catalogs -- EAGLE-super'
 
 #Select with unit system should be used
 #DS: the system standard units are chosen which are mass [Msun], sfr [Msun/yr], pos [comMpc], mean_age_stars [Gyr]
@@ -57,15 +58,19 @@ set plot_single = False
 set plot_single_mix = False
 set subplots = False
 
-#Should the header of an filtered ASCII-output file be written so that Topcat uses automatically the names to name the columns? name1(1) name2(2)
-set set_header_Topcat_format = 'yes'
 
 #Enter target selection code: e.g. 'CMASS', 'LRG', etc --> name of the subcat (hdf5 or ASCII) you will create with filterData method --> use the same tarsel_code if you want to filter an alrady selected catalog (subfilter)!
 #+++++++++++++++++++++++++++++++++++++++++++
-set tarsel_code_default = ''
-set tarsel_code_default = ''
+set tarsel_code_default = 'REF100_generaltable_z0-header_crossmatched'
+#set tarsel_code_default = 'REF25_generaltable_z0'
+set tarsel_code_default = 'centrals_super_corr_ropt2'
+#set tarsel_code_default = 'tree_roots'
+#set tarsel_code_default = 'tree_roots_history_assembly'
+#set tarsel_code_default = 'centrals_crossmatched_bins_regplot'
+#set tarsel_code_default = ''
+#HF-PaperII_dens6'
 
-set tarsel_code_Galacticus = '300_April2024'
+set tarsel_code_Galacticus = ''
 set tarsel_code_SAG = ''
 set tarsel_code_SAGE = ''
 
@@ -75,13 +80,20 @@ set tarsel_code_SAGE = ''
 set add_tarsel_code = ''
 
 
-set output_filename_code_Galacticus = 'radii+mags'
+set output_filename_code_Galacticus = ''
 set output_filename_code_SAG = ''
 set output_filename_code_SAGE = ''
 
 #NOTE standard: [plot_key]_[catname+boxsize]_z_[redshift(0.2f)].[fileformat]
 #set output_filename_code_default = 'SFH_300_main_cents'
-set output_filename_code_default = 'test'
+#set output_filename_code_default = 'crossmatched_mstar_gt_1e9_existing'
+set output_filename_code_default = 'parents_dens'
+#set output_filename_code_default = 'dens7'
+#set output_filename_code_default = 'super'
+set output_filename_code_default = 'kine'
+
+#Should the header of an filtered ASCII-output file be written so that Topcat uses automatically the names to name the columns? name1(1) name2(2)
+set set_header_Topcat_format = 'yes'
 
 #CHANGE IMF:
 set change_IMF = 'Kroupa_Croton+16'
@@ -90,19 +102,18 @@ set change_IMF = 'False'
 #+++++++++++++++++++++++++++++++++++++++++++
 
 #name of the register you want to write/read data, if default register is not desired! Change 'default' to 'your name'
-set set_register_name = 'default'
+set set_register_name = False
 #++++++++++++++++++++++++++++++++++++++++++
 
 #Set file job-id numbers which should be selected: NOTE: only Galacticus job0-job103==1Snapshot/redshift
 #+++++++++++++++++++++++++++++++++++++++++++
 set start_fileID 	= 0
 set nr_files_snapshot 	= 1
-set end_fileID 	= 100
-#False
+set end_fileID 	= False
 
 #choose a selection name which describes the current selection you want to apply
 #+++++++++++++++++++++++++++++++++++++++++++
-set selection_name = ''
+set selection_name = False
 
 set plot_custom_array = ('')
 
@@ -110,10 +121,10 @@ set plot_custom_array = ('')
 #+++++++++++++++++++++++++++++++++++++++++++
 
 #NOTE: Load subcat=True to load the extracted subcatalogues of the SAM!
-if ($HOME == /home/claudia || $HOME == /home/doriss) then
+if ($HOME == /home/claudia || $HOME == /home/doris) then
 	set HOME_MODE = True
 	set HDF5_read_code = 'HDF5'
-	set load_subcat = True
+	set load_subcat = False
 	set PLOT_CUM = 'False'
 else
 	set HOME_MODE = False
@@ -142,7 +153,7 @@ if ($HOME_MODE == $set_home_mode) then
 	set LOAD_FROM_FILE = 'True'
 
 else
-	set SOFTLINK_CODE = A
+	set SOFTLINK_CODE = E
 	set plot_all = 'False'		
 	set LOAD_FROM_FILE = 'False'
 endif
@@ -186,8 +197,7 @@ if ($HDF5_read_code == 'SAMHDF5' || $HDF5_read_code == 'BINARY_SAGE') then
 		#set MYSNAPS_1Gpc	= '79 75 70 67 65 60 57 52 50 47 45 42 40 38 36 34 32 30 28 26 24 22 20 18 16 14 13 12 11 10 9 8 7 6 5 4 3 2 1'
 
 		#SFH 300
-		set MYSNAPS_1Gpc	= '79'
-# 78 77 76 75 74 73 72 71 70 69 68 67 66 65 64 63 62 61 60 59 58 57 56 55 54 53 52 51 50 49 48 47 46 45 44 43 42 41 40 39 38 37 36 35 34 33 32 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5'
+		set MYSNAPS_1Gpc	= '79 78 77 76 75 74 73 72 71 70 69 68 67 66 65 64 63 62 61 60 59 58 57 56 55 54 53 52 51 50 49 48 47 46 45 44 43 42 41 40 39 38 37 36 35 34 33 32 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5'
 		#all Galacticus
 		#set MYSNAPS_1Gpc	= '59 58 57 56 55'
 # 54 53 52 51 50 49 48 47 46 45 44 43 42 41 40 39 38 37 36 35 34 33 32 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5'
@@ -220,7 +230,7 @@ if ($HDF5_read_code == 'SAMHDF5' || $HDF5_read_code == 'BINARY_SAGE') then
 	endif
 else
 	if ($SOFTLINK_CODE == A) then 
-		set MYSNAPS_1Gpc	= '79'
+		set MYSNAPS_1Gpc	= '29'
 	else if ($SOFTLINK_CODE == B) then 
 		set MYSNAPS_1Gpc	= '121'
 	else if ($SOFTLINK_CODE == I) then 
@@ -593,309 +603,838 @@ set analyse_tarsel_mstar_mhalo	= 0
 
 #99='DO NOT CHOOSE COLUMN', others=col_id
 #COLUMN-CODE IN HALO CATALOGUE
-set halo_nhalos		= 99
-set halo_haloid		= 99
-set halo_hostid		= 99
-set halo_desIndex	= 99
-set halo_nodemass	= 99
-set halo_vmax		= 99
-set halo_rsca		= 99
-set halo_angmom		= 99
-set halo_spin		= 99
+set halo_nhalos		= 999
+set halo_haloid		= 999
+set halo_hostid		= 999
+set halo_desIndex	= 999
+set halo_nodemass	= 999
+set halo_vmax		= 999
+set halo_rsca		= 999
+set halo_angM		= 999
+set halo_spin		= 999
 
-set halo_redshift	= 99
+set halo_redshift	= 999
 
-set halo_x_pos	= 99
-set halo_y_pos	= 99
-set halo_z_pos	= 99
+set halo_x_pos	= 999
+set halo_y_pos	= 999
+set halo_z_pos	= 999
 
-set halo_x_vel	= 99
-set halo_y_vel	= 99
-set halo_z_vel	= 99
+set halo_x_vel	= 999
+set halo_y_vel	= 999
+set halo_z_vel	= 999
 
-set halo_x_vel_disp	= 99
-set halo_y_vel_disp	= 99
-set halo_z_vel_disp	= 99
+set halo_x_vel_disp	= 999
+set halo_y_vel_disp	= 999
+set halo_z_vel_disp	= 999
 
+###############################################################################
+#	IDNUMBERS
+###############################################################################
+
+set haloid		= 1		
+set hostid		= 999
+set galaxyID		= 3
+set jsub 		= 5
+
+set nodeIndex		= 999
+set parentIndex		= 999
+set satelliteNodeIndex	= 999
+set satelliteIndex	= 999
+set siblingIndex	= 999
+
+set fofID		= 0
+set progFofID		= 999
+set mainLeafID		= 999
+set topLeafID		= 999
+set firstProgenitorID	= 999
+set lastProgID		= 999
 
 ###############################################################################
 #	HALOS
 ###############################################################################
+	
+set redshift 		= 999
+	
+set mhalo		= 999
+#only for Galacticus
+set mhalo_sat		= 999
+
+set mhalo_30kpc		= 999
+set mhalo_200c		= 4
+set mhalo_cents		= 999
+set mhalo_cents_200c	= 999
+set mbasic		= 999
+set mbasic_200c		= 999
+set mhalo_fof		= 999
+set mhalo_50kpc		= 999
+set mhalo_70kpc		= 999
 
 #Standard properties
-set ngalaxies		= 99
-set haloid		= 1				
-set hostid		= 99	
-set orphan		= 99				
-set mhalo		= 2
-set mhalo_200c		= 99
-set mhalo_cents		= 99
-set mhalo_cents_200c	= 99
-set mbasic		= 99
-set mbasic_200c		= 99
+set ngalaxies		= 999
+set nsats		= 999
+set nSubhalos		= 999
+set npros		= 999
 
-#300
-set regionName		= 0
+set timeLastIsolated	= 999
+set satelliteMergeTime	= 999
 
-#Environment
-set env_512		= 99
-set env_1024		= 99
-set envr		= 99
+###############################################################################
+#	MERGER
+###############################################################################
 
-#flags
-set pop 				= 99
-set CMASS_sample_key 	= 99
+set lastMerger		= 84
+set lastMinorM		= 999
+set lastMajorM		= 999
+set ratio_lastM 	= 85
 
-set nr_sample_keys	 	= 99
-set flag_CMASS_l		= 99
-set flag_CMASS_h		= 99
-set flag_CMASS_p		= 99
-set flag_CMASS_a		= 99
-set flag_CMASS_r		= 99
-set flag_CMASS_b		= 99
-set flag_CMASS_lz		= 99
-set flag_CMASS_hz		= 99
-set flag_CMASS_lzr		= 99
-set flag_CMASS_hzr		= 99
+###############################################################################
+#	POSITIONS
+###############################################################################
 
-#control samples
-set flag_CMASS_lsm		= 99
-set flag_CMASS_hsm		= 99
-set flag_CMASS_lhm		= 99
-set flag_CMASS_hhm		= 99
-set flag_sample		 	= 99
+set x_pos		= 999
+set y_pos		= 999
+set z_pos		= 999
 
-#only for Galacticus
-set mhalo_sat		= 99
-set nodeIndex		= 99
-set parentIndex		= 99
-set satelliteNodeIndex	= 99
-set satelliteIndex	= 99
-set siblingIndex	= 99
-set satelliteMergeTime	= 99
-set isolated		= 99
-set timeLastIsolated	= 99
-set firstProgenitorID	= 99
-set lastProID		= 99
-set npros		= 99
-set fofID		= 99
-set mainLeafID		= 99
+set x_pos_subhalo		= 7
+set y_pos_subhalo		= 8
+set z_pos_subhalo		= 9
+
+set x_pos_cof		= 999
+set y_pos_cof		= 999
+set z_pos_cof		= 999
+
+
+###############################################################################
+#	STRUCTURE & KINEMATICS
+###############################################################################
+
+set NFW_con		= 13
+
+set x_vel		= 25
+set y_vel		= 26
+set z_vel		= 27
+
+set vmax		= 41
+
+set vbulge		= 999
+set vdisk		= 999
+
+set vpeak		= 999
+set vdisp 		= 999
+set vdisp_30kpc	= 14
+set vdisp_50kpc = 999
+set vdisp_70kpc = 999
+
+set vpec_norm 	= 999
+
+#EAGLE Silvio
+set vdisp_r502D_edgeOn	= 15
+set vdisp_r502D_random	= 999
+set vdisp_2r502D_edgeOn	= 16
+set vdisp_2r502D_random	= 999
+
+set delta_vdisp_edgeOn	= 24
+
+set VvS_r502D_edgeOn	= 17
+set VvS_r502D_random	= 999
+set VvS_2r502D_edgeOn	= 18
+set VvS_2r502D_random	= 999
+
+set delta_VvS_edgeOn	= 69
+
+set ell_r502D_edgeOn	= 19
+set ell_r502D_random	= 999
+set ell_2r502D_edgeOn	= 20
+set ell_2r502D_random	= 999
+
+set Sersic_n = 21
+
+set ell_30kpc_T19 = 10
+set ellDM_30kpc_T19 = 11
+set vdisp_30kpc_T19 = 12
+set Vrot2Vdisp_30kpc_T19 = 89
+set kappaCoRot_30kpc_T19 = 90
+set medOrbCirc_30kpc_T19 = 28
+set triax_30kpc_T19 = 33
+
+set v200c	= 999
+
+###############################################################################
+#	PARTICLES & PARTICLE MASSES
+###############################################################################
 
 #only for hydros
 #number of particles
-set np_disk		= 99
-set np_gas		= 99
-set np_stars		= 99
+set np_disk			= 999
+set np_gas			= 999
+set np_stars			= 999
 
-set lastMinorM		= 99
-set lastMajorM		= 99
+set np_disk_1comma5ropt		= 999
+set np_gas_1comma5ropt		= 999
+set np_stars_1comma5ropt	= 999
 
+#EAGLE total partical masses for different components
+set mPart_DM 	= 999
+set mPart_stars = 999
+set mPart_gas 	= 999
+set mPart_bh 	= 999
 
-#only for SAG and SAGE
-set vmax		= 99
-
-set vbulge		= 99
-set vdisk		= 99
-
-#only for SAG
-set vpeak		= 99
-set NFW_con		= 99
-
-#only Galacticus and SAGE		
-set spinParameter	= 99
-
-#posistion & velocities
-set x_pos		= 3
-set y_pos		= 4
-set z_pos		= 5
-set x_vel		= 99
-set y_vel		= 99
-set z_vel		= 99
+#EAGLE starforming gas
+set mPart_gasSF		= 999
+#EAGLE non-starforming gasmbh
+set mPart_gasNSF		= 999
 
 ###############################################################################
-#	RADII
+#	FLAGS
+###############################################################################
+
+set orphan		= 999
+set isolated		= 999
+
+set flag_SB 				= 999
+set flag_SB_envr			= 999
+set flag_SB_B 				= 999
+set flag_SB_B_new			= 29
+set flag_SB_r 				= 999
+set flag_SFE 				= 999
+set flag_SBplusSFE 			= 999
+set flag_sample 			= 999
+set flag_mstar_bin 			= 999
+set flag_mhalo_bin 			= 999
+set flag_sfe_bin 			= 999
+set flag_age_bin			= 999
+set flag_SHMR_bin			= 999
+
+set flag_t50_st2ha			= 999
+set flag_t50_bh2ha			= 999
+set flag_t50_bh2st			= 999
+
+set flag_t70_st2ha			= 999
+set flag_t70_bh2ha			= 999
+set flag_t70_bh2st			= 999
+
+set flag_tform_halo			= 999
+set flag_tform_stars			= 999
+set flag_tform_bh			= 999
+
+set flag_mhalo				= 999
+set flag_majorM				= 30
+
+set flag_dens				= 999
+set flag_dens3				= 999
+set flag_dens6				= 999
+set flag_dens3b				= 999
+set flag_dens6b				= 999
+set flag_dens3b_new			= 999
+set flag_dens6b_new			= 2
+
+set flag_std_fit_t70_stars		= 999
+set flag_std_fit_t70_halo		= 999
+set flag_std_fit_t70_bh			= 999
+
+set flag_std_fit_t50_stars		= 999
+set flag_std_fit_t50_halo		= 999
+set flag_std_fit_t50_bh			= 999
+
+set flag_use_inter_stars		= 999
+set flag_use_inter_halo			= 999
+set flag_use_inter_bh			= 999
+
+set flag_use_fit_stars			= 999
+set flag_use_fit_halo			= 999
+set flag_use_fit_bh			= 999
+
+###############################################################################
+#	ENVIRONMENT
+###############################################################################
+
+set envr			= 6
+
+#Environment as in VWeb (Cui et al. 2019)
+set env_512			= 999
+set env_1024		= 999
+
+#Densities EAGLE for Silvio
+set sDensity_N10	= 32
+set sDensity_N7		= 999
+set sDensity_N5		= 34
+
+
+###############################################################################
+#	RADII & DIAMETER
 ###############################################################################
 
 #only SAG
-set rhalf_bulge		= 99
-set rhalf_disk		= 99
+set rhalf_bulge		= 999
+set rhalf_disk		= 999
 
 #only SAGE and Galacticus
-set rdisk		= 6
+set rdisk		= 999
 
 #only Galacticus
-set rbulge		= 7
-set rhalf_mass		= 8
+set rbulge			= 999
+set rhalf_mass		= 999
 
-set ropt		= 99
-set r200c		= 99
-set rhalf_stars		= 99
-set rhalf_gas		= 99
 
-set rhotHalo		= 9
+set ropt			= 35
 
+set reff_gas					= 999
+set reff_gas_disk 				= 999
+set reff_gas_1comma5ropt		= 36
+set reff_gas_disk_1comma5ropt 	= 88
+
+set r200c			= 37
+set rhalf_DM		= 999
+set rhalf_DM_2D		= 999
+set rhalf_stars		= 97
+set rhalf_stars_2D	= 999
+set rhalf_stars_30kpc		= 38
+set rhalf_stars_30kpc_2D	= 999
+set rhalf_gas		= 999
+set rhalf_gas_2D	= 999
+set rhalf_bh		= 999
+set rhalf_bh_2D		= 999
+set rhalf_stars_1comma5ropt		= 39
+set rhalf_gas_1comma5ropt		= 999
+
+set Dgas_disk_1comma5ropt		= 999
+
+set rhalf_sfr				= 999
+set rVmax					= 40
+set rcenter2r200c 			= 999
+
+set rVoid					= 42
+set DtoVoidCent 			= 43
 
 ###############################################################################
 #	AGES
 ###############################################################################
 
 #only SAG and SAGE
-set mean_age_stars	= 99
+set mean_age_stars	= 999
 
 #only Galacticus
-set mean_age_stars_disk	= 99
-set age_sfr_int_disk 	= 99
+set mean_age_stars_disk	= 999
+set age_sfr_int_disk 	= 999
 
-set mean_age_stars_spheroid	= 99
-set age_sfr_int_spheroid = 99
+set mean_age_stars_spheroid	= 999
+set age_sfr_int_spheroid = 999
 
+set age_stars_rband_r502D	= 44
+set age_stars_rband_2r502D	= 45
+
+set delta_age_stars_rband	= 91
+
+set z_mean_birth_stars	= 999
+set age_mean_stars		= 999
+
+set t50_stars				= 46
+set t70_stars				= 999
+
+set t50_halo				= 47
+set t70_halo				= 999
+
+set t50_bh					= 48
+set t70_bh					= 999
+
+set t50_curve_fit_stars				= 999
+set t70_curve_fit_stars				= 999
+
+set t50_curve_fit_halo				= 999
+set t70_curve_fit_halo				= 999
+
+set t50_curve_fit_bh					= 999
+set t70_curve_fit_bh					= 999
+
+set t50_cs_fit_stars				= 999
+set t70_cs_fit_stars				= 999
+
+set t50_cs_fit_halo				= 999
+set t70_cs_fit_halo				= 999
+
+set t50_cs_fit_bh					= 999
+set t70_cs_fit_bh					= 999
+
+set t50_stars_std				= 999
+set t70_stars_std				= 999
+
+set t50_halo_std				= 999
+set t70_halo_std				= 999
+
+set t50_bh_std					= 999
+set t70_bh_std					= 999
+
+set tmin_rVmax					= 999
+set tmax_rVmax					= 999
+
+set tmin_angM_stars					= 999
+set tmax_angM_stars					= 999
+
+set tmin_angM_SFgas					= 999
+set tmax_angM_SFgas					= 999
+
+set tmin_angM_NSFgas					= 999
+set tmax_angM_NSFgas					= 999
+
+set tmin_angM_norm_stars					= 999
+set tmax_angM_norm_stars					= 999
+
+set tmin_angM_norm_SFgas					= 999
+set tmax_angM_norm_SFgas					= 999
+
+set tmin_angM_norm_NSFgas					= 999
+set tmax_angM_norm_NSFgas					= 999
+
+set tmin_sfr					= 999
+set tmax_sfr					= 999
+
+set tmin_ssfr					= 999
+set tmax_ssfr					= 999
+
+set tmin_bh_acc_rate					= 999
+set tmax_bh_acc_rate					= 999
+
+set tmin_vmax					= 999
+set tmax_vmax					= 999
+
+set tmin_vdisp					= 999
+set tmax_vdisp					= 999
+
+set tmin_mgas					= 999
+set tmax_mgas					= 999
+
+set tmin_SHMR					= 999
+set tmax_SHMR					= 999
+
+set tmin_mgas_SF					= 999
+set tmax_mgas_SF					= 999
+
+set tmin_mgas_NSF					= 999
+set tmax_mgas_NSF					= 999
+
+set tmin_vel					= 999
+set tmax_vel					= 999
+
+set tmin_age					= 999
+set tmax_age					= 999
+
+###############################################################################
+#	DELTAS
+###############################################################################
+
+set delta_tform_stars	= 999
+set delta_tform_halo	= 999
+set delta_tform_bh		= 999
+
+set delta_tform_curve_fit_stars		= 999
+set delta_tform_curve_fit_halo		= 999
+set delta_tform_curve_fit_bh		= 999
+
+set delta_tform_cs_fit_stars	= 999
+set delta_tform_cs_fit_halo		= 999
+set delta_tform_cs_fit_bh		= 999
+
+set delta_tvar_bh_acc_rate		= 999
+set delta_tvar_rVmax			= 999
+set delta_tvar_angM_stars		= 999
+set delta_tvar_angM_SFgas		= 999
+set delta_tvar_angM_NSFgas		= 999
+set delta_tvar_angM_norm_stars		= 999
+set delta_tvar_angM_norm_SFgas		= 999
+set delta_tvar_angM_norm_NSFgas		= 999
+set delta_tvar_sfr	= 999
+set delta_tvar_ssfr	= 999
+set delta_tvar_vmax	= 999
+set delta_tvar_vdisp	= 999
+set delta_tvar_mgas_SF	= 999
+set delta_tvar_mgas_NSF	= 999
+set delta_tvar_mgas	= 999
+set delta_tvar_SHMR	= 999
+set delta_tvar_vel	= 999
+set delta_tvar_age	= 999
+
+set delta_t50				= 999
+
+set delta_t50_st2ha			= 999
+set delta_t50_bh2ha			= 999
+set delta_t50_bh2st			= 999
+
+set delta_t70_st2ha			= 999
+set delta_t70_bh2ha			= 999
+set delta_t70_bh2st			= 999
+
+set delta_inter_fit_t50_stars		= 999
+set delta_inter_fit_t50_halo		= 999
+set delta_inter_fit_t50_bh			= 999
+
+set delta_inter_fit_t70_stars		= 999
+set delta_inter_fit_t70_halo		= 999
+set delta_inter_fit_t70_bh			= 999
+
+set nr_strikes_stars				= 999
+set nr_strikes_halo					= 999
+set nr_strikes_bh					= 999
+
+###############################################################################
+#	ENERGIES
+###############################################################################
+
+set Etot		= 999
+set Ekin		= 999
+set Emech		= 999
+set Etherm_gas	= 999
+
+set Etot_gasSF		= 999
+set Ekin_gasSF		= 999
+set Etherm_gasSF 	= 999
+
+set Etot_gasNSF		= 999
+set Ekin_gasNSF		= 999
+set Etherm_gasNSF 	= 999
 
 ###############################################################################
 #	ANGULAR MOMENTA
 ###############################################################################
 
-set angM_disk		= 99
-set angM_spheroid	= 99
+set angM_disk		= 999
+set angM_spheroid	= 999
 
-set angM_hotHalo	= 99
-set angM_outflowHotHalo	= 99
+set angM_stars		= 999
+set angM_SFgas		= 999
+set angM_NSFgas		= 999
+
+#normalised
+set angM_norm_1comma5ropt_stars	= 49
+set angM_norm_1comma5ropt_gas	= 50
+set angM_norm_1comma5ropt_bar	= 999
+
+set angM_norm_stars		= 999
+set angM_norm_SFgas		= 999
+set angM_norm_NSFgas	= 999
 
 
-set jbar	= 99
-set jdisk	= 99
-set jbulge	= 99
+###############################################################################
+#	SPIN 
+###############################################################################
 
-set jhotHalo	= 99
-set joutHotHalo	= 99
+#EAGLE total gas in particles
+set spinGas_x = 999
+set spinGas_y = 999
+set spinGas_z = 999
 
+#EAGLE starforming gas
+set spinGasSF_x = 999
+set spinGasSF_y = 999
+set spinGasSF_z = 999
+
+#EAGLE non-starforming gas
+set spinGasNSF_x = 999
+set spinGasNSF_y = 999
+set spinGasNSF_z = 999
+
+#EAGLE total stars in particles
+set spinStars_x = 999
+set spinStars_y = 999
+set spinStars_z = 999
+
+#only Galacticus and SAGE		
+set spinParameter	= 999
+
+#EAGLE stellar
+set lambda_r502D_edgeOn	= 54
+set lambda_r502D_random	= 999
+
+set lambda_2r502D_edgeOn	= 55
+set lambda_2r502D_random	= 999
+
+set delta_lambda_edgeOn		= 56
+set delta_lambda_random		= 999
 
 ###############################################################################
 #	BLACK HOLES
 ###############################################################################
 
-set mbh			= 99
-set bhcount		= 99
-set bheff		= 99
-set bh_acc_rate		= 99
+set mbh			= 57
+set bhcount		= 999
+set bheff		= 999
+set bh_acc_rate		= 999
 
 ###############################################################################
 #	STELLAR
 ###############################################################################
 
-set mstar_spheroid	= 99
-set mstar_disk		= 99
-set mstar		= 10
-set mstar_alt		= 99
+set mstar_spheroid	= 999
+set mstar_disk		= 999
+set mstar		= 999
 
-set BvT			= 99
-set DvT_stars		= 99
-set DvT_stars_alt	= 99
-set DvT_gas		= 99
+set mstar_30kpc 	= 58
+set mstar_50kpc		= 999
+set mstar_70kpc		= 999
 
-set mstar_IC		= 99
-set mstarPlusIC		= 99
+set mstar_1comma5ropt 	= 59
+set mstar_half_reff_gas_disk 	= 99
+set mstar_birth 	= 99
 
-set SHMR			= 99
+set BvT				= 999
+set BvT_Lagos17b	= 61
+set DvT_stars		= 999
+set DvT_stars_alt	= 999
+set DvT_gas			= 999
+set DvT_30kpc_T19	= 96
+
+set DvT_stars_c0comma4		= 999
+set DvT_stars_c0comma5		= 999
+set DvT_gas_c0comma4		= 999
+set DvT_gas_c0comma5		= 999
+
+set DvT_stars_c0comma4_1comma5ropt		= 999
+set DvT_stars_c0comma5_1comma5ropt		= 62
+set DvT_gas_c0comma4_1comma5ropt		= 999
+set DvT_gas_c0comma5_1comma5ropt		= 63
+
+set mstar_IC		= 999
+set mstarPlusIC		= 999
+
+set SHMR 			 = 999
+set SHMR_30kpc 		 = 64
+set SHMR_1comma5ropt = 65
+
+###############################################################################
+#	SURFACE DENSITIES & BRIGHTNESSES
+###############################################################################
+
+#Surface Densities
+#----------------------------------------
+
+set Sigma_gas_1comma5ropt			= 51
+set Sigma_gas_reff_1comma5ropt		= 102
+set Sigma_gas_reff_disk_1comma5ropt	= 60
+set Sigma_stars_1comma5ropt		= 52
+set Sigma_stars_30kpc			= 101
+set Sigma_sfr_1comma5ropt		= 53
+set Sigma_sfr_30kpc				= 98
+
+set Sigma_HI_30kpc				= 99
+set Sigma_H2_30kpc				= 100
+set Sigma_HIH2_30kpc			= 83
+
+#star formation efficiency
+#----------------------------------------
+
+set sfe_gas_reff_disk_1comma5ropt	= 106
+set sfe_gas_reff_1comma5ropt		= 107
+set sfe_gas_1comma5ropt				= 103
+set sfe_HI_30kpc					= 104
+set sfe_HIH2_30kpc					= 105
+
+#Surface Brightnesses
+#----------------------------------------
+
+set SB_mu_eff_gas_disk_B			= 999
+set SB_mu_ropt_B					= 999
+set SB_mu_1comma5ropt_B				= 66
+set SB_mu_corr_ropt_B				= 67
+set SB_mu_eff_stars_1comma5ropt_B	= 999
+set SB_mu_eff_stars_30kpc_B			= 999
+
+set SB_mu_eff_gas_disk_r			= 999
+set SB_mu_opt_r						= 999
+set SB_mu_eff_stars_1comma5ropt_r	= 999
+set SB_mu_eff_stars_30kpc_r			= 999
+
+set SB_mu_eff_gas_disk_V			= 999
+set SB_mu_opt_V						= 999
+set SB_mu_eff_stars_1comma5ropt_V	= 999
+set SB_mu_eff_stars_30kpc_V			= 999
+
+set SB_mu_eff_gas_disk_g			= 999
+set SB_mu_opt_g						= 999
+set SB_mu_eff_stars_1comma5ropt_g	= 999
+set SB_mu_eff_stars_30kpc_g			= 999
 
 ###############################################################################
 #	MASSES OF GAS
 ###############################################################################
 
-set mcold_disk		= 99
+#Masses of gas
+#----------------------------------------
+set Mgas_disk		= 999
+
+#only SAG and Galacticus
+set Mgas_spheroid	= 999
+set Mgas		= 999
+
+#only hydros
+set Mgas_HI		= 999
+set Mgas_H2		= 999
+
+set Mgas_HI_60kpc_GK11		= 999
+set Mgas_H2_60kpc_GK11		= 999
+
+set Mgas_HI_60kpc_K13		= 999
+set Mgas_H2_60kpc_K13		= 999
+
+set Mgas_HI_30kpc_GK11		= 93
+set Mgas_H2_30kpc_GK11		= 94
+set Mgas_HIH2_30kpc_GK11	= 95
+
+set Mgas_HI_30kpc_K13		= 999
+set Mgas_H2_30kpc_K13		= 999
+
+set mcold_disk		= 999
 
 #only Galacitcus and SAG
-set mcold_spheroid	= 99
-set mcold		= 99
+set mcold_spheroid	= 999
+set mcold		= 999
 
-set mhot		= 99
-set mhot_outflow		= 99
+set mhot		= 999
+
+set mgas_30kpc		= 70
+set mgas_50kpc		= 999
+set mgas_70kpc		= 999
+
+set mgas_1comma5ropt 	= 71
+set mgas_half_reff_gas_disk	= 999
+
+set mgas_SF_30kpc		= 999
+set mgas_SF		= 999
+set mgas_NSF		= 999
 
 
 ###############################################################################
 #	STAR FORMATION
 ###############################################################################
 
-set sfr_spheroid	= 99
-set sfr_disk		= 99
-set sfr			= 11
-set ssfr		= 99
+set sfr_spheroid	= 999
+set sfr_disk		= 999
+set sfr			= 999
+set ssfr		= 999
 
-set sfr_int_disk	= 99
-set sfr_int_spheroid	= 99
+set sfr_total	= 87
+set sfr_30kpc	= 72
+set ssfr_30kpc 	= 73
+set sfr_50kpc	= 999
+set sfr_70kpc	= 999
+set sfr_1comma5ropt	= 74
+set ssfr_1comma5ropt = 75
 
-set sfr_int_quies	= 99
-set sfr_int_gas		= 99
+set sfr_int_disk	= 999
+set sfr_int_spheroid	= 999
+
+set sfr_int_quies	= 999
+set sfr_gasSF		= 999
+set ssfr_gasSF		= 999
 
 
 ###############################################################################
 #	METALLICITIES & MASSES OF METALS
 ###############################################################################
 
-#Masses of metals
-#----------------------------------------
-set Mzgas_disk		= 99
-
-#only SAG and Galacticus
-set Mzgas_spheroid	= 99
-set Mzgas			= 99
-
-#only hydros
-set Mzgas_HI		= 99
-set Mzgas_HII		= 99
-
 #only SAG and SAGE
-set Mzstar_spheroid	= 99
-set Mzstar_disk		= 99
-set Mzstar			= 99
-set Mzhot_halo		= 99
-set Mzhot_outflowHalo	= 99
+set Mzstar_spheroid	= 999
+set Mzstar_disk		= 999
+set Mzstar			= 999
+set Mzhot_halo		= 999
 
 #only SAG
-set OH_gas_disk		= 99
-set OH_gas_bulge	= 99
-set OH_gas_disk_bulge	= 99
+set OH_gas_disk			= 999
+set OH_gas_bulge		= 999
+set OH_gas_disk_bulge	= 999
 
 #metallicities / abundances
 #----------------------------------------
 #only Galacticus
-set zgas_spheroid	= 99
+set zgas_spheroid	= 999
 
 #only Galacticus and SAGE
-set zgas_disk		= 99
-set zcold			= 99
+set zgas_disk		= 999
+set zcold			= 999
+
+#EAGLE starforming gas
+set zgasSF_H		= 999
+set zgasSF_O		= 999
+set zgasSF_N		= 999
+
+set OH_gas_30kpc	= 86
+
+set metalfrac_SF 	= 999
+
+set zcold_gasSF		= 999
+set z_grad			= 999
+
+#EAGLE non-starforming gas
+set zgasNSF_H		= 999
+set zgasNSF_O		= 999
+set zgasNSF_N		= 999
+set metalfrac_NSF 	= 999
 
 #only Galacticus			 
-set zstar_spheroid	= 99
-set zstar_disk		= 99
-set zstar			= 99
-
-set zhot_halo		= 99
-
-set zcold_zstar		= 99
+set zstar_spheroid	= 999
+set zstar_disk		= 999
+set zhot_halo		= 999
 
 ###############################################################################
 #	OBSERVATIONS
 ###############################################################################
 
-set DEC			= 99
-set RA			= 99
-set Z			= 99
-set age			= 99
-set weight_tot		= 99
+set DEC			= 999
+set RA			= 999
+set Z			= 999
+set age			= 999
+set weight_tot	= 999
 
 ###############################################################################
 #	OTHER PROPERTIES
 ###############################################################################
 
 #Gas depletion time mcold/sfr
-set Tcons		= 99
+set Tcons					= 999
+set Tcons_30kpc				= 22
+set Tcons_1comma5ropt		= 999
+set Tcons_HI_30kpc			= 999
+set Tcons_HIH2_30kpc		= 999
+set Tcons_gasSF				= 999
 
 #cold gas fraction mcold/mstar
-set cgf			= 99
+set cgf					= 999
+set cgf_30kpc			= 999
+set cgf_HI_30kpc		= 999
+set cgf_HIH2_30kpc		= 23
+set cgf_1comma5ropt		= 999
+set cgf_gasSF			= 999
 
-#total mass of the baryon: mstar+mcold
-set fbar		= 99
+#total baryon fraction: mcold/(mstar+mcold)
+set fbar				= 999
+set fbar_30kpc			= 68
+set fbar_1comma5ropt	= 999
+set fbar_HI_30kpc		= 999
+set fbar_HIH2_30kpc		= 999
+set fbar_gasSF			= 999
 
+#atomic gas fraction according to Rosas-Guevara+22 (page 5) and Obreschkow+16
+set fatom_30kpc_GK11	= 31
+set fmol_30kpc_GK11		= 92
+
+###############################################################################
+#	LAST TIME CENTRAL (ltc) PROPERTIES
+###############################################################################
+
+set lastTimeCentral = 999
+
+set mstar_ltc	= 999
+set sfr_ltc		= 999
+set ssfr_ltc	= 999
+
+set VvS_r502D_edgeOn_ltc	= 999
+set VvS_r502D_random_ltc	= 999
+set VvS_2r502D_edgeOn_ltc	= 999
+set VvS_2r502D_random_ltc	= 999
+
+set lambda_r502D_random_ltc	= 999
+set lambda_2r502D_random_ltc	= 999
+
+set angM_r502D_random_ltc	= 999
+set angM_2r502D_random_ltc	= 999
 
 ###############################################################################
 #	LUMINOSITIES, FLUXES & MAGNITUDES
@@ -903,166 +1442,217 @@ set fbar		= 99
 
 #Luminosities
 #----------------------------------------
-set L_SDSS_spheroid_u	= 99
-set L_SDSS_spheroid_g	= 99
-set L_SDSS_spheroid_r	= 99
-set L_SDSS_spheroid_i	= 99
-set L_SDSS_spheroid_z	= 99
 
-set L_SDSS_dA_spheroid_u	= 99
-set L_SDSS_dA_spheroid_g	= 99
-set L_SDSS_dA_spheroid_r	= 99
-set L_SDSS_dA_spheroid_i	= 99
-set L_SDSS_dA_spheroid_z	= 99
+set L_bolo				= 999
 
-set L_SDSS_disk_u	= 99
-set L_SDSS_disk_g	= 99
-set L_SDSS_disk_r	= 99
-set L_SDSS_disk_i	= 99
-set L_SDSS_disk_z	= 99
+set L_SDSS_spheroid_u	= 999
+set L_SDSS_spheroid_g	= 999
+set L_SDSS_spheroid_r	= 999
+set L_SDSS_spheroid_i	= 999
+set L_SDSS_spheroid_z	= 999
 
-set L_SDSS_dA_disk_u	= 99
-set L_SDSS_dA_disk_g	= 99
-set L_SDSS_dA_disk_r	= 99
-set L_SDSS_dA_disk_i	= 99
-set L_SDSS_dA_disk_z	= 99
+set L_SDSS_dA_spheroid_u	= 999
+set L_SDSS_dA_spheroid_g	= 999
+set L_SDSS_dA_spheroid_r	= 999
+set L_SDSS_dA_spheroid_i	= 999
+set L_SDSS_dA_spheroid_z	= 999
 
-set L_SDSS_u	= 99
-set L_SDSS_g	= 99
-set L_SDSS_r	= 99
-set L_SDSS_i	= 99
-set L_SDSS_z	= 99
+set L_SDSS_disk_u	= 999
+set L_SDSS_disk_g	= 999
+set L_SDSS_disk_r	= 999
+set L_SDSS_disk_i	= 999
+set L_SDSS_disk_z	= 999
 
-set L_SDSS_dA_u	= 99
-set L_SDSS_dA_g	= 99
-set L_SDSS_dA_r	= 99
-set L_SDSS_dA_i	= 99
-set L_SDSS_dA_z	= 99
+set L_SDSS_dA_disk_u	= 999
+set L_SDSS_dA_disk_g	= 999
+set L_SDSS_dA_disk_r	= 999
+set L_SDSS_dA_disk_i	= 999
+set L_SDSS_dA_disk_z	= 999
 
-set L_SDSS_dA_total_u	= 99
-set L_SDSS_dA_total_g	= 99
-set L_SDSS_dA_total_r	= 99
-set L_SDSS_dA_total_i	= 99
-set L_SDSS_dA_total_z	= 99
+set L_SDSS_u	= 999
+set L_SDSS_g	= 999
+set L_SDSS_r	= 999
+set L_SDSS_i	= 999
+set L_SDSS_z	= 999
+
+set L_SDSS_dA_u	= 999
+set L_SDSS_dA_g	= 999
+set L_SDSS_dA_r	= 999
+set L_SDSS_dA_i	= 999
+set L_SDSS_dA_z	= 999
+
+set L_SDSS_dA_total_u	= 999
+set L_SDSS_dA_total_g	= 999
+set L_SDSS_dA_total_r	= 999
+set L_SDSS_dA_total_i	= 999
+set L_SDSS_dA_total_z	= 999
+
+#Fluxes Standard
 #----------------------------------------
+
+set F_dA_SDSS_u				= 999
+set F_dA_SDSS_g				= 999
+set F_dA_SDSS_r				= 999
+set F_dA_SDSS_i				= 999
+set F_dA_SDSS_z				= 999
+
+set F_dA_Johnson_U				= 999
+set F_dA_Johnson_B				= 999
+set F_dA_Johnson_V				= 999
+set F_dA_Johnson_R				= 999
+
 
 #Magnitudes Standard
 #----------------------------------------
-set mAB_dA_total_u	= 99
-set mAB_dA_total_g	= 99
-set mAB_dA_total_r	= 99
-set mAB_dA_total_i	= 99
-set mAB_dA_total_z	= 99
+set mAB_dA_SDSS_u	= 999
+set mAB_dA_SDSS_g	= 999
+set mAB_dA_SDSS_r	= 999
+set mAB_dA_SDSS_i	= 999
+set mAB_dA_SDSS_z	= 999
 
-set MAB_dA_total_u	= 99
-set MAB_dA_total_g	= 12
-set MAB_dA_total_r	= 13
-set MAB_dA_total_i	= 14
-set MAB_dA_total_z	= 99
+set mAB_dA_Johnson_U	= 999
+set mAB_dA_Johnson_B	= 999
+set mAB_dA_Johnson_V	= 999
+set mAB_dA_Johnson_R	= 999
 
-set Mag_dA_total_B	= 99
+set mAB_SDSS_u	= 999
+set mAB_SDSS_g	= 999
+set mAB_SDSS_r	= 999
+set mAB_SDSS_i	= 999
+set mAB_SDSS_z	= 999
 
-set MAB_total_u		= 99
-set MAB_total_g		= 99
-set MAB_total_r		= 99
-set MAB_total_i		= 99
-set MAB_total_z		= 99
+set mAB_Johnson_U	= 999
+set mAB_Johnson_B	= 999
+set mAB_Johnson_V	= 999
+set mAB_Johnson_R	= 999
+
+#------------------------------------------
+
+set MAB_SDSS_u		= 999
+set MAB_SDSS_g		= 999
+set MAB_SDSS_r		= 999
+set MAB_SDSS_i		= 999
+set MAB_SDSS_z		= 999
+
+set MAB_dA_SDSS_u	= 999
+set MAB_dA_SDSS_g	= 76
+set MAB_dA_SDSS_r	= 77
+set MAB_dA_SDSS_i	= 78
+set MAB_dA_SDSS_z	= 999
+
+set MAB_Johnson_U	= 999
+set MAB_Johnson_B	= 999
+set MAB_Johnson_V	= 999
+set MAB_Johnson_R	= 999
+
+set MAB_dA_Johnson_U	= 999
+set MAB_dA_Johnson_B	= 79
+set MAB_dA_Johnson_V	= 80
+set MAB_dA_Johnson_R	= 999
 #----------------------------------------
 
 #Further Magnitudes
 #----------------------------------------
-set mag_u		= 99
-set mag_g		= 99
-set mag_r		= 99
-set mag_i		= 99
-set mag_z		= 99
+set mag_u		= 999
+set mag_g		= 999
+set mag_r		= 999
+set mag_i		= 999
+set mag_z		= 999
 
-set mAB_u		= 99
-set mAB_g		= 99
-set mAB_r		= 99
-set mAB_i		= 99
-set mAB_z		= 99
+set mAB_u		= 999
+set mAB_g		= 999
+set mAB_r		= 999
+set mAB_i		= 999
+set mAB_z		= 999
 
-set mAB_total_u		= 99
-set mAB_total_g		= 99
-set mAB_total_r		= 99
-set mAB_total_i		= 99
-set mAB_total_z		= 99
+set MAB_total_u		= 999
+set MAB_total_g		= 999
+set MAB_total_r		= 999
+set MAB_total_i		= 999
+set MAB_total_z		= 999
 
-set mAB_u	= 99
-set mAB_g	= 99
-set mAB_r	= 99
-set mAB_i	= 99
-set mAB_z	= 99
+set mAB_total_u		= 999
+set mAB_total_g		= 999
+set mAB_total_r		= 999
+set mAB_total_i		= 999
+set mAB_total_z		= 999
 
-set mAB_dA_u		= 99
-set mAB_dA_g		= 99
-set mAB_dA_r		= 99
-set mAB_dA_i		= 99
-set mAB_dA_z		= 99
+set mAB_u	= 999
+set mAB_g	= 999
+set mAB_r	= 999
+set mAB_i	= 999
+set mAB_z	= 999
 
-set mAs_u	= 99
-set mAs_g	= 99
-set mAs_r	= 99
-set mAs_i	= 99
-set mAs_z	= 99
+set mAB_dA_u		= 999
+set mAB_dA_g		= 999
+set mAB_dA_r		= 999
+set mAB_dA_i		= 999
+set mAB_dA_z		= 999
 
-set mAs_dA_u		= 99
-set mAs_dA_g		= 99
-set mAs_dA_r		= 99
-set mAs_dA_i		= 99
-set mAs_dA_z		= 99
+set mAs_u	= 999
+set mAs_g	= 999
+set mAs_r	= 999
+set mAs_i	= 999
+set mAs_z	= 999
 
-set mAs_dA_total_u		= 99
-set mAs_dA_total_g		= 99
-set mAs_dA_total_r		= 99
-set mAs_dA_total_i		= 99
-set mAs_dA_total_z		= 99
+set mAs_dA_u		= 999
+set mAs_dA_g		= 999
+set mAs_dA_r		= 999
+set mAs_dA_i		= 999
+set mAs_dA_z		= 999
+
+set mAs_dA_total_u		= 999
+set mAs_dA_total_g		= 999
+set mAs_dA_total_r		= 999
+set mAs_dA_total_i		= 999
+set mAs_dA_total_z		= 999
 #----------------------------------------
 
 #Target selection cuts
 #----------------------------------------
-set mAB_total_cut_r_i	= 99
-set mAB_total_cut_g_r	= 99
-set mAB_total_cut_g_i	= 99
-set mAB_total_cut_dmesa	= 99
-set mAB_total_cut_i_lt_dmesa	= 99
+set mAB_total_cut_r_i	= 999
+set mAB_total_cut_g_r	= 999
+set mAB_total_cut_g_i	= 999
+set mAB_total_cut_dmesa	= 999
+set mAB_total_cut_i_lt_dmesa	= 999
 
-set mAB_dA_total_cut_r_i	= 15
-set mAB_dA_total_cut_g_r	= 16
-set mAB_dA_total_cut_g_i	= 17
-set mAB_dA_total_cut_u_g	= 99
-set mAB_dA_total_cut_u_i	= 99
-set mAB_dA_total_cut_i_z	= 99
+set mAB_dA_total_cut_r_i	= 81
+set mAB_dA_total_cut_g_r	= 999
+set mAB_dA_total_cut_g_i	= 999
+set mAB_dA_total_cut_u_g	= 999
+set mAB_dA_total_cut_u_i	= 999
+set mAB_dA_total_cut_i_z	= 999
 
-set mAB_dA_total_cut_dmesa	= 99
-set mAB_dA_total_cut_i_lt_dmesa	= 99
-set mAB_dA_total_cut_i_lt_dmesa_sparse	= 99
+set mAB_dA_total_cut_B_V	= 82
 
-set mAB_dA_total_cut_cmesa	= 99
-set mAB_dA_total_cut_cpar	= 99
-set mAB_dA_total_cut_r_lt_cpar	= 99
+set mAB_dA_total_cut_dmesa	= 999
+set mAB_dA_total_cut_i_lt_dmesa	= 999
+set mAB_dA_total_cut_i_lt_dmesa_sparse	= 999
 
-set mAs_dA_total_cut_r_i	= 99
-set mAs_dA_total_cut_dmesa	= 99
-set mAs_dA_total_cut_g_r	= 99
-set mAs_dA_total_cut_i_lt_dmesa	= 99
+set mAB_dA_total_cut_cmesa	= 999
+set mAB_dA_total_cut_cpar	= 999
+set mAB_dA_total_cut_r_lt_cpar	= 999
+
+set mAs_dA_total_cut_r_i	= 999
+set mAs_dA_total_cut_dmesa	= 999
+set mAs_dA_total_cut_g_r	= 999
+set mAs_dA_total_cut_i_lt_dmesa	= 999
 #----------------------------------------
 
 #Emission lines
 #----------------------------------------
-set OII_3727_ext	= 99
-set OII_3727		= 99
-set OII_3729_ext	= 99
-set OII_3729		= 99
+set OII_3727_ext	= 999
+set OII_3727		= 999
+set OII_3729_ext	= 999
+set OII_3729		= 999
 #----------------------------------------
 
 #Continuum Emission lines
 #----------------------------------------
-set OII_cont_3727_ext	= 99
-set OII_cont_3727	= 99
-set OII_cont_3729_ext	= 99
-set OII_cont_3729	= 99
+set OII_cont_3727_ext	= 999
+set OII_cont_3727	= 999
+set OII_cont_3729_ext	= 999
+set OII_cont_3729	= 999
 
 
 #DON'T TOUCH BEYOND THIS LINE!!!!!
@@ -1115,13 +1705,13 @@ set method_array = ($plotXY $plotOnly $filterData $analyseTargetSelection $SMF $
 #	GENERATE FILTER AND CUT VALUE FILE 	"CUT_CONDS"		#
 #########################################################################
 
-set halo_col_name_array = (halo_nhalos halo_haloid halo_hostid halo_desIndex halo_nodemass halo_vmax halo_rsca halo_angmom halo_spin halo_redshift halo_x_pos halo_y_pos halo_z_pos halo_x_vel halo_y_vel halo_z_vel halo_x_vel_disp halo_y_vel_disp halo_z_vel_disp)
+set halo_col_name_array = (halo_nhalos halo_haloid halo_hostid halo_desIndex halo_nodemass halo_vmax halo_rsca halo_angM halo_spin halo_redshift halo_x_pos halo_y_pos halo_z_pos halo_x_vel halo_y_vel halo_z_vel halo_x_vel_disp halo_y_vel_disp halo_z_vel_disp)
 
-set halo_col_array = ($halo_nhalos $halo_haloid $halo_hostid $halo_desIndex $halo_nodemass $halo_vmax $halo_rsca $halo_angmom $halo_spin $halo_redshift $halo_x_pos $halo_y_pos $halo_z_pos $halo_x_vel $halo_y_vel $halo_z_vel $halo_x_vel_disp $halo_y_vel_disp $halo_z_vel_disp)
+set halo_col_array = ($halo_nhalos $halo_haloid $halo_hostid $halo_desIndex $halo_nodemass $halo_vmax $halo_rsca $halo_angM $halo_spin $halo_redshift $halo_x_pos $halo_y_pos $halo_z_pos $halo_x_vel $halo_y_vel $halo_z_vel $halo_x_vel_disp $halo_y_vel_disp $halo_z_vel_disp)
 
-set col_name_array = (ngalaxies haloid hostid satelliteNodeIndex parentIndex orphan mhalo vmax vpeak spinParameter NFW_con zgas_spheroid zgas_disk zstar_disk zstar_spheroid zhot_halo mcold_spheroid mcold_disk mcold mbh mstar_spheroid mstar_disk mstar mhot Mzgas_spheroid Mzgas_disk Mzgas Mzstar_spheroid Mzstar_disk Mzstar Mzhot_halo sfr_spheroid sfr_disk sfr x_pos y_pos z_pos x_vel y_vel z_vel L_SDSS_spheroid_u L_SDSS_spheroid_g L_SDSS_spheroid_r L_SDSS_spheroid_i L_SDSS_spheroid_z L_SDSS_dA_spheroid_u L_SDSS_dA_spheroid_g L_SDSS_dA_spheroid_r L_SDSS_dA_spheroid_i L_SDSS_dA_spheroid_z L_SDSS_disk_u L_SDSS_disk_g L_SDSS_disk_r L_SDSS_disk_i L_SDSS_disk_z L_SDSS_dA_disk_u L_SDSS_dA_disk_g L_SDSS_dA_disk_r L_SDSS_dA_disk_i L_SDSS_dA_disk_z L_SDSS_u L_SDSS_g L_SDSS_r L_SDSS_i L_SDSS_z L_SDSS_dA_u L_SDSS_dA_g L_SDSS_dA_r L_SDSS_dA_i L_SDSS_dA_z L_SDSS_dA_total_u L_SDSS_dA_total_g L_SDSS_dA_total_r L_SDSS_dA_total_i L_SDSS_dA_total_z mag_u mag_g mag_r mag_i mag_z mAB_u mAB_g mAB_r mAB_i mAB_z mAB_total_u mAB_total_g mAB_total_r mAB_total_i mAB_total_z mAB_dA_u mAB_dA_g mAB_dA_r mAB_dA_i mAB_dA_z mAB_dA_total_u mAB_dA_total_g mAB_dA_total_r mAB_dA_total_i mAB_dA_total_z MAB_dA_total_u MAB_dA_total_g MAB_dA_total_r MAB_dA_total_i MAB_dA_total_z MAB_total_u MAB_total_g MAB_total_r MAB_total_i MAB_total_z mAs_u mAs_g mAs_r mAs_i mAs_z mAs_dA_u mAs_dA_g mAs_dA_r mAs_dA_i mAs_dA_z mAs_dA_total_u mAs_dA_total_g mAs_dA_total_r mAs_dA_total_i mAs_dA_total_z mAB_total_cut_r_i mAB_total_cut_dmesa mAB_total_cut_g_r mAB_total_cut_i_lt_dmesa 'mAB_dA_total_cut_r_i' 'mAB_dA_total_cut_g_r' 'mAB_dA_total_cut_g_i' 'mAB_dA_total_cut_u_g' 'mAB_dA_total_cut_u_i' 'mAB_dA_total_cut_i_z' mAB_dA_total_cut_dmesa mAB_dA_total_cut_cmesa mAB_dA_total_cut_cpar mAB_dA_total_cut_i_lt_dmesa mAB_dA_total_cut_i_lt_dmesa_sparse mAB_dA_total_cut_r_lt_cpar mAs_dA_total_cut_r_i mAs_dA_total_cut_dmesa mAs_dA_total_cut_g_r mAs_dA_total_cut_i_lt_dmesa RA DEC Z age mean_age_stars mhalo_sat OH_gas_disk OH_gas_bulge OH_gas_disk_bulge weight_tot OII_3727_ext OII_3727 OII_3729_ext OII_3729 nodeIndex satelliteIndex siblingIndex satelliteMergeTime isolated timeLastIsolated firstProgenitorID npros Mag_dA_total_B rhalf_bulge rhalf_disk rbulge rdisk rhalf_mass mstar_IC OII_cont_3727_ext OII_cont_3727 OII_cont_3729_ext OII_cont_3729 sfr_int_spheroid sfr_quies_int mhalo_200c mbasic mbasic_200c mhalo_cents_200c mhalo_cents 'mstar+IC' ssfr env_512 env_1024 zcold lastProID mainLeafID fofID bhcount vbulge vdisk age_sfr_int_disk sfr_int_disk sfr_int_spheroid age_sfr_int_spheroid sfr_int_spheroid mean_age_stars_disk mean_age_stars_spheroid cgf angM_spheroid angM_disk Tcons fbar bheff BvT Mzgas_HI Mzgas_HII envr lastMinorM lastMajorM DvT_stars DvT_stars_alt DvT_gas np_stars np_gas np_disk ropt rhalf_stars r200c sfr_int_gas bh_acc_rate mstar_alt mAB_total_cut_g_i rhalf_gas pop CMASS_sample_key SHMR nr_sample_keys flag_CMASS_l flag_CMASS_h flag_CMASS_p flag_CMASS_a flag_CMASS_r flag_CMASS_b flag_CMASS_lz flag_CMASS_hz flag_CMASS_lzr flag_CMASS_hzr zcold_zstar zstar flag_sample flag_CMASS_lsm flag_CMASS_hsm flag_CMASS_lhm flag_CMASS_hhm jbar jdisk jbulge rhotHalo angM_outflowHotHalo regionName joutHotHalo mhot_outflow jhotHalo angM_hotHalo Mzhot_outflowHalo)
+set col_name_array = (ngalaxies haloid hostid satelliteNodeIndex parentIndex orphan mhalo vmax vpeak spinParameter NFW_con zgas_spheroid zgas_disk zstar_disk zstar_spheroid zhot_halo mcold_spheroid mcold_disk mcold mbh mstar_spheroid mstar_disk mstar mhot Mgas_spheroid Mgas_disk Mgas Mzstar_spheroid Mzstar_disk Mzstar Mzhot_halo sfr_spheroid sfr_disk sfr x_pos y_pos z_pos x_vel y_vel z_vel L_SDSS_spheroid_u L_SDSS_spheroid_g L_SDSS_spheroid_r L_SDSS_spheroid_i L_SDSS_spheroid_z L_SDSS_dA_spheroid_u L_SDSS_dA_spheroid_g L_SDSS_dA_spheroid_r L_SDSS_dA_spheroid_i L_SDSS_dA_spheroid_z L_SDSS_disk_u L_SDSS_disk_g L_SDSS_disk_r L_SDSS_disk_i L_SDSS_disk_z L_SDSS_dA_disk_u L_SDSS_dA_disk_g L_SDSS_dA_disk_r L_SDSS_dA_disk_i L_SDSS_dA_disk_z L_SDSS_u L_SDSS_g L_SDSS_r L_SDSS_i L_SDSS_z L_SDSS_dA_u L_SDSS_dA_g L_SDSS_dA_r L_SDSS_dA_i L_SDSS_dA_z L_SDSS_dA_total_u L_SDSS_dA_total_g L_SDSS_dA_total_r L_SDSS_dA_total_i L_SDSS_dA_total_z mag_u mag_g mag_r mag_i mag_z mAB_u mAB_g mAB_r mAB_i mAB_z mAB_total_u mAB_total_g mAB_total_r mAB_total_i mAB_total_z mAB_dA_u mAB_dA_g mAB_dA_r mAB_dA_i mAB_dA_z mAB_dA_SDSS_u mAB_dA_SDSS_g mAB_dA_SDSS_r mAB_dA_SDSS_i mAB_dA_SDSS_z MAB_dA_SDSS_u MAB_dA_SDSS_g MAB_dA_SDSS_r MAB_dA_SDSS_i MAB_dA_SDSS_z MAB_total_u MAB_total_g MAB_total_r MAB_total_i MAB_total_z mAs_u mAs_g mAs_r mAs_i mAs_z mAs_dA_u mAs_dA_g mAs_dA_r mAs_dA_i mAs_dA_z mAs_dA_total_u mAs_dA_total_g mAs_dA_total_r mAs_dA_total_i mAs_dA_total_z mAB_total_cut_r_i mAB_total_cut_dmesa mAB_total_cut_g_r mAB_total_cut_i_lt_dmesa 'mAB_dA_total_cut_r_i' 'mAB_dA_total_cut_g_r' 'mAB_dA_total_cut_g_i' 'mAB_dA_total_cut_u_g' 'mAB_dA_total_cut_u_i' 'mAB_dA_total_cut_i_z' mAB_dA_total_cut_dmesa mAB_dA_total_cut_cmesa mAB_dA_total_cut_cpar mAB_dA_total_cut_i_lt_dmesa mAB_dA_total_cut_i_lt_dmesa_sparse mAB_dA_total_cut_r_lt_cpar mAs_dA_total_cut_r_i mAs_dA_total_cut_dmesa mAs_dA_total_cut_g_r mAs_dA_total_cut_i_lt_dmesa RA DEC Z age mean_age_stars mhalo_sat OH_gas_disk OH_gas_bulge OH_gas_disk_bulge weight_tot OII_3727_ext OII_3727 OII_3729_ext OII_3729 nodeIndex satelliteIndex siblingIndex satelliteMergeTime isolated timeLastIsolated firstProgenitorID npros rhalf_bulge rhalf_disk rbulge rdisk rhalf_mass mstar_IC OII_cont_3727_ext OII_cont_3727 OII_cont_3729_ext OII_cont_3729 sfr_int_spheroid sfr_quies_int mhalo_200c mbasic mbasic_200c mhalo_cents_200c mhalo_cents 'mstar+IC' ssfr env_512 env_1024 zcold lastProgID mainLeafID fofID bhcount vbulge vdisk age_sfr_int_disk sfr_int_disk sfr_int_spheroid age_sfr_int_spheroid sfr_int_spheroid mean_age_stars_disk mean_age_stars_spheroid cgf angM_spheroid angM_disk Tcons fbar bheff BvT Mgas_HI Mgas_H2 envr lastMinorM lastMajorM DvT_stars DvT_stars_alt DvT_gas np_stars np_gas np_disk ropt rhalf_stars r200c sfr_gasSF bh_acc_rate mAB_total_cut_g_i SHMR rhalf_gas rhalf_stars_2D vdisp_r502D_edgeOn vdisp_r502D_random vdisp_2r502D_random VvS_r502D_edgeOn VvS_r502D_random ell_r502D_edgeOn ell_r502D_random Sersic_n Mgas_HI_60kpc_GK11 Mgas_HI_60kpc_K13 Mgas_H2_60kpc_GK11 Mgas_H2_60kpc_K13 vdisp_2r502D_edgeOn VvS_2r502D_edgeOn VvS_2r502D_random ell_2r502D_edgeOn ell_2r502D_random age_stars_rband_r502D age_stars_rband_2r502D angM_r502D_random_ltc angM_2r502D_random_ltc mstar_ltc sfr_ltc ssfr_ltc VvS_r502D_random_ltc VvS_2r502D_random_ltc VvS_r502D_edgeOn_ltc VvS_2r502D_edgeOn_ltc lastTimeCentral rcenter2r200c sDensity_N10 sDensity_N7 sDensity_N5 lastMerger ratio_lastM rhalf_sfr lambda_r502D_edgeOn lambda_r502D_random lambda_2r502D_edgeOn lambda_2r502D_random lambda_r502D_random_ltc lambda_2r502D_random_ltc nsats Mgas_HI_30kpc_GK11 Mgas_H2_30kpc_GK11 Mgas_HI_30kpc_K13 Mgas_H2_30kpc_K13 mstar_30kpc angM_norm_1.5ropt_stars angM_norm_1.5ropt_gas reff_gas_disk DvT_stars_c0.4 DvT_stars_c0.5 DvT_gas_c0.4 DvT_gas_c0.5 np_disk_1.5ropt np_stars_1.5ropt np_gas_1.5ropt jsub mstar_1.5ropt rhalf_stars_1.5ropt rhalf_gas_1.5ropt mhalo_fof galaxyID nSubhalos x_pos_subhalo y_pos_subhalo z_pos_subhalo mPart_DM mPart_stars mPart_gas mPart_bh rhalf_DM spinGas_x spinGas_y spinGas_z rhalf_gas_2D rhalf_bh rhalf_bh_2D Etot Ekin Emech Etherm_gas mstar_birth rVmax vdisp rhalf_DM_2D sfr_1.5ropt ssfr_1.5ropt sfr_30kpc BvT_Lagos17b DvT_30kpc_T19 ell_30kpc_T19 vdisp_30kpc_T19 Vrot2Vdisp_30kpc_T19 ellDM_30kpc_T19 sfr_total zgasSF_H zgasSF_O zgasSF_N zgasNSF_H zgasNSF_O zgasNSF_N reff_gas mgas_30kpc mgas_50kpc mgas_70kpc mstar_50kpc mstar_70kpc sfr_50kpc sfr_70kpc vdisp_50kpc vdisp_70kpc mhalo_50kpc mhalo_70kpc spinGasSF_x spinGasSF_y spinGasSF_z spinGasNSF_x spinGasNSF_y spinGasNSF_z mPart_gasSF mPart_gasNSF metalfrac_SF metalfrac_NSF Etot_gasSF Ekin_gasSF Etherm_gasSF Etot_gasNSF Ekin_gasNSF Etherm_gasNSF reff_gas_1.5ropt reff_gas_disk_1.5ropt DvT_stars_c0.4_1.5ropt DvT_stars_c0.5_1.5ropt DvT_gas_c0.4_1.5ropt DvT_gas_c0.5_1.5ropt mgas_1.5ropt mstar_half_reff_gas_disk mgas_half_reff_gas_disk Sigma_HI_30kpc Sigma_H2_30kpc Sigma_HIH2_30kpc sfe_HIH2_30kpc SB_mu_eff_stars_1.5ropt_r SB_mu_eff_stars_30kpc_r SB_mu_eff_gas_disk_B SB_mu_ropt_B ssfr_30kpc ssfr_gasSF zcold_gasSF Sigma_gas_1.5ropt Sigma_gas_reff_disk_1.5ropt Sigma_stars_1.5ropt Sigma_stars_30kpc Sigma_sfr_1.5ropt Sigma_sfr_30kpc Tcons_30kpc Tcons_1.5ropt Tcons_HIH2_30kpc Tcons_gasSF cgf_30kpc cgf_1.5ropt cgf_HIH2_30kpc cgf_gasSF fbar_30kpc fbar_1.5ropt fbar_HIH2_30kpc fbar_gasSF SHMR_1.5ropt rhalf_stars_30kpc rhalf_stars_30kpc_2D F_dA_Johnson_U F_dA_Johnson_B F_dA_Johnson_V F_dA_Johnson_R F_dA_SDSS_u F_dA_SDSS_g F_dA_SDSS_r F_dA_SDSS_i F_dA_SDSS_z MAB_Johnson_U MAB_Johnson_B MAB_Johnson_V MAB_Johnson_R MAB_dA_Johnson_U MAB_dA_Johnson_B MAB_dA_Johnson_V MAB_dA_Johnson_R mAB_Johnson_U mAB_Johnson_B mAB_Johnson_V mAB_Johnson_R mAB_dA_Johnson_U mAB_dA_Johnson_B mAB_dA_Johnson_V mAB_dA_Johnson_R mAB_SDSS_u mAB_SDSS_g mAB_SDSS_r mAB_SDSS_i mAB_SDSS_z MAB_SDSS_u MAB_SDSS_g MAB_SDSS_r MAB_SDSS_i MAB_SDSS_z z_mean_birth_stars age_mean_stars sfe_HI_30kpc Tcons_HI_30kpc cgf_HI_30kpc fbar_HI_30kpc SHMR_30kpc SB_mu_eff_stars_1.5ropt_B SB_mu_eff_stars_30kpc_B SB_mu_eff_gas_disk_r SB_mu_opt_r SB_mu_eff_stars_1.5ropt_V SB_mu_eff_stars_30kpc_V SB_mu_eff_gas_disk_V SB_mu_opt_V SB_mu_eff_stars_1.5ropt_g SB_mu_eff_stars_30kpc_g SB_mu_eff_gas_disk_g SB_mu_opt_g Sigma_gas_reff_1.5ropt SB_mu_1.5ropt_B Mgas_HIH2_30kpc_GK11 sfe_gas_1.5ropt mAB_dA_total_cut_B_V sfe_gas_reff_1.5ropt sfe_gas_reff_disk_1.5ropt flag_SB flag_SB_B flag_SB_r flag_SFE flag_sample flag_SB+SFE flag_SB_envr DtoVoidCent delta_age_stars_rband t50_stars t70_stars OH_gas_30kpc z_grad L_bolo t50_halo t70_halo v200c delta_tform_stars delta_tform_halo flag_mstar_bin flag_mhalo_bin flag_sfe_bin flag_age_bin delta_t50 delta_lambda_edgeOn delta_lambda_random delta_tform_bh t50_bh t70_bh delta_t50_st2ha delta_t50_bh2ha flag_t50_st2ha flag_t50_bh2ha fatom_30kpc_GK11 tmin_rVmax tmax_rVmax delta_tvar_rVmax tmin_angM_stars tmax_angM_stars delta_tvar_angM_stars tmin_angM_SFgas tmax_angM_SFgas delta_tvar_angM_SFgas tmin_angM_NSFgas tmax_angM_NSFgas delta_tvar_angM_NSFgas angM_stars angM_SFgas angM_NSFgas fmol_30kpc_GK11 flag_SHMR_bin tmin_sfr tmax_sfr tmin_ssfr tmax_ssfr tmin_bh_acc_rate tmax_bh_acc_rate tmin_vmax tmax_vmax tmin_vdisp tmax_vdisp tmin_mgas_SF tmax_mgas_SF tmin_mgas_NSF tmax_mgas_NSF delta_tvar_sfr delta_tvar_ssfr delta_tvar_vmax delta_tvar_vdisp delta_tvar_mgas_SF delta_tvar_mgas_NSF tmin_SHMR tmax_SHMR tmin_mgas tmax_mgas delta_tvar_SHMR delta_tvar_mgas mhalo_30kpc spinStars_x spinStars_y spinStars_z mgas_SF mgas_NS vpec_norm x_pos_cof y_pos_cof z_pos_cof redshift topLeafID progFofID delta_tvar_bh_acc_rate vdisp_30kpc tmin_vel tmax_vel delta_tvar_vel tmin_age tmax_age delta_tvar_age angM_norm_stars angM_norm_SFgas angM_norm_NSFgas delta_tvar_angM_norm_stars delta_tvar_angM_norm_SFgas delta_tvar_angM_norm_NSFgas tmin_angM_norm_stars tmax_angM_norm_stars tmin_angM_norm_SFgas tmax_angM_norm_SFgas tmin_angM_norm_NSFgas tmax_angM_norm_NSFgas flag_majorM rVoid t50_curve_fit_stars t70_curve_fit_stars t50_cs_fit_stars t70_cs_fit_stars t50_stars_std t70_stars_std delta_tform_curve_fit_stars delta_tform_cs_fit_stars t50_curve_fit_halo t70_curve_fit_halo t50_cs_fit_halo t70_cs_fit_halo t50_halo_std t70_halo_std delta_tform_curve_fit_halo delta_tform_cs_fit_halo t50_curve_fit_bh t70_curve_fit_bh t50_cs_fit_bh t70_cs_fit_bh t50_bh_std t70_bh_std delta_tform_curve_fit_bh delta_tform_cs_fit_bh flag_std_fit_t50_stars flag_std_fit_t50_halo flag_std_fit_t50_bh delta_inter_fit_t50_stars delta_inter_fit_t50_halo delta_inter_fit_t50_bh flag_std_fit_t70_stars flag_std_fit_t70_halo flag_std_fit_t70_bh delta_inter_fit_t70_stars delta_inter_fit_t70_halo delta_inter_fit_t70_bh flag_use_inter_stars flag_use_inter_halo flag_use_inter_bh flag_use_fit_stars flag_use_fit_halo flag_use_fit_bh nr_strikes_stars nr_strikes_halo nr_strikes_bh delta_t50_bh2st delta_t70_st2ha delta_t70_bh2ha delta_t70_bh2st flag_t50_bh2st flag_t70_st2ha flag_t70_bh2ha flag_t70_bh2st flag_tform_stars flag_mhalo flag_tform_bh flag_tform_halo flag_dens flag_dens3 flag_dens6 flag_dens3b flag_dens6b angM_norm_1.5ropt_bar delta_VvS_edgeOn delta_vdisp_edgeOn flag_SB_B_new flag_dens3b_new flag_dens6b_new SB_mu_corr_ropt_B kappaCoRot_30kpc_T19 medOrbCirc_30kpc_T19 triax_30kpc_T19)
 
-set col_array = ($ngalaxies $haloid $hostid $satelliteNodeIndex $parentIndex $orphan $mhalo $vmax $vpeak $spinParameter $NFW_con $zgas_spheroid $zgas_disk $zstar_disk $zstar_spheroid $zhot_halo $mcold_spheroid $mcold_disk $mcold $mbh $mstar_spheroid $mstar_disk $mstar $mhot $Mzgas_spheroid $Mzgas_disk $Mzgas $Mzstar_spheroid $Mzstar_disk $Mzstar $Mzhot_halo $sfr_spheroid $sfr_disk $sfr $x_pos $y_pos $z_pos $x_vel $y_vel $z_vel $L_SDSS_spheroid_u $L_SDSS_spheroid_g $L_SDSS_spheroid_r $L_SDSS_spheroid_i $L_SDSS_spheroid_z $L_SDSS_dA_spheroid_u $L_SDSS_dA_spheroid_g $L_SDSS_dA_spheroid_r $L_SDSS_dA_spheroid_i $L_SDSS_dA_spheroid_z $L_SDSS_disk_u $L_SDSS_disk_g $L_SDSS_disk_r $L_SDSS_disk_i $L_SDSS_disk_z $L_SDSS_dA_disk_u $L_SDSS_dA_disk_g $L_SDSS_dA_disk_r $L_SDSS_dA_disk_i $L_SDSS_dA_disk_z $L_SDSS_u $L_SDSS_g $L_SDSS_r $L_SDSS_i $L_SDSS_z $L_SDSS_dA_u $L_SDSS_dA_g $L_SDSS_dA_r $L_SDSS_dA_i $L_SDSS_dA_z $L_SDSS_dA_total_u $L_SDSS_dA_total_g $L_SDSS_dA_total_r $L_SDSS_dA_total_i $L_SDSS_dA_total_z $mag_u $mag_g $mag_r $mag_i $mag_z $mAB_u $mAB_g $mAB_r $mAB_i $mAB_z $mAB_total_u $mAB_total_g $mAB_total_r $mAB_total_i $mAB_total_z $mAB_dA_u $mAB_dA_g $mAB_dA_r $mAB_dA_i $mAB_dA_z $mAB_dA_total_u $mAB_dA_total_g $mAB_dA_total_r $mAB_dA_total_i $mAB_dA_total_z $MAB_dA_total_u $MAB_dA_total_g $MAB_dA_total_r $MAB_dA_total_i $MAB_dA_total_z $MAB_total_u $MAB_total_g $MAB_total_r $MAB_total_i $MAB_total_z $mAs_u $mAs_g $mAs_r $mAs_i $mAs_z $mAs_dA_u $mAs_dA_g $mAs_dA_r $mAs_dA_i $mAs_dA_z $mAs_dA_total_u $mAs_dA_total_g $mAs_dA_total_r $mAs_dA_total_i $mAs_dA_total_z $mAB_total_cut_r_i $mAB_total_cut_dmesa $mAB_total_cut_g_r $mAB_total_cut_i_lt_dmesa $mAB_dA_total_cut_r_i $mAB_dA_total_cut_g_r $mAB_dA_total_cut_g_i $mAB_dA_total_cut_u_g $mAB_dA_total_cut_u_i $mAB_dA_total_cut_i_z $mAB_dA_total_cut_dmesa $mAB_dA_total_cut_cmesa $mAB_dA_total_cut_cpar $mAB_dA_total_cut_i_lt_dmesa $mAB_dA_total_cut_i_lt_dmesa_sparse $mAB_dA_total_cut_r_lt_cpar $mAs_dA_total_cut_r_i $mAs_dA_total_cut_dmesa $mAs_dA_total_cut_g_r $mAs_dA_total_cut_i_lt_dmesa $RA $DEC $Z $age $mean_age_stars $mhalo_sat $OH_gas_disk $OH_gas_bulge $OH_gas_disk_bulge $weight_tot $OII_3727_ext $OII_3727 $OII_3729_ext $OII_3729 $nodeIndex $satelliteIndex $siblingIndex $satelliteMergeTime $isolated $timeLastIsolated $firstProgenitorID $npros $Mag_dA_total_B $rhalf_bulge $rhalf_disk $rbulge $rdisk $rhalf_mass $mstar_IC $OII_cont_3727_ext $OII_cont_3727 $OII_cont_3729_ext $OII_cont_3729 $sfr_int_spheroid $sfr_int_quies $mhalo_200c $mbasic $mbasic_200c $mhalo_cents_200c $mhalo_cents $mstarPlusIC $ssfr $env_512 $env_1024 $zcold $lastProID $mainLeafID $fofID $bhcount $vbulge $vdisk $age_sfr_int_disk $sfr_int_disk $sfr_int_spheroid $age_sfr_int_spheroid $sfr_int_spheroid $mean_age_stars_disk $mean_age_stars_spheroid $cgf $angM_spheroid $angM_disk $Tcons $fbar $bheff $BvT $Mzgas_HI $Mzgas_HII $envr $lastMinorM $lastMajorM $DvT_stars $DvT_stars_alt $DvT_gas $np_stars $np_gas $np_disk $ropt $rhalf_stars $r200c $sfr_int_gas $bh_acc_rate $mstar_alt $mAB_total_cut_g_i $rhalf_gas $pop $CMASS_sample_key $SHMR $nr_sample_keys $flag_CMASS_l $flag_CMASS_h $flag_CMASS_p $flag_CMASS_a $flag_CMASS_r $flag_CMASS_b $flag_CMASS_lz $flag_CMASS_hz $flag_CMASS_lzr $flag_CMASS_hzr $zcold_zstar $zstar $flag_sample $flag_CMASS_lsm $flag_CMASS_hsm $flag_CMASS_lhm $flag_CMASS_hhm $jbar $jdisk $jbulge $rhotHalo $angM_outflowHotHalo $regionName $joutHotHalo $mhot_outflow $jhotHalo $angM_hotHalo $Mzhot_outflowHalo)
+set col_array = ($ngalaxies $haloid $hostid $satelliteNodeIndex $parentIndex $orphan $mhalo $vmax $vpeak $spinParameter $NFW_con $zgas_spheroid $zgas_disk $zstar_disk $zstar_spheroid $zhot_halo $mcold_spheroid $mcold_disk $mcold $mbh $mstar_spheroid $mstar_disk $mstar $mhot $Mgas_spheroid $Mgas_disk $Mgas $Mzstar_spheroid $Mzstar_disk $Mzstar $Mzhot_halo $sfr_spheroid $sfr_disk $sfr $x_pos $y_pos $z_pos $x_vel $y_vel $z_vel $L_SDSS_spheroid_u $L_SDSS_spheroid_g $L_SDSS_spheroid_r $L_SDSS_spheroid_i $L_SDSS_spheroid_z $L_SDSS_dA_spheroid_u $L_SDSS_dA_spheroid_g $L_SDSS_dA_spheroid_r $L_SDSS_dA_spheroid_i $L_SDSS_dA_spheroid_z $L_SDSS_disk_u $L_SDSS_disk_g $L_SDSS_disk_r $L_SDSS_disk_i $L_SDSS_disk_z $L_SDSS_dA_disk_u $L_SDSS_dA_disk_g $L_SDSS_dA_disk_r $L_SDSS_dA_disk_i $L_SDSS_dA_disk_z $L_SDSS_u $L_SDSS_g $L_SDSS_r $L_SDSS_i $L_SDSS_z $L_SDSS_dA_u $L_SDSS_dA_g $L_SDSS_dA_r $L_SDSS_dA_i $L_SDSS_dA_z $L_SDSS_dA_total_u $L_SDSS_dA_total_g $L_SDSS_dA_total_r $L_SDSS_dA_total_i $L_SDSS_dA_total_z $mag_u $mag_g $mag_r $mag_i $mag_z $mAB_u $mAB_g $mAB_r $mAB_i $mAB_z $mAB_total_u $mAB_total_g $mAB_total_r $mAB_total_i $mAB_total_z $mAB_dA_u $mAB_dA_g $mAB_dA_r $mAB_dA_i $mAB_dA_z $mAB_dA_SDSS_u $mAB_dA_SDSS_g $mAB_dA_SDSS_r $mAB_dA_SDSS_i $mAB_dA_SDSS_z $MAB_dA_SDSS_u $MAB_dA_SDSS_g $MAB_dA_SDSS_r $MAB_dA_SDSS_i $MAB_dA_SDSS_z $MAB_total_u $MAB_total_g $MAB_total_r $MAB_total_i $MAB_total_z $mAs_u $mAs_g $mAs_r $mAs_i $mAs_z $mAs_dA_u $mAs_dA_g $mAs_dA_r $mAs_dA_i $mAs_dA_z $mAs_dA_total_u $mAs_dA_total_g $mAs_dA_total_r $mAs_dA_total_i $mAs_dA_total_z $mAB_total_cut_r_i $mAB_total_cut_dmesa $mAB_total_cut_g_r $mAB_total_cut_i_lt_dmesa $mAB_dA_total_cut_r_i $mAB_dA_total_cut_g_r $mAB_dA_total_cut_g_i $mAB_dA_total_cut_u_g $mAB_dA_total_cut_u_i $mAB_dA_total_cut_i_z $mAB_dA_total_cut_dmesa $mAB_dA_total_cut_cmesa $mAB_dA_total_cut_cpar $mAB_dA_total_cut_i_lt_dmesa $mAB_dA_total_cut_i_lt_dmesa_sparse $mAB_dA_total_cut_r_lt_cpar $mAs_dA_total_cut_r_i $mAs_dA_total_cut_dmesa $mAs_dA_total_cut_g_r $mAs_dA_total_cut_i_lt_dmesa $RA $DEC $Z $age $mean_age_stars $mhalo_sat $OH_gas_disk $OH_gas_bulge $OH_gas_disk_bulge $weight_tot $OII_3727_ext $OII_3727 $OII_3729_ext $OII_3729 $nodeIndex $satelliteIndex $siblingIndex $satelliteMergeTime $isolated $timeLastIsolated $firstProgenitorID $npros $rhalf_bulge $rhalf_disk $rbulge $rdisk $rhalf_mass $mstar_IC $OII_cont_3727_ext $OII_cont_3727 $OII_cont_3729_ext $OII_cont_3729 $sfr_int_spheroid $sfr_int_quies $mhalo_200c $mbasic $mbasic_200c $mhalo_cents_200c $mhalo_cents $mstarPlusIC $ssfr $env_512 $env_1024 $zcold $lastProgID $mainLeafID $fofID $bhcount $vbulge $vdisk $age_sfr_int_disk $sfr_int_disk $sfr_int_spheroid $age_sfr_int_spheroid $sfr_int_spheroid $mean_age_stars_disk $mean_age_stars_spheroid $cgf $angM_spheroid $angM_disk $Tcons $fbar $bheff $BvT $Mgas_HI $Mgas_H2 $envr $lastMinorM $lastMajorM $DvT_stars $DvT_stars_alt $DvT_gas $np_stars $np_gas $np_disk $ropt $rhalf_stars $r200c $sfr_gasSF $bh_acc_rate $mAB_total_cut_g_i $SHMR $rhalf_gas $rhalf_stars_2D $vdisp_r502D_edgeOn $vdisp_r502D_random $vdisp_2r502D_random $VvS_r502D_edgeOn $VvS_r502D_random $ell_r502D_edgeOn $ell_r502D_random $Sersic_n $Mgas_HI_60kpc_GK11 $Mgas_HI_60kpc_K13 $Mgas_H2_60kpc_GK11 $Mgas_H2_60kpc_K13 $vdisp_2r502D_edgeOn $VvS_2r502D_edgeOn $VvS_2r502D_random $ell_2r502D_edgeOn $ell_2r502D_random $age_stars_rband_r502D $age_stars_rband_2r502D $angM_r502D_random_ltc $angM_2r502D_random_ltc $mstar_ltc $sfr_ltc $ssfr_ltc $VvS_r502D_random_ltc $VvS_2r502D_random_ltc $VvS_r502D_edgeOn_ltc $VvS_2r502D_edgeOn_ltc $lastTimeCentral $rcenter2r200c $sDensity_N10 $sDensity_N7 $sDensity_N5 $lastMerger $ratio_lastM $rhalf_sfr $lambda_r502D_edgeOn $lambda_r502D_random $lambda_2r502D_edgeOn $lambda_2r502D_random $lambda_r502D_random_ltc $lambda_2r502D_random_ltc $nsats $Mgas_HI_30kpc_GK11 $Mgas_H2_30kpc_GK11 $Mgas_HI_30kpc_K13 $Mgas_H2_30kpc_K13 $mstar_30kpc $angM_norm_1comma5ropt_stars $angM_norm_1comma5ropt_gas $reff_gas_disk $DvT_stars_c0comma4 $DvT_stars_c0comma5 $DvT_gas_c0comma4 $DvT_gas_c0comma5 $np_disk_1comma5ropt $np_stars_1comma5ropt $np_gas_1comma5ropt $jsub $mstar_1comma5ropt $rhalf_stars_1comma5ropt $rhalf_gas_1comma5ropt $mhalo_fof $galaxyID $nSubhalos $x_pos_subhalo $y_pos_subhalo $z_pos_subhalo $mPart_DM $mPart_stars $mPart_gas $mPart_bh $rhalf_DM $spinGas_x $spinGas_y $spinGas_z $rhalf_gas_2D $rhalf_bh $rhalf_bh_2D $Etot $Ekin $Emech $Etherm_gas $mstar_birth $rVmax $vdisp $rhalf_DM_2D $sfr_1comma5ropt $ssfr_1comma5ropt $sfr_30kpc $BvT_Lagos17b $DvT_30kpc_T19 $ell_30kpc_T19 $vdisp_30kpc_T19 $Vrot2Vdisp_30kpc_T19 $ellDM_30kpc_T19 $sfr_total $zgasSF_H $zgasSF_O $zgasSF_N $zgasNSF_H $zgasNSF_O $zgasNSF_N $reff_gas $mgas_30kpc $mgas_50kpc $mgas_70kpc $mstar_50kpc $mstar_70kpc $sfr_50kpc $sfr_70kpc $vdisp_50kpc $vdisp_70kpc $mhalo_50kpc $mhalo_70kpc $spinGasSF_x $spinGasSF_y $spinGasSF_z $spinGasNSF_x $spinGasNSF_y $spinGasNSF_z $mPart_gasSF $mPart_gasNSF $metalfrac_SF $metalfrac_NSF $Etot_gasSF $Ekin_gasSF $Etherm_gasSF $Etot_gasNSF $Ekin_gasNSF $Etherm_gasNSF $reff_gas_1comma5ropt $reff_gas_disk_1comma5ropt $DvT_stars_c0comma4_1comma5ropt $DvT_stars_c0comma5_1comma5ropt $DvT_gas_c0comma4_1comma5ropt $DvT_gas_c0comma5_1comma5ropt $mgas_1comma5ropt $mstar_half_reff_gas_disk $mgas_half_reff_gas_disk $Sigma_HI_30kpc $Sigma_H2_30kpc $Sigma_HIH2_30kpc $sfe_HIH2_30kpc $SB_mu_eff_stars_1comma5ropt_r $SB_mu_eff_stars_30kpc_r $SB_mu_eff_gas_disk_B $SB_mu_ropt_B $ssfr_30kpc $ssfr_gasSF $zcold_gasSF $Sigma_gas_1comma5ropt $Sigma_gas_reff_disk_1comma5ropt $Sigma_stars_1comma5ropt $Sigma_stars_30kpc $Sigma_sfr_1comma5ropt $Sigma_sfr_30kpc $Tcons_30kpc $Tcons_1comma5ropt $Tcons_HIH2_30kpc $Tcons_gasSF $cgf_30kpc $cgf_1comma5ropt $cgf_HIH2_30kpc $cgf_gasSF $fbar_30kpc $fbar_1comma5ropt $fbar_HIH2_30kpc $fbar_gasSF $SHMR_1comma5ropt $rhalf_stars_30kpc $rhalf_stars_30kpc_2D $F_dA_Johnson_U $F_dA_Johnson_B $F_dA_Johnson_V $F_dA_Johnson_R $F_dA_SDSS_u $F_dA_SDSS_g $F_dA_SDSS_r $F_dA_SDSS_i $F_dA_SDSS_z $MAB_Johnson_U $MAB_Johnson_B $MAB_Johnson_V $MAB_Johnson_R $MAB_dA_Johnson_U $MAB_dA_Johnson_B $MAB_dA_Johnson_V $MAB_dA_Johnson_R $mAB_Johnson_U $mAB_Johnson_B $mAB_Johnson_V $mAB_Johnson_R $mAB_dA_Johnson_U $mAB_dA_Johnson_B $mAB_dA_Johnson_V $mAB_dA_Johnson_R $mAB_SDSS_u $mAB_SDSS_g $mAB_SDSS_r $mAB_SDSS_i $mAB_SDSS_z $MAB_SDSS_u $MAB_SDSS_g $MAB_SDSS_r $MAB_SDSS_i $MAB_SDSS_z $z_mean_birth_stars $age_mean_stars $sfe_HI_30kpc $Tcons_HI_30kpc $cgf_HI_30kpc $fbar_HI_30kpc $SHMR_30kpc $SB_mu_eff_stars_1comma5ropt_B $SB_mu_eff_stars_30kpc_B $SB_mu_eff_gas_disk_r $SB_mu_opt_r $SB_mu_eff_stars_1comma5ropt_V $SB_mu_eff_stars_30kpc_V $SB_mu_eff_gas_disk_V $SB_mu_opt_V $SB_mu_eff_stars_1comma5ropt_g $SB_mu_eff_stars_30kpc_g $SB_mu_eff_gas_disk_g $SB_mu_opt_g $Sigma_gas_reff_1comma5ropt $SB_mu_1comma5ropt_B $Mgas_HIH2_30kpc_GK11 $sfe_gas_1comma5ropt $mAB_dA_total_cut_B_V $sfe_gas_reff_1comma5ropt $sfe_gas_reff_disk_1comma5ropt $flag_SB $flag_SB_B $flag_SB_r $flag_SFE $flag_sample $flag_SBplusSFE $flag_SB_envr $DtoVoidCent $delta_age_stars_rband $t50_stars $t70_stars $OH_gas_30kpc $z_grad $L_bolo $t50_halo $t70_halo $v200c $delta_tform_stars $delta_tform_halo $flag_mstar_bin $flag_mhalo_bin $flag_sfe_bin $flag_age_bin $delta_t50 $delta_lambda_edgeOn $delta_lambda_random $delta_tform_bh $t50_bh $t70_bh $delta_t50_st2ha $delta_t50_bh2ha $flag_t50_st2ha $flag_t50_bh2ha $fatom_30kpc_GK11 $tmin_rVmax $tmax_rVmax $delta_tvar_rVmax $tmin_angM_stars $tmax_angM_stars $delta_tvar_angM_stars $tmin_angM_SFgas $tmax_angM_SFgas $delta_tvar_angM_SFgas $tmin_angM_NSFgas $tmax_angM_NSFgas $delta_tvar_angM_NSFgas $angM_stars $angM_SFgas $angM_NSFgas $fmol_30kpc_GK11 $flag_SHMR_bin $tmin_sfr $tmax_sfr $tmin_ssfr $tmax_ssfr $tmin_bh_acc_rate $tmax_bh_acc_rate $tmin_vmax $tmax_vmax $tmin_vdisp $tmax_vdisp $tmin_mgas_SF $tmax_mgas_SF $tmin_mgas_NSF $tmax_mgas_NSF $delta_tvar_sfr $delta_tvar_ssfr $delta_tvar_vmax $delta_tvar_vdisp $delta_tvar_mgas_SF $delta_tvar_mgas_NSF $tmin_SHMR $tmax_SHMR $tmin_mgas $tmax_mgas $delta_tvar_SHMR $delta_tvar_mgas $mhalo_30kpc $spinStars_x $spinStars_y $spinStars_z $mgas_SF $mgas_NSF $vpec_norm $x_pos_cof $y_pos_cof $z_pos_cof $redshift $topLeafID $progFofID $delta_tvar_bh_acc_rate $vdisp_30kpc $tmin_vel $tmax_vel $delta_tvar_vel $tmin_age $tmax_age $delta_tvar_age $angM_norm_stars $angM_norm_SFgas $angM_norm_NSFgas $delta_tvar_angM_norm_stars $delta_tvar_angM_norm_SFgas $delta_tvar_angM_norm_NSFgas $tmin_angM_norm_stars $tmax_angM_norm_stars $tmin_angM_norm_SFgas $tmax_angM_norm_SFgas $tmin_angM_norm_NSFgas $tmax_angM_norm_NSFgas $flag_majorM $rVoid $t50_curve_fit_stars $t70_curve_fit_stars $t50_cs_fit_stars $t70_cs_fit_stars $t50_stars_std $t70_stars_std $delta_tform_curve_fit_stars $delta_tform_cs_fit_stars $t50_curve_fit_halo $t70_curve_fit_halo $t50_cs_fit_halo $t70_cs_fit_halo $t50_halo_std $t70_halo_std $delta_tform_curve_fit_halo $delta_tform_cs_fit_halo $t50_curve_fit_bh $t70_curve_fit_bh $t50_cs_fit_bh $t70_cs_fit_bh $t50_bh_std $t70_bh_std $delta_tform_curve_fit_bh $delta_tform_cs_fit_bh $flag_std_fit_t50_stars $flag_std_fit_t50_halo $flag_std_fit_t50_bh $delta_inter_fit_t50_stars $delta_inter_fit_t50_halo $delta_inter_fit_t50_bh $flag_std_fit_t70_stars $flag_std_fit_t70_halo $flag_std_fit_t70_bh $delta_inter_fit_t70_stars $delta_inter_fit_t70_halo $delta_inter_fit_t70_bh $flag_use_inter_stars $flag_use_inter_halo $flag_use_inter_bh $flag_use_fit_stars $flag_use_fit_halo $flag_use_fit_bh $nr_strikes_stars $nr_strikes_halo $nr_strikes_bh $delta_t50_bh2st $delta_t70_st2ha $delta_t70_bh2ha $delta_t70_bh2st $flag_t50_bh2st $flag_t70_st2ha $flag_t70_bh2ha $flag_t70_bh2st $flag_tform_stars $flag_mhalo $flag_tform_bh $flag_tform_halo $flag_dens $flag_dens3 $flag_dens6 $flag_dens3b $flag_dens6b $angM_norm_1comma5ropt_bar $delta_VvS_edgeOn $delta_vdisp_edgeOn $flag_SB_B_new $flag_dens3b_new $flag_dens6b_new $SB_mu_corr_ropt_B $kappaCoRot_30kpc_T19 $medOrbCirc_30kpc_T19 $triax_30kpc_T19)
 
 set total_col_name_array=()
 set total_col_array=()
@@ -1565,7 +2155,8 @@ foreach MODEL (`ls -d $PATH_TO_SOFTLINKS/*`)
 			set SNAPIDZ_MAPPING 		= False
 		endif
 		if ($NAME =~ EAGLE*) then
-			set CUSTOM_SNAPNAME			= 'EAGLE_ASCII'
+			#set CUSTOM_SNAPNAME			= 'EAGLE_ASCII_full_trees'
+			set CUSTOM_SNAPNAME			= 'EAGLE_ASCII_full'
 		endif
 
 	endif
@@ -1744,7 +2335,7 @@ foreach MODEL (`ls -d $PATH_TO_SOFTLINKS/*`)
 				rm -f $CONFIGFILE
 				touch $CONFIGFILE
 			endif
-
+    #subs.call(mycomp+'anaconda/pro/myRun/gen_input_cat_filter_EAGLE_cross.sh', shell=True)
 			echo 'SNAP_LIST:' $SNAP_LIST 'SNAPNAME:' $SNAPNAME
 
 			if ($SNAPNAME =~ *config* || $SNAPNAME =~ *idzred* || $SNAPNAME =~ *READ*) then
@@ -1791,17 +2382,22 @@ foreach MODEL (`ls -d $PATH_TO_SOFTLINKS/*`)
 					echo 'data_format= BINARY_SAGE'              	>> $CONFIGFILE
 					echo 'format_info= choose_all'     		>> $CONFIGFILE
 					echo 'delimiter= \t'		     	 	>> $CONFIGFILE
-					echo 'fileformat= '				>> $CONFIGFILE
-				else if ($NAME =~ EAGLE* && $CUSTOM_SNAPNAME == 'EAGLE_ASCII') then
+					echo 'fileformat= ""'				>> $CONFIGFILE
+				else if ($NAME =~ EAGLE* && $CUSTOM_SNAPNAME == hdf5 ) then
+					echo 'data_format= HDF5'	 		>> $CONFIGFILE
+					echo 'format_info= choose_all'     		>> $CONFIGFILE
+					echo 'delimiter= ""'		     	 	>> $CONFIGFILE
+					echo 'fileformat= hdf5'		>> $CONFIGFILE
+				else if ($NAME =~ EAGLE* && $CUSTOM_SNAPNAME =~ EAGLE_ASCI*) then
 					echo 'data_format= '$CUSTOM_SNAPNAME  		>> $CONFIGFILE
 					echo 'format_info= choose_all'     		>> $CONFIGFILE
-					echo 'delimiter= '		     	 	>> $CONFIGFILE
-					echo 'fileformat= dat'				>> $CONFIGFILE
+					echo 'delimiter= ""'		     	 	>> $CONFIGFILE
+					echo 'fileformat= dat'				>> $CONFIGFILE					
 				else if ($CUSTOM_SNAPNAME =~ *its) then
 					echo 'data_format= '$HDF5_read_code  		>> $CONFIGFILE
 					echo 'format_info= choose_all'     		>> $CONFIGFILE
 					echo 'delimiter= \t'		     	 	>> $CONFIGFILE
-					echo 'fileformat= 	'			>> $CONFIGFILE
+					echo 'fileformat= ""'			>> $CONFIGFILE
 				else if ($SNAPNAME =~ *dat || $CUSTOM_SNAPNAME =~ *dat) then
 					echo 'data_format= BINARY'              	>> $CONFIGFILE
 					echo 'format_info= choose_all'     		>> $CONFIGFILE
@@ -1810,7 +2406,7 @@ foreach MODEL (`ls -d $PATH_TO_SOFTLINKS/*`)
 				else if ($SNAPNAME =~ *xt || $CUSTOM_SNAPNAME =~ *xt) then
 					echo 'data_format= CATASCII' 		 	>> $CONFIGFILE
 					echo 'format_info= shaped'	     	>> $CONFIGFILE
-					echo 'delimiter= '		 	>> $CONFIGFILE
+					echo 'delimiter= ""'		 	>> $CONFIGFILE
 					echo 'fileformat= txt'			>> $CONFIGFILE
 				else if ($SNAPNAME =~ *MDPL*) then
 					echo 'data_format= ASCII'               	>> $CONFIGFILE
@@ -1820,7 +2416,7 @@ foreach MODEL (`ls -d $PATH_TO_SOFTLINKS/*`)
 				else if ($SNAPNAME =~ *tree*) then
 					echo 'data_format= SAMHDF5'               	>> $CONFIGFILE
 					echo 'format_info= unshaped'	     	>> $CONFIGFILE
-					echo 'delimiter= 	'		 	>> $CONFIGFILE
+					echo 'delimiter= ""'		 	>> $CONFIGFILE
 					echo 'fileformat= h5'				>> $CONFIGFILE
 					echo 'halocat_code= True'			>> $CONFIGFILE
 				else if ($SNAPNAME =~ *hdf5 || $CUSTOM_SNAPNAME =~ *hdf5) then
@@ -1846,11 +2442,10 @@ foreach MODEL (`ls -d $PATH_TO_SOFTLINKS/*`)
 				else if ($NAME =~ *400*) then
 					echo 'nr_rows= 200000000'   	>> $CONFIGFILE
 				else if ($NAME =~ *62* || $HOME_MODE == True || $HOME =~ /home/*) then
-					echo 'nr_rows= 200000000'   >> $CONFIGFILE
-					echo 'nr_rows= 460000'   >> $CONFIGFILE
+					echo 'nr_rows= 5000000'   >> $CONFIGFILE
 				else
 					echo 'nr_rows= 200000000'   >> $CONFIGFILE
-					echo 'nr_rows= 460000'   >> $CONFIGFILE
+					echo 'nr_rows= 10000'   >> $CONFIGFILE
 				endif					
 				
 				#Unit correction specifics
@@ -1922,7 +2517,7 @@ foreach MODEL (`ls -d $PATH_TO_SOFTLINKS/*`)
 						set INPUTFILENAME_PART1 = $key
 					endif
 
-					set INPUTFILENAME_PART2 = ''
+					set INPUTFILENAME_PART2 = '/'
 				endif				
 
 				#Take care of proper naming SNAPIDZRED.txt files:
@@ -2036,9 +2631,7 @@ foreach MODEL (`ls -d $PATH_TO_SOFTLINKS/*`)
 					set output_filename_code = $output_filename_code_default
 				endif
 
-
 				echo 'set_header_Topcat_format= '$set_header_Topcat_format			 	>> $CONFIGFILE
-
 				echo 'change_IMF= '$change_IMF			 	>> $CONFIGFILE
 				echo 'which_kcorrect= '$which_kcorrect			>> $CONFIGFILE
 				echo 'calc_fast_histo= '$calc_fast_histo 	 	>> $CONFIGFILE
@@ -2131,7 +2724,7 @@ foreach item ($method_array)
 	if ("$method_name_array[$c]" == plotOnly && $item == 1) then
 		foreach item2 ($total_col_name_array)
 
-			if ("$total_col_array[$i]" != 99) then
+			if ("$total_col_array[$i]" != 999) then
 				#echo 1291 $item2 "$total_col_array[$i]" "$method_name_array[$c]" $tarsel_code "$plot_plotOnly_config_array[$a]"
 				
 				$MAIN_PATH'myRun/plot_config.sh' "plotOnly" "$plot_plotOnly_config_array[$a]" $BOX_SIZE $CALI_CODE $item2 $CAT_NAME_IN_PLOT0 $CAT_NAME_IN_PLOT1 $REDSHIFT_PLOT0 $REDSHIFT_PLOT1 $SOFTLINK_CODE $a $tarsel_code_Galacticus $tarsel_code_SAG $MATPLOT_LINESTYLE $MATPLOT_COL $MATPLOT_MARKERSTYLE $MATPLOT_MARKERCOL $MATPLOT_COLORMAP $MATPLOT_COLORBAR $MATPLOT_PLOTTYPE $MATPLOT_ALPHA $MATPLOT_PLOTLEGEND $MATPLOT_ADD_XAXIS $MATPLOT_ADD_YAXIS $PLOT_CUSTOM_LOOP
